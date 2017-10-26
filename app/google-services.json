@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "571049334430",
+    "firebase_url": "https://parkhere-5ab76.firebaseio.com",
+    "project_id": "parkhere-5ab76",
+    "storage_bucket": "parkhere-5ab76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:571049334430:android:4c4dfd02242f7875",
+        "android_client_info": {
+          "package_name": "edu.sjsu.team408.parkhere"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "571049334430-aq06lgqg8digld2arql3am7ggadsmcq0.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAzn_HETST9kvG5ZFse6IJsjbXud5VUrfc"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
