@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 26
-    buildToolsVersion "26.0.1"
+    buildToolsVersion '26.0.2'
     defaultConfig {
         applicationId "edu.sjsu.team408.parkhere"
         minSdkVersion 21
@@ -26,5 +26,9 @@ dependencies {
     })
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support:design:26.+'
+
     testCompile 'junit:junit:4.12'
 }
+
+// Add to the bottom of the file
+apply plugin: 'com.google.gms.google-services'
