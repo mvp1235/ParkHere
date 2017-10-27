@@ -1,15 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     android:paddingLeft="@dimen/profile_item_padding"
     android:paddingRight="@dimen/profile_item_padding"
-    android:orientation="vertical"
-    tools:context="edu.sjsu.team408.parkhere.ProfileFragment">
+    tools:context="edu.sjsu.team408.parkhere.EditProfileActivity">
 
     <TextView
-        android:id="@+id/profileLabel"
+        android:id="@+id/editProfileLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/profile_item_margin"
@@ -26,21 +27,13 @@
         android:orientation="horizontal">
 
         <ImageView
-            android:id="@+id/profilePicture"
+            android:id="@+id/editProfilePicture"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:contentDescription="@string/userProfilePictureDescription"
             android:src="@drawable/common_google_signin_btn_icon_dark_normal" />
 
-        <Button
-            android:id="@+id/editProfileBtn"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:text="@string/edit" />
-
-
     </LinearLayout>
 
     <LinearLayout
@@ -50,19 +43,18 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/userFullNameLabel"
+            android:id="@+id/editUserFullNameLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/name"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/userFullName"
+        <EditText
+            android:id="@+id/editUserFullName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="Huy Nguyen" />
+            android:layout_weight="3"/>
 
     </LinearLayout>
 
@@ -73,19 +65,18 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/userEmailLabel"
+            android:id="@+id/editUserEmailLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/email"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/userEmail"
+        <EditText
+            android:id="@+id/editUserEmail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="huy.nguyen@sjsu.edu" />
+            android:layout_weight="3" />
 
     </LinearLayout>
 
@@ -96,19 +87,18 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/userPhoneLabel"
+            android:id="@+id/editUserPhoneLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/phone"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/userPhone"
+        <EditText
+            android:id="@+id/editUserPhone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="(408) 123-4567" />
+            android:layout_weight="3" />
 
     </LinearLayout>
 
@@ -119,21 +109,19 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/userAddressLabel"
+            android:id="@+id/editUserAddressLabel"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="@string/address"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/userAddress"
+        <EditText
+            android:id="@+id/editUserAddress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="One Washington Square Hall, San Jose CA 95112" />
+            android:layout_weight="3"/>
 
     </LinearLayout>
-
 
 </LinearLayout>

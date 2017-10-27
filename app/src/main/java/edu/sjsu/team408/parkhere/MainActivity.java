@@ -7,7 +7,10 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -50,13 +53,17 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
-
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
 
         //Set default option to the Home view fragmemt.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, new HomeFragment());
         transaction.commit();
+
+    }
+
+    public void searchListing(String location) {
+        Toast.makeText(getApplicationContext(), location, Toast.LENGTH_SHORT).show();
     }
 
 }
