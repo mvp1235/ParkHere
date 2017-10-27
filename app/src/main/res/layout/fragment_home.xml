@@ -1,69 +1,62 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="20dp"
+    android:paddingRight="20dp"
     tools:context="edu.sjsu.team408.parkhere.HomeFragment">
 
-    <LinearLayout
+    <EditText
+        android:id="@+id/searchTerm"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:ems="10"
+        android:hint="@string/searchParkingHint"
+        android:inputType="textPostalAddress" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/Search" />
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/activity_vertical_margin"
+        android:columnCount="2"
+        android:rowCount="2">
 
 
-        <EditText
-            android:id="@+id/searchTerm"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imageView5"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="enter location"
-            android:paddingLeft="20dp"/>
+            android:layout_columnWeight="1"
+            app:srcCompat="@drawable/ic_notifications_black_24dp" />
 
-        <Button
-            android:id="@+id/button"
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imageView3"
+            android:layout_width="0dp"
+            android:layout_columnWeight="1"
             android:layout_height="wrap_content"
-            android:text="@string/Search" />
+            app:srcCompat="@drawable/ic_dashboard_black_24dp" />
 
-        <GridLayout
-            android:layout_width="match_parent"
+        <ImageView
+            android:id="@+id/imageView"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:columnCount="2"
-            android:rowCount="2">
+            android:layout_columnWeight="1"
+            app:srcCompat="@drawable/ic_home_black_24dp" />
 
+        <ImageView
+            android:id="@+id/imageView6"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_columnWeight="1"
+            app:srcCompat="@drawable/ic_home_black_24dp" />
+    </GridLayout>
 
-            <ImageView
-                android:id="@+id/imageView5"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                app:srcCompat="@drawable/ic_notifications_black_24dp" />
-
-            <ImageView
-                android:id="@+id/imageView3"
-                android:layout_width="0dp"
-                android:layout_columnWeight="1"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_dashboard_black_24dp" />
-
-            <ImageView
-                android:id="@+id/imageView"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                app:srcCompat="@drawable/ic_home_black_24dp" />
-
-            <ImageView
-                android:id="@+id/imageView6"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_columnWeight="1"
-                app:srcCompat="@drawable/ic_home_black_24dp" />
-        </GridLayout>
-
-
-    </LinearLayout>
-
-</FrameLayout>
+</LinearLayout>

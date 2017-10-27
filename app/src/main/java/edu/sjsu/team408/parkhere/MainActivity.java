@@ -22,22 +22,24 @@ public class MainActivity extends AppCompatActivity {
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
             Fragment selectedFragment = null;
 
+            //Choose appropriate fragment based on the menu item clicked
             switch (item.getItemId()) {
                 case R.id.navigation_home:
                     selectedFragment = new HomeFragment();
-                    return true;
+                    break;
                 case R.id.navigation_history:
-                    selectedFragment = new HomeFragment();
-                    return true;
+                    selectedFragment = new HistoryFragment();
+                    break;
                 case R.id.navigation_profile:
-                    selectedFragment = new HomeFragment();
-                    return true;
+                    selectedFragment = new ProfileFragment();
+                    break;
             }
+
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
             transaction.replace(R.id.container, selectedFragment);
             transaction.commit();
 
-            return false;
+            return true;
         }
 
     };
@@ -47,10 +49,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mTextMessage = (TextView) findViewById(R.id.message);
         navigation = (BottomNavigationView) findViewById(R.id.navigation);
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener);
+
+        //Set default option to the Home view fragmemt.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.container, new HomeFragment());
         transaction.commit();
