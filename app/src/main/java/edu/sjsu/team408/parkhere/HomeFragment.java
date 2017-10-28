@@ -54,4 +54,5 @@ public class HomeFragment extends Fragment {
         Toast.makeText(getContext(), location, Toast.LENGTH_SHORT).show();
     }
 
+
 }

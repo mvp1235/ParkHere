@@ -16,5 +16,14 @@
     <string name="history">History</string>
     <string name="phone">Phone</string>
     <string name="searchParkingHint">Enter location</string>
+    <string name="newListing">List</string>
+    <string name="listingParkingLabel">Listing A New Parking Space</string>
+    <string name="owner">Owner</string>
+    <string name="price">Price</string>
+    <string name="startDate">Start Date</string>
+    <string name="endDate">End Date</string>
+    <string name="dateSample">mm/dd/yyyy</string>
+    <string name="priceSample">decimal, $ by default</string>
+    <string name="finish">Finish</string>
 
 </resources>
