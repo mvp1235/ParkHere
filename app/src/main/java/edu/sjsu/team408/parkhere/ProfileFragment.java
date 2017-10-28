@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -83,7 +84,7 @@ public class ProfileFragment extends Fragment {
             }
         } else if (requestCode == MAKE_NEW_LISTING_CODE) {  // handling result from making new listing activity
             if (resultCode == RESULT_OK) {
-                
+
             }
         }
     }

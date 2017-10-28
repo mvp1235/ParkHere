@@ -25,5 +25,8 @@
     <string name="dateSample">mm/dd/yyyy</string>
     <string name="priceSample">decimal, $ by default</string>
     <string name="finish">Finish</string>
+    <string name="startTime">Start Time</string>
+    <string name="endTime">End Time</string>
+    <string name="sampleTime">5:00 PM</string>
 
 </resources>
