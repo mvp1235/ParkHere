@@ -207,7 +207,7 @@ public class NewListingActivity extends AppCompatActivity {
     public void setEndTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";
-        
+
         if (hour > 12) {
             hour = hour % 12;
             ampm = "PM";
