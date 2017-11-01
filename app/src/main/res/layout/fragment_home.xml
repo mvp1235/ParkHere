@@ -16,6 +16,30 @@
         android:hint="@string/searchParkingHint"
         android:inputType="textPostalAddress" />
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/profile_item_margin"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/searchDate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Date"
+            android:textStyle="bold" />
+
+        <EditText
+            android:id="@+id/searchDatePicker"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="3"
+            android:focusable="false"
+            android:hint="@string/dateSample" />
+
+    </LinearLayout>
+
     <Button
         android:id="@+id/searchBtn"
         android:layout_width="match_parent"

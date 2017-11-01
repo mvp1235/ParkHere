@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
         transaction.replace(R.id.container, new HomeFragment());
         transaction.commit();
 
+
+
     }
 
     public void searchListing(String location) {
