@@ -1,0 +1,21 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/profile_item_padding"
+    android:paddingRight="@dimen/profile_item_padding"
+    tools:context="edu.sjsu.team408.parkhere.HistoryFragment">
+
+    <TextView
+        android:id="@+id/historyLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/profile_item_margin"
+        android:text="@string/history"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
+</LinearLayout>
