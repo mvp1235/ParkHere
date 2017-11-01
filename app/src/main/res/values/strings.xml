@@ -35,5 +35,6 @@
     <string name="distance">Distance</string>
     <string name="searchParking">Search Parkings</string>
     <string name="specialInstruction">Special Instruction</string>
+    <string name="reserve">Reserve</string>
 
 </resources>

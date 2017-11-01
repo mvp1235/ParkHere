@@ -54,7 +54,7 @@ public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
         }
         parkingDate.setText(availableDate);
 
-        parkingPrice.setText(String.valueOf(parking.getPrice()));
+        parkingPrice.setText("$" + String.valueOf(parking.getPrice()));
 
         //For now, we will have every as 1 mile away, since we dont have google api implemented yet
         parkingDistance.setText("1 mile away");

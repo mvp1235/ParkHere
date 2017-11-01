@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -13,6 +15,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV;
     private ImageView parkingPhoto;
+    private Button reserveBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,6 +29,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         dateTV = (TextView) findViewById(R.id.detailParkingDate);
         priceTV = (TextView) findViewById(R.id.detailParkingPrice);
         parkingPhoto = (ImageView) findViewById(R.id.detailParkingPhoto);
+        reserveBtn = (Button) findViewById(R.id.reserveBtn);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
@@ -47,5 +51,19 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         priceTV.setText("$" + String.valueOf(clickedParking.getPrice()));
 
+        reserveBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                makeReservation();
+            }
+        });
     }
+
+    /**
+     * Implement reservation functionality here
+     */
+    public void makeReservation() {
+
+    }
+
 }
