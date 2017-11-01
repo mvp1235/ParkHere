@@ -99,9 +99,6 @@ public class NewListingActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
         userID = 3; //just random we will implement this later....
 
-
-
-
     }
 
     /**

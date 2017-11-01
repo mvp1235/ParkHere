@@ -25,9 +25,9 @@ public class ReservationActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.fragment_home);
+        setContentView(R.layout.activity_reservation);
 
-        searchDate = (EditText) findViewById(R.id.searchDatePicker);
+        searchDate = (EditText) findViewById(R.id.searchDate);
 
         searchDate.setOnClickListener(new View.OnClickListener() {
             @Override

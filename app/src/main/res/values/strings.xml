@@ -28,5 +28,7 @@
     <string name="startTime">Start Time</string>
     <string name="endTime">End Time</string>
     <string name="sampleTime">5:00 PM</string>
+    <string name="location">Location</string>
+    <string name="date">Date</string>
 
 </resources>
