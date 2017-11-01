@@ -34,6 +34,7 @@ public class NewListingActivity extends AppCompatActivity {
     private int year, month, day;
 
     private DatabaseReference databaseReference;
+    private int userID;
 
 
     @Override
@@ -95,8 +96,8 @@ public class NewListingActivity extends AppCompatActivity {
             }
         });
 
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-
+        databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
+        userID = 3; //just random we will implement this later....
 
 
 
@@ -136,6 +137,8 @@ public class NewListingActivity extends AppCompatActivity {
 
             setResult(RESULT_OK, i);
             finish();
+
+            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString);
 
         }
 
@@ -254,8 +257,83 @@ public class NewListingActivity extends AppCompatActivity {
         endDate.setText(completeDate);
     }
 
-    public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime, String userID) {
+    /**
+     * Adds listing to database
+     * @param startDate start date
+     * @param endDate   end date
+     * @param startTime start time
+     * @param endTime   end time
+     */
+    public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime) {
+        String startDateList[] = startDate.split("-");
+        String endDateList[] = endDate.split("-");
 
+        int startMonth = Integer.parseInt(startDateList[0]);
+        int startDay = Integer.parseInt(startDateList[1]);
+        int startYear = Integer.parseInt(startDateList[2]);
+
+        int endMonth = Integer.parseInt(endDateList[0]);
+        int endDay= Integer.parseInt(endDateList[1]);
+        int endYear = Integer.parseInt(endDateList[2]);
+
+        String parentKey = "";
+        String childKey = "";
+        String dataValue = "";
+
+        //i'll clean up code later....
+        //for now restriction is owner can post 1 listing per day.
+        //doesn't support same day different time listing yet. Ex available 2-3 and 5-6. Will implement later
+        if(endYear - startYear == 0) {
+            //same year
+            if(endMonth - startMonth == 0) {
+                //same month
+                if(endDay - startDay == 0) {
+                    //same day, just add one key and value to database
+                    String owner = this.owner.getText().toString();
+                    String price = this.price.getText().toString();
+                    String address = this.address.getText().toString();
+                    dataValue = getValue(startDate, endDate, startTime, endTime, this.userID, owner, price, address);
+                    parentKey = startDate;
+                    childKey = this.userID + "";
+                    databaseReference.child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                } else {
+                    //more than one day in the same month
+                    int i = endDay - startDay;
+                    String owner = this.owner.getText().toString();
+                    String price = this.price.getText().toString();
+                    String address = this.address.getText().toString();
+                    childKey = this.userID + "";
+                    while(i >= 0) {
+                        int newStartDay = startDay + i;
+                        int newEndDay = endDay;
+                        if(i != 0) {
+                            newEndDay += i;
+                        }
+                        String newStartDate = startMonth + "-" + newStartDay + "-" + startYear;
+                        String newEndDate = endMonth + "-" + newEndDay + "-" + endYear;
+                        dataValue = getValue(newStartDate, newEndDate, startTime, endTime, this.userID, owner, price, address);
+                        parentKey = newStartDate;
+                        databaseReference.child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                        i--;
+                    }
+                }
+            } else {
+                //not within the same month
+            }
+        } else {
+            //available more than 1 year....
+        }
+        //userID = 4;   //we will fix this later.... purpose is to simulate different userID for every listing //this doesn't change value for testing
+        //*******   Process so far: Complete listing for one day and multiple days in a row.
+        //technique - making start day as parent key and userID for child key.
+        //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
     }
+
+    private static String getValue(String startDate, String endDate, String startTime, String endTime, int userID, String ownerName, String price, String address) {
+        String result ="";
+        result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
+        return result;
+    }
+
 
 }
