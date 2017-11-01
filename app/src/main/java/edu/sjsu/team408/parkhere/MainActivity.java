@@ -39,13 +39,14 @@ public class MainActivity extends AppCompatActivity {
             }
 
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.replace(R.id.container, selectedFragment);
+            transaction.replace(R.id.content, selectedFragment);
             transaction.commit();
 
             return true;
         }
 
     };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,8 +58,10 @@ public class MainActivity extends AppCompatActivity {
 
         //Set default option to the Home view fragmemt.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.container, new HomeFragment());
+        transaction.replace(R.id.content, new HomeFragment());
         transaction.commit();
+
+
 
     }
 
