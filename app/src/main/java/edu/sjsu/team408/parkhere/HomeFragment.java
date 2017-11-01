@@ -3,6 +3,7 @@ package edu.sjsu.team408.parkhere;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
@@ -25,6 +26,7 @@ import java.util.Calendar;
  */
 public class HomeFragment extends Fragment {
 
+    private static final int VIEW_PARKING_CODE = 123;
     private Button searchBtn;
     private static EditText searchDateET;
     private EditText searchTerm;
@@ -85,6 +87,8 @@ public class HomeFragment extends Fragment {
     //Only displaying the value of input text for now
     public void searchListing(String location) {
         Toast.makeText(getContext(), location, Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+        startActivityForResult(intent, VIEW_PARKING_CODE);
     }
 
     public void showDatePickerDialog(View v) {

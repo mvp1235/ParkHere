@@ -14,6 +14,15 @@ public class User {
 
     public User(){};
 
+    public User(String id, String name, Address address, String phoneNumber, String emailAddress, String profileURL) {
+        this.id = id;
+        this.name = name;
+        this.address = address;
+        this.phoneNumber = phoneNumber;
+        this.emailAddress = emailAddress;
+        this.profileURL = profileURL;
+    }
+
     public String getId() {
         return id;
     }

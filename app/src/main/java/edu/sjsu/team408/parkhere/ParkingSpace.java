@@ -11,8 +11,20 @@ public class ParkingSpace {
     private String specialInstruction;
     private String startDate;
     private String endDate;
+    private double price;
+
 
     public ParkingSpace(){};
+
+    public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction, String startDate, String endDate, double price) {
+        this.address = address;
+        this.owner = owner;
+        this.parkingImageUrl = parkingImageUrl;
+        this.specialInstruction = specialInstruction;
+        this.startDate = startDate;
+        this.endDate = endDate;
+        this.price = price;
+    }
 
     public Address getAddress() {
         return address;
@@ -60,5 +72,13 @@ public class ParkingSpace {
 
     public void setEndDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
     }
 }
