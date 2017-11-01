@@ -8,6 +8,17 @@
     android:paddingRight="20dp"
     tools:context="edu.sjsu.team408.parkhere.HomeFragment">
 
+    <TextView
+        android:id="@+id/searchLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/profile_item_margin"
+        android:text="@string/searchParking"
+        android:textAlignment="center"
+        android:textColor="@color/colorAccent"
+        android:textSize="24sp"
+        android:textStyle="bold" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

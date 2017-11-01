@@ -1,10 +1,13 @@
 package edu.sjsu.team408.parkhere;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by MVP on 10/31/17.
  */
 
-public class Address {
+public class Address implements Parcelable {
     private String streetAddress;
     private String city;
     private String state;
@@ -19,7 +22,27 @@ public class Address {
         this.zipCode = zipCode;
     }
 
-    public String getFullAddress(){
+
+    protected Address(Parcel in) {
+        streetAddress = in.readString();
+        city = in.readString();
+        state = in.readString();
+        zipCode = in.readString();
+    }
+
+    public static final Creator<Address> CREATOR = new Creator<Address>() {
+        @Override
+        public Address createFromParcel(Parcel in) {
+            return new Address(in);
+        }
+
+        @Override
+        public Address[] newArray(int size) {
+            return new Address[size];
+        }
+    };
+
+    public String toString(){
         return streetAddress + ", " + city + ", " + state + " " + zipCode;
     }
 
@@ -45,5 +68,35 @@ public class Address {
 
     public String getZipCode() {
         return zipCode;
+    }
+
+    /**
+     * Describe the kinds of special objects contained in this Parcelable
+     * instance's marshaled representation. For example, if the object will
+     * include a file descriptor in the output of {@link #writeToParcel(Parcel, int)},
+     * the return value of this method must include the
+     * {@link #CONTENTS_FILE_DESCRIPTOR} bit.
+     *
+     * @return a bitmask indicating the set of special object types marshaled
+     * by this Parcelable object instance.
+     */
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(streetAddress);
+        dest.writeString(city);
+        dest.writeString(state);
+        dest.writeString(zipCode);
     }
 }

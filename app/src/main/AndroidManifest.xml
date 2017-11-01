@@ -19,13 +19,16 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EditProfileActivity"
-            android:screenOrientation="portrait"/>
-        <activity android:name=".NewListingActivity"
-            android:screenOrientation="portrait"></activity>
-
-        <activity android:name=".SearchResultActivity"
-            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".EditProfileActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".NewListingActivity"
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".SearchResultActivity"
+            android:screenOrientation="portrait" />
+        <activity android:name=".DetailParkingActivity"></activity>
     </application>
 
 </manifest>

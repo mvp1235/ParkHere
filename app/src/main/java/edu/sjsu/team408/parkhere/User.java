@@ -1,10 +1,13 @@
 package edu.sjsu.team408.parkhere;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by MVP on 10/31/17.
  */
 
-public class User {
+public class User implements Parcelable{
     private String id;
     private String name;
     private Address address;
@@ -22,6 +25,42 @@ public class User {
         this.emailAddress = emailAddress;
         this.profileURL = profileURL;
     }
+
+    protected User(Parcel in) {
+        id = in.readString();
+        name = in.readString();
+        address = in.readParcelable(Address.class.getClassLoader());
+        phoneNumber = in.readString();
+        emailAddress = in.readString();
+        profileURL = in.readString();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
+        dest.writeString(name);
+        dest.writeParcelable(address, flags);
+        dest.writeString(phoneNumber);
+        dest.writeString(emailAddress);
+        dest.writeString(profileURL);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    public static final Creator<User> CREATOR = new Creator<User>() {
+        @Override
+        public User createFromParcel(Parcel in) {
+            return new User(in);
+        }
+
+        @Override
+        public User[] newArray(int size) {
+            return new User[size];
+        }
+    };
 
     public String getId() {
         return id;
@@ -70,4 +109,5 @@ public class User {
     public void setProfileURL(String profileURL) {
         this.profileURL = profileURL;
     }
+
 }

@@ -1,7 +1,9 @@
 package edu.sjsu.team408.parkhere;
 
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -14,6 +16,17 @@ import java.util.ArrayList;
 
 public class SearchResultActivity extends ListActivity {
 
+    static final String PARKING_BUNDLE = "parkingBundle";
+    static final String ADDRESS = "address";
+    static final String OWNER = "owner";
+    static final String PARKING_IMAGE_URL = "parkingImageUrl";
+    static final String SPECIAL_INSTRUCTION = "specialInstruction";
+    static final String START_DATE = "startDate";
+    static final String END_DATE = "endDate";
+    static final String PRICE = "price";
+
+
+    private static final int VIEW_DETAIL_PARKING = 101;
     private ArrayList<ParkingSpace> parkingSpaces;
 
     @Override
@@ -35,7 +48,20 @@ public class SearchResultActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         ParkingSpace parking = (ParkingSpace)getListAdapter().getItem(position);
-        Toast.makeText(this, "" + parking.getAddress(), Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this, DetailParkingActivity.class);
+
+        Bundle b = new Bundle();
+        b.putParcelable(ADDRESS, parking.getAddress());
+        b.putParcelable(OWNER, parking.getOwner());
+        b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
+        b.putString(SPECIAL_INSTRUCTION, parking.getSpecialInstruction());
+        b.putString(START_DATE, parking.getStartDate());
+        b.putString(END_DATE, parking.getEndDate());
+        b.putDouble(PRICE, parking.getPrice());
+
+        intent.putExtra(PARKING_BUNDLE, b);
+        startActivityForResult(intent, VIEW_DETAIL_PARKING);
+
     }
 
     //Generate some parking spaces for testing

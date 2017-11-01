@@ -26,7 +26,7 @@ import java.util.Calendar;
  */
 public class HomeFragment extends Fragment {
 
-    private static final int VIEW_PARKING_CODE = 123;
+    private static final int VIEW_PARKINGS_CODE = 123;
     private Button searchBtn;
     private static EditText searchDateET;
     private EditText searchTerm;
@@ -88,7 +88,7 @@ public class HomeFragment extends Fragment {
     public void searchListing(String location) {
         Toast.makeText(getContext(), location, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
-        startActivityForResult(intent, VIEW_PARKING_CODE);
+        startActivityForResult(intent, VIEW_PARKINGS_CODE);
     }
 
     public void showDatePickerDialog(View v) {
