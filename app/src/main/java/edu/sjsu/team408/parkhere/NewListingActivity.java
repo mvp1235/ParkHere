@@ -14,6 +14,8 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 import java.util.Calendar;
+
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
 
@@ -34,7 +36,8 @@ public class NewListingActivity extends AppCompatActivity {
     private int year, month, day;
 
     private DatabaseReference databaseReference;
-    private int userID;
+    private FirebaseAuth firebaseAuth;
+    private String userID;
 
 
     @Override
@@ -97,7 +100,8 @@ public class NewListingActivity extends AppCompatActivity {
         });
 
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
-        userID = 3; //just random we will implement this later....
+        firebaseAuth = FirebaseAuth.getInstance();
+        userID = firebaseAuth.getCurrentUser().getUid(); //just random we will implement this later....
 
     }
 
@@ -325,7 +329,7 @@ public class NewListingActivity extends AppCompatActivity {
         //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
     }
 
-    private static String getValue(String startDate, String endDate, String startTime, String endTime, int userID, String ownerName, String price, String address) {
+    private static String getValue(String startDate, String endDate, String startTime, String endTime, String userID, String ownerName, String price, String address) {
         String result ="";
         result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
         return result;
