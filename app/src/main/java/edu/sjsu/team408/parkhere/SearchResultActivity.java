@@ -34,6 +34,11 @@ public class SearchResultActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_search_result);
 
+        Intent intent = getIntent();
+
+        //get user input for location
+        String searchTerm = intent.getStringExtra("location");
+
         //Construct data source
         populateDefaultParkingSpaces();
 

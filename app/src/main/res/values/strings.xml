@@ -36,5 +36,10 @@
     <string name="searchParking">Search Parkings</string>
     <string name="specialInstruction">Special Instruction</string>
     <string name="reserve">Reserve</string>
+    <string name="results">Results</string>
+    <string name="password">Password</string>
+    <string name="signUp">Sign Up</string>
+    <string name="signIn">Sign In</string>
+    <string name="logOut">Log Out</string>
 
 </resources>

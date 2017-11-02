@@ -9,6 +9,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,6 +28,7 @@ import java.util.Calendar;
 public class HomeFragment extends Fragment {
 
     private static final int VIEW_PARKINGS_CODE = 123;
+
     private Button searchBtn;
     private static EditText searchDateET;
     private EditText searchTerm;
@@ -60,13 +62,14 @@ public class HomeFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_home, container, false);
+        searchTerm = (EditText) view.findViewById(R.id.searchTerm);
+
 
         //Referencing and setting onclick listener for search button
         searchBtn = (Button) view.findViewById(R.id.searchBtn);
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                searchTerm = (EditText) getActivity().findViewById(R.id.searchTerm);
                 String searchQuery = searchTerm.getText().toString();
                 searchListing(searchQuery);
             }
@@ -84,10 +87,10 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-    //Only displaying the value of input text for now
+
     public void searchListing(String location) {
-        Toast.makeText(getContext(), location, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
+        intent.putExtra("location", searchTerm.getText().toString());
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
     }
 

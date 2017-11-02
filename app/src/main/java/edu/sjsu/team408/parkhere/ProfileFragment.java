@@ -3,7 +3,9 @@ package edu.sjsu.team408.parkhere;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +14,16 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseUser;
 import com.squareup.picasso.Picasso;
 
 import static android.app.Activity.RESULT_OK;
+import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 
 
 /**
@@ -23,11 +31,18 @@ import static android.app.Activity.RESULT_OK;
  */
 public class ProfileFragment extends Fragment {
 
+    public static String TAG_SIGN_UP = "Sign Up";
+    public static String TAG_SIGN_IN = "Sign In";
 
     private static final int EDIT_PROFILE_CODE = 10001;
     private static final int MAKE_NEW_LISTING_CODE = 10002;
+    private static final int SIGN_UP_CODE = 10003;
+    private static final int SIGN_IN_CODE = 10004;
+
     private TextView name, email, phone, address;
     private ImageView profile;
+    private Button signUpBtn, signInBtn, logOutBtn;
+
 
     public ProfileFragment() {
         // Required empty public constructor
@@ -45,6 +60,10 @@ public class ProfileFragment extends Fragment {
         phone = (TextView) view.findViewById(R.id.userPhone);
         address = (TextView) view.findViewById(R.id.userAddress);
         profile = (ImageView) view.findViewById(R.id.profilePicture);
+        signUpBtn = (Button) view.findViewById(R.id.profileSignUpBtn);
+        signInBtn = (Button) view.findViewById(R.id.profileSignInBtn);
+        logOutBtn = (Button) view.findViewById(R.id.profileLogoutBtn);
+
 
         Picasso.with(getContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profile);
 
@@ -66,6 +85,51 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        signUpBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SignUpActivity.class);
+                startActivityForResult(intent, SIGN_UP_CODE);
+            }
+        });
+
+        signInBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SignInActivity.class);
+                startActivityForResult(intent, SIGN_IN_CODE);
+            }
+        });
+
+        logOutBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                signOut();
+            }
+        });
+
+        //Hiding/Showing elements based on whether user is logged in or not
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null) {
+            signUpBtn.setVisibility(View.GONE);
+            signInBtn.setVisibility(View.GONE);
+            logOutBtn.setVisibility(View.VISIBLE);
+            view.findViewById(R.id.profileLL).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.profileNameLL).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.profileEmailLL).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.profilePhoneLL).setVisibility(View.VISIBLE);
+            view.findViewById(R.id.profileAddressLL).setVisibility(View.VISIBLE);
+        } else {
+            view.findViewById(R.id.profileLL).setVisibility(View.GONE);
+            view.findViewById(R.id.profileNameLL).setVisibility(View.GONE);
+            view.findViewById(R.id.profileEmailLL).setVisibility(View.GONE);
+            view.findViewById(R.id.profilePhoneLL).setVisibility(View.GONE);
+            view.findViewById(R.id.profileAddressLL).setVisibility(View.GONE);
+            logOutBtn.setVisibility(View.GONE);
+            signUpBtn.setVisibility(View.VISIBLE);
+            signInBtn.setVisibility(View.VISIBLE);
+        }
+
 
         return view;
     }
@@ -85,6 +149,14 @@ public class ProfileFragment extends Fragment {
         } else if (requestCode == MAKE_NEW_LISTING_CODE) {  // handling result from making new listing activity
             if (resultCode == RESULT_OK) {
 
+            }
+        } else if (requestCode == SIGN_UP_CODE) {
+            if (resultCode == RESULT_OK) {
+                refreshPage();
+            }
+        } else if (requestCode == SIGN_IN_CODE) {
+            if (resultCode == RESULT_OK) {
+                refreshPage();
             }
         }
     }
@@ -118,6 +190,19 @@ public class ProfileFragment extends Fragment {
         Intent intent = new Intent(getContext(), NewListingActivity.class);
         intent.putExtra("name", nameString);
         startActivityForResult(intent, MAKE_NEW_LISTING_CODE);
+    }
+
+    private void signOut() {
+        mAuth.signOut();
+        refreshPage();
+//        updateUI(null);
+    }
+
+    private void refreshPage() {
+        //Refresh profile page
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(R.id.content, new ProfileFragment());
+        transaction.commit();
     }
 
 

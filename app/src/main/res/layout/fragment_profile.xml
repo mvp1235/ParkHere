@@ -23,6 +23,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/profile_item_margin"
+        android:id="@+id/profileLL"
         android:orientation="horizontal">
 
         <ImageView
@@ -55,6 +56,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/profile_item_margin"
+        android:id="@+id/profileNameLL"
         android:orientation="horizontal">
 
         <TextView
@@ -78,6 +80,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/profile_item_margin"
+        android:id="@+id/profileEmailLL"
         android:orientation="horizontal">
 
         <TextView
@@ -101,6 +104,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/profile_item_margin"
+        android:id="@+id/profilePhoneLL"
         android:orientation="horizontal">
 
         <TextView
@@ -124,6 +128,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/profile_item_margin"
+        android:id="@+id/profileAddressLL"
         android:orientation="horizontal">
 
         <TextView
@@ -142,6 +147,24 @@
             android:text="One Washington Square Hall, San Jose CA 95112" />
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/profileSignUpBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/signUp" />
+
+    <Button
+        android:id="@+id/profileSignInBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/signIn" />
+
+    <Button
+        android:id="@+id/profileLogoutBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/logOut" />
 
 
 </LinearLayout>
