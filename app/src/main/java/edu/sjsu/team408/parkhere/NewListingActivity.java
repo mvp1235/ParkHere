@@ -353,10 +353,10 @@ public class NewListingActivity extends AppCompatActivity {
         //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
     }
 
-    private static ParkingSpace getValue(String startDate, String endDate, String startTime, String endTime, int userID, String ownerName, String price, String address) {
+    private static ParkingSpace getValue(String startDate, String endDate, String startTime, String endTime, String userID, String ownerName, String price, String address) {
         //String result ="";
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
-        Address addr = new Address(address);    //correct format later
+        edu.sjsu.team408.parkhere.Address addr = new edu.sjsu.team408.parkhere.Address(address);    //correct format later
         User owner = new User(userID+"", ownerName, null,null,null,null);
         String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
         String specialInstruction = "";
