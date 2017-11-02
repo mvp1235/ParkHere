@@ -4,6 +4,8 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.location.*;
+import android.location.Address;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -13,7 +15,13 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
+
+import com.google.android.gms.maps.model.LatLng;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
 
@@ -34,7 +42,8 @@ public class NewListingActivity extends AppCompatActivity {
     private int year, month, day;
 
     private DatabaseReference databaseReference;
-    private int userID;
+    private FirebaseAuth firebaseAuth;
+    private String userID;
 
 
     @Override
@@ -97,7 +106,8 @@ public class NewListingActivity extends AppCompatActivity {
         });
 
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
-        userID = 3; //just random we will implement this later....
+        firebaseAuth = FirebaseAuth.getInstance();
+        userID = firebaseAuth.getCurrentUser().getUid(); //just random we will implement this later....
 
     }
 
@@ -132,7 +142,25 @@ public class NewListingActivity extends AppCompatActivity {
             i.putExtra("startDate", startDateString);
             i.putExtra("endDate", endDateString);
 
-            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString);
+            Geocoder geocoder = new Geocoder(this);
+            List<android.location.Address> addressList;
+            LatLng point = null;
+
+            try {
+                addressList = geocoder.getFromLocationName(addressString, 5);
+                if (addressList != null) {
+                    Address location = addressList.get(0);
+                    location.getLatitude();
+                    location.getLongitude();
+                    point = new LatLng(location.getLatitude(), location.getLongitude());
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
+
+            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString, point);
             
             setResult(RESULT_OK, i);
             finish();
@@ -260,7 +288,7 @@ public class NewListingActivity extends AppCompatActivity {
      * @param startTime start time
      * @param endTime   end time
      */
-    public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime) {
+    public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime, LatLng latLng) {
         String startDateList[] = startDate.split("-");
         String endDateList[] = endDate.split("-");
 
@@ -325,10 +353,10 @@ public class NewListingActivity extends AppCompatActivity {
         //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
     }
 
-    private static ParkingSpace getValue(String startDate, String endDate, String startTime, String endTime, int userID, String ownerName, String price, String address) {
+    private static ParkingSpace getValue(String startDate, String endDate, String startTime, String endTime, String userID, String ownerName, String price, String address) {
         //String result ="";
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
-        Address addr = new Address(address);    //correct format later
+        edu.sjsu.team408.parkhere.Address addr = new edu.sjsu.team408.parkhere.Address(address);    //correct format later
         User owner = new User(userID+"", ownerName, null,null,null,null);
         String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
         String specialInstruction = "";
