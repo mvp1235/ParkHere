@@ -123,8 +123,6 @@ public class SearchResultActivity extends ListActivity {
 
         // Attach the adapter to a ListView
         setListAdapter(adapter);
-
-
     }
 
 }

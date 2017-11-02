@@ -119,13 +119,6 @@ public class ParkingSpace implements Parcelable{
         this.price = price;
     }
 
-    public Bundle toBundle() {
-        Bundle b = new Bundle();
-
-
-        return b;
-    }
-
     @Override
     public int describeContents() {
         return 0;

@@ -1,198 +1,272 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin"
     tools:context="edu.sjsu.team408.parkhere.NewListingActivity">
 
-
-    <TextView
-        android:id="@+id/listingLabel"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/listingParkingLabel"
-        android:textAlignment="center"
-        android:textColor="@color/colorAccent"
-        android:textSize="18sp"
-        android:textStyle="bold" />
-
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:layout_marginLeft="@dimen/activity_horizontal_margin"
+        android:layout_marginRight="@dimen/activity_horizontal_margin">
 
         <TextView
-            android:id="@+id/listingOwnerLabel"
-            android:layout_width="0dp"
+            android:id="@+id/listingLabel"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/owner"
+            android:text="@string/listingParkingLabel"
+            android:textAlignment="center"
+            android:textColor="@color/colorAccent"
+            android:textSize="18sp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/listingOwner"
-            android:layout_width="0dp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="3"/>
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/listingOwnerLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/owner"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/listingOwner"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/streetAddress"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingAddressStreetNumber"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:inputType="textCapWords"
+                android:hint="One Washington Square" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/city"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingAddressCity"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:inputType="textCapWords"
+                android:hint="San Jose" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/state"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingAddressState"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:inputType="textCapCharacters"
+                android:hint="CA" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/zipCode"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingAddressZipCode"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:inputType="number"
+                android:hint="95112" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/listingPriceLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/price"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingPrice"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/priceSample"
+                android:inputType="numberDecimal" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/listingStartDateLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/startDate"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingStartDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/dateSample"
+                android:focusable="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/listingEndDateLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/endDate"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingEndDate"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/dateSample"
+                android:focusable="false" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/listingStartTimeLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/startTime"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingStartTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/sampleTime"
+                android:focusable="false"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/profile_item_margin"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/listingEndTimeLabel"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/endTime"
+                android:textStyle="bold" />
+
+            <EditText
+                android:id="@+id/listingEndTime"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:hint="@string/sampleTime"
+                android:focusable="false"/>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/saveListingBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="@string/finish"
+            android:textAlignment="center"
+            android:textStyle="bold" />
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/listingAddressLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/address"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/listingAddress"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:hint="Street name, city, state, zipcode" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/listingPriceLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/price"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/listingPrice"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:hint="@string/priceSample"
-            android:inputType="numberDecimal" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/listingStartDateLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/startDate"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/listingStartDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:hint="@string/dateSample"
-            android:focusable="false"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/listingEndDateLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/endDate"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/listingEndDate"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:hint="@string/dateSample"
-            android:focusable="false" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/listingStartTimeLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/startTime"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/listingStartTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:hint="@string/sampleTime"
-            android:focusable="false"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/listingEndTimeLabel"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/endTime"
-            android:textStyle="bold" />
-
-        <EditText
-            android:id="@+id/listingEndTime"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:hint="@string/sampleTime"
-            android:focusable="false"/>
-
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/saveListingBtn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="@string/finish"
-        android:textAlignment="center"
-        android:textStyle="bold" />
-
-
-</LinearLayout>
+</ScrollView>
