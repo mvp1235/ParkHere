@@ -1,27 +1,35 @@
 {
   "project_info": {
-    "project_number": "571049334430",
-    "firebase_url": "https://parkhere-5ab76.firebaseio.com",
-    "project_id": "parkhere-5ab76",
-    "storage_bucket": "parkhere-5ab76.appspot.com"
+    "project_number": "852978832643",
+    "firebase_url": "https://parkheretest-8a520.firebaseio.com",
+    "project_id": "parkheretest-8a520",
+    "storage_bucket": "parkheretest-8a520.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:571049334430:android:4c4dfd02242f7875",
+        "mobilesdk_app_id": "1:852978832643:android:4c4dfd02242f7875",
         "android_client_info": {
           "package_name": "edu.sjsu.team408.parkhere"
         }
       },
       "oauth_client": [
         {
-          "client_id": "571049334430-aq06lgqg8digld2arql3am7ggadsmcq0.apps.googleusercontent.com",
+          "client_id": "852978832643-gojftpr475e14dc8cqtagi4gmaho53ib.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "edu.sjsu.team408.parkhere",
+            "certificate_hash": "67437f6024927836d5fb3d02b4f03e58d7813fe2"
+          }
+        },
+        {
+          "client_id": "852978832643-itnd5dg1t5vs53cuoup6f40ad9ehu9fh.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyAzn_HETST9kvG5ZFse6IJsjbXud5VUrfc"
+          "current_key": "AIzaSyBTAUZkkFkdejEPI-ye-Qlzi9iX4F6N9Ss"
         }
       ],
       "services": {
@@ -29,8 +37,13 @@
           "status": 1
         },
         "appinvite_service": {
-          "status": 1,
-          "other_platform_oauth_client": []
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "852978832643-itnd5dg1t5vs53cuoup6f40ad9ehu9fh.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         },
         "ads_service": {
           "status": 2
