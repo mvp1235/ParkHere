@@ -77,7 +77,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         databaseReference.child(startDate).removeValue();
         //now just need to transition to home Fragment...
         //Huy can you do this in the morning?
-        
+
+
     }
 
 }
