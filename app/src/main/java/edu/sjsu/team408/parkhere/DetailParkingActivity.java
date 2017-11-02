@@ -9,7 +9,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 public class DetailParkingActivity extends AppCompatActivity {
@@ -18,11 +22,13 @@ public class DetailParkingActivity extends AppCompatActivity {
     private ImageView parkingPhoto;
     private Button reserveBtn;
     private DatabaseReference databaseReference;
+    private ParkingSpace clickedParking;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_parking);
+        //databaseReference = FirebaseDatabase.getInstance().getReference();
 
         //Reference to the UI elements
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
@@ -36,7 +42,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
 
-        ParkingSpace clickedParking = new ParkingSpace(bundle);
+        clickedParking = new ParkingSpace(bundle);
 
         Picasso.with(getApplicationContext()).load(clickedParking.getParkingImageUrl()).into(parkingPhoto);
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
@@ -66,7 +72,12 @@ public class DetailParkingActivity extends AppCompatActivity {
      */
     public void makeReservation() {
         //for now make reservation will just delete the listing on database.
-
+        String startDate = clickedParking.getStartDate();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        databaseReference.child(startDate).removeValue();
+        //now just need to transition to home Fragment...
+        //Huy can you do this in the morning?
+        
     }
 
 }

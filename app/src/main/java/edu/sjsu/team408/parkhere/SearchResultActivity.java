@@ -62,7 +62,7 @@ public class SearchResultActivity extends ListActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                //unsupported
+                //not supported
             }
         });
 
