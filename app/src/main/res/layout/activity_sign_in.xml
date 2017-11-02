@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_margin="@dimen/activity_vertical_margin"
     tools:context="edu.sjsu.team408.parkhere.SignInActivity">
 
     <LinearLayout

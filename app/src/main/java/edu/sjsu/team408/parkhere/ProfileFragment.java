@@ -129,8 +129,7 @@ public class ProfileFragment extends Fragment {
             signUpBtn.setVisibility(View.VISIBLE);
             signInBtn.setVisibility(View.VISIBLE);
         }
-
-
+        
         return view;
     }
 

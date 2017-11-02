@@ -75,12 +75,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mAuth.signOut();
-    }
-
     public void searchListing(String location) {
         Toast.makeText(getApplicationContext(), location, Toast.LENGTH_SHORT).show();
     }

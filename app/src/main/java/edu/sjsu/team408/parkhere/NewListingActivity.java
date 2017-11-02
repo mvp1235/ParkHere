@@ -132,11 +132,10 @@ public class NewListingActivity extends AppCompatActivity {
             i.putExtra("startDate", startDateString);
             i.putExtra("endDate", endDateString);
 
+            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString);
+            
             setResult(RESULT_OK, i);
             finish();
-
-            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString);
-
         }
 
     }
