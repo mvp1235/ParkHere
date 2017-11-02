@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.firebase.database.DatabaseReference;
 import com.squareup.picasso.Picasso;
 
 public class DetailParkingActivity extends AppCompatActivity {
@@ -16,6 +17,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV;
     private ImageView parkingPhoto;
     private Button reserveBtn;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +39,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         ParkingSpace clickedParking = new ParkingSpace(bundle);
 
         Picasso.with(getApplicationContext()).load(clickedParking.getParkingImageUrl()).into(parkingPhoto);
-        addressTV.setText(clickedParking.getAddress().toString());
+        addressTV.setText(clickedParking.getAddress().toString());      //crashes here
         ownerTV.setText(clickedParking.getOwner().getId());
         specialInstructionTV.setText(clickedParking.getSpecialInstruction());
 
@@ -63,6 +65,7 @@ public class DetailParkingActivity extends AppCompatActivity {
      * Implement reservation functionality here
      */
     public void makeReservation() {
+        //for now make reservation will just delete the listing on database.
 
     }
 

@@ -274,7 +274,7 @@ public class NewListingActivity extends AppCompatActivity {
 
         String parentKey = "";
         String childKey = "";
-        String dataValue = "";
+        ParkingSpace dataValue = null;
 
         //i'll clean up code later....
         //for now restriction is owner can post 1 listing per day.
@@ -325,11 +325,20 @@ public class NewListingActivity extends AppCompatActivity {
         //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
     }
 
-    private static String getValue(String startDate, String endDate, String startTime, String endTime, int userID, String ownerName, String price, String address) {
-        String result ="";
-        result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
-        return result;
+    private static ParkingSpace getValue(String startDate, String endDate, String startTime, String endTime, int userID, String ownerName, String price, String address) {
+        //String result ="";
+        //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
+        Address addr = new Address(address);    //correct format later
+        User owner = new User(userID+"", ownerName, null,null,null,null);
+        String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
+        String specialInstruction = "";
+        ParkingSpace newParkingSpace = new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, Double.parseDouble(price));
+
+
+        //return result;
+        return newParkingSpace;
     }
+
 
 
 }

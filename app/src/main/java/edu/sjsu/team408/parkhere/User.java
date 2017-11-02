@@ -26,6 +26,7 @@ public class User implements Parcelable{
         this.profileURL = profileURL;
     }
 
+
     protected User(Parcel in) {
         id = in.readString();
         name = in.readString();

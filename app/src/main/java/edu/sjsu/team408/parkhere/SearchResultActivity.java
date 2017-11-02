@@ -8,6 +8,12 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 /**
@@ -28,6 +34,7 @@ public class SearchResultActivity extends ListActivity {
 
     private static final int VIEW_DETAIL_PARKING = 101;
     private ArrayList<ParkingSpace> parkingSpaces;
+    private DatabaseReference databaseReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,18 +42,31 @@ public class SearchResultActivity extends ListActivity {
         setContentView(R.layout.activity_search_result);
 
         Intent intent = getIntent();
+        databaseReference = FirebaseDatabase.getInstance().getReference();
 
+        parkingSpaces = new ArrayList<ParkingSpace>();
         //get user input for location
-        String searchTerm = intent.getStringExtra("location");
+        final String searchTerm = intent.getStringExtra("date");
 
-        //Construct data source
-        populateDefaultParkingSpaces();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild(searchTerm)) {
+                    for(DataSnapshot userIDList: dataSnapshot.child(searchTerm).getChildren()) {
+                        ParkingSpace p = userIDList.getValue(ParkingSpace.class);
+                        parkingSpaces.add(p);
+                        showResult();
+                    }
+                }
+            }
 
-        // Create the adapter to convert the array to views
-        ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                //unsupported
+            }
+        });
 
-        // Attach the adapter to a ListView
-        setListAdapter(adapter);
+        //showResult();
 
     }
 
@@ -72,7 +92,7 @@ public class SearchResultActivity extends ListActivity {
     //Generate some parking spaces for testing
     //Later on, we will generate an arraylist of parking spaces with datas in Firebase
     public void populateDefaultParkingSpaces() {
-        parkingSpaces = new ArrayList<ParkingSpace>();
+        //parkingSpaces = new ArrayList<ParkingSpace>();
 
 //        public Address(String streetAddress, String city, String state, String zipCode) {
         Address address = new Address("1 Washington Square", "San Jose", "CA", "95112");
@@ -87,11 +107,24 @@ public class SearchResultActivity extends ListActivity {
         ParkingSpace p = new ParkingSpace(address, user, "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg",
                 "watch out for dogs", "1/1/2017", "2/2/2017", 5.99);
 
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+    }
+
+    private void showResult (){
+        //Construct data source
+        populateDefaultParkingSpaces();
+
+        // Create the adapter to convert the array to views
+        ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces);
+
+        // Attach the adapter to a ListView
+        setListAdapter(adapter);
+
+
     }
 
 }

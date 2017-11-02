@@ -19,6 +19,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DatabaseReference;
+
 import java.util.Calendar;
 
 
@@ -39,9 +41,9 @@ public class HomeFragment extends Fragment {
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             // Use the current date as the default date in the picker
-            final Calendar c = Calendar.getInstance();
+            Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH);
+            int month = c.get(Calendar.MONTH) + 1;  //starts from 0 for no reason
             int day = c.get(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
@@ -61,9 +63,18 @@ public class HomeFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
+
         View view = inflater.inflate(R.layout.fragment_home, container, false);
         searchTerm = (EditText) view.findViewById(R.id.searchTerm);
 
+
+        searchDateET = (EditText) view.findViewById(R.id.searchDate);
+        searchDateET.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(v);
+            }
+        });
 
         //Referencing and setting onclick listener for search button
         searchBtn = (Button) view.findViewById(R.id.searchBtn);
@@ -75,14 +86,6 @@ public class HomeFragment extends Fragment {
             }
         });
 
-        searchDateET = (EditText) view.findViewById(R.id.searchDate);
-        searchDateET.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                showDatePickerDialog(v);
-            }
-        });
-
 
         return view;
     }
@@ -90,8 +93,14 @@ public class HomeFragment extends Fragment {
 
     public void searchListing(String location) {
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
-        intent.putExtra("location", searchTerm.getText().toString());
+        intent.putExtra("date", searchDateET.getText().toString());   //instead of location it's just date for now.
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
+
+
+
+
+
+
     }
 
     public void showDatePickerDialog(View v) {

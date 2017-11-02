@@ -30,6 +30,10 @@ public class Address implements Parcelable {
         zipCode = in.readString();
     }
 
+    public Address(String address) {
+        formatAddress(address);
+    }
+
     public static final Creator<Address> CREATOR = new Creator<Address>() {
         @Override
         public Address createFromParcel(Parcel in) {
@@ -57,6 +61,8 @@ public class Address implements Parcelable {
     public void setZipCode(String zipCode) {
         this.zipCode = zipCode;
     }
+
+    public void setState(String state) { this.state = state;}
 
     public String getStreetAddress() {
         return streetAddress;
@@ -98,5 +104,13 @@ public class Address implements Parcelable {
         dest.writeString(city);
         dest.writeString(state);
         dest.writeString(zipCode);
+    }
+
+    public void formatAddress(String address){
+        String addressToken[] = address.split(",");
+        setStreetAddress(addressToken[0]);
+        setCity(addressToken[1]);
+        setState(addressToken[2]);
+        setZipCode(addressToken[3]);
     }
 }
