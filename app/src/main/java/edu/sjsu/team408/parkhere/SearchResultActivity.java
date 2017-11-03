@@ -48,11 +48,11 @@ public class SearchResultActivity extends ListActivity {
         //get user input for location
         final String searchTerm = intent.getStringExtra("date");
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild(searchTerm)) {
-                    for(DataSnapshot userIDList: dataSnapshot.child(searchTerm).getChildren()) {
+                if(dataSnapshot.child("AvailableParkings").hasChild(searchTerm)) {
+                    for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings").child(searchTerm).getChildren()) {
                         ParkingSpace p = userIDList.getValue(ParkingSpace.class);
                         parkingSpaces.add(p);
                         showResult();
@@ -89,6 +89,16 @@ public class SearchResultActivity extends ListActivity {
 
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == VIEW_DETAIL_PARKING) {
+            if (resultCode == RESULT_OK) {
+                finish();
+            }
+        }
+    }
+
     //Generate some parking spaces for testing
     //Later on, we will generate an arraylist of parking spaces with datas in Firebase
     public void populateDefaultParkingSpaces() {
@@ -123,8 +133,6 @@ public class SearchResultActivity extends ListActivity {
 
         // Attach the adapter to a ListView
         setListAdapter(adapter);
-
-
     }
 
 }

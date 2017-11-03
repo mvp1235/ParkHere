@@ -1,7 +1,14 @@
 package edu.sjsu.team408.parkhere;
 
+/**
+ * Parking spaces available on multiple days have the same end date, perhaps set end date to the start date?
+ * No State on database
+ * Address on detailed parking page is showing null
+ */
+
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 /**
  * Created by MVP on 10/31/17.
@@ -47,7 +54,9 @@ public class Address implements Parcelable {
     };
 
     public String toString(){
-        return streetAddress + ", " + city + ", " + state + " " + zipCode;
+        String address = streetAddress + ", " + city + ", " + state + " " + zipCode;        // state is null for some reason
+        Log.i("TEST", state + " SDSDS");    //FIX
+        return address;
     }
 
     public void setStreetAddress(String streetAddress) {
@@ -63,6 +72,8 @@ public class Address implements Parcelable {
     }
 
     public void setState(String state) { this.state = state;}
+
+    public String getState() { return state;}
 
     public String getStreetAddress() {
         return streetAddress;
@@ -106,11 +117,27 @@ public class Address implements Parcelable {
         dest.writeString(zipCode);
     }
 
+    //The address should follow this format:
+    // One Washington Square, San Jose, CA 95112
+    // Token 1 = One Washington Square
+    // Token 2 = San Jose
+    // Token 3 = CA 95112
+    // Separate Token 3 to get state code and zip code
     public void formatAddress(String address){
         String addressToken[] = address.split(",");
-        setStreetAddress(addressToken[0]);
-        setCity(addressToken[1]);
-        setState(addressToken[2]);
-        setZipCode(addressToken[3]);
+        String stateAndZipCode[] = addressToken[2].trim().split(" ");
+
+        String streetAddress = addressToken[0].trim();
+        String city = addressToken[1].trim();
+        String state = stateAndZipCode[0].trim();
+        String zipcode = stateAndZipCode[1].trim();
+
+
+        setStreetAddress(streetAddress);
+        setCity(city);
+        setState(state);
+        setZipCode(zipcode);
+
+
     }
 }

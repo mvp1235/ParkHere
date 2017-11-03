@@ -74,10 +74,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         //for now make reservation will just delete the listing on database.
         String startDate = clickedParking.getStartDate();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child(startDate).removeValue();
+        databaseReference.child("AvailableParkings").child(startDate).removeValue();
         //now just need to transition to home Fragment...
         //Huy can you do this in the morning?
-
+        setResult(RESULT_OK);
+        finish();
 
     }
 
