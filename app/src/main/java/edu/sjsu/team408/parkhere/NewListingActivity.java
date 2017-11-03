@@ -5,7 +5,6 @@ import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.location.*;
-import android.location.Address;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -33,7 +32,7 @@ public class NewListingActivity extends AppCompatActivity {
     private final static int TO_TIME = 3;
 
     private TextView owner;
-    private EditText address, price, startDate, endDate, startTime, endTime;
+    private EditText addressStreetNumber, addressCity, addressState, addressZipCode, price, startDate, endDate, startTime, endTime;
     private Button saveListingBtn;
 
     //For picking date of availability
@@ -55,7 +54,10 @@ public class NewListingActivity extends AppCompatActivity {
 
         //Referencing to the UI elements
         owner = (TextView) findViewById(R.id.listingOwner);
-        address = (EditText) findViewById(R.id.listingAddress);
+        addressStreetNumber = (EditText) findViewById(R.id.listingAddressStreetNumber);
+        addressCity = (EditText) findViewById(R.id.listingAddressCity);
+        addressState = (EditText) findViewById(R.id.listingAddressState);
+        addressZipCode = (EditText) findViewById(R.id.listingAddressZipCode);
         price = (EditText) findViewById(R.id.listingPrice);
         startDate = (EditText) findViewById(R.id.listingStartDate);
         endDate = (EditText) findViewById(R.id.listingEndDate);
@@ -116,7 +118,10 @@ public class NewListingActivity extends AppCompatActivity {
      */
     public void saveNewListing() {
         Intent i = new Intent();
-        String addressString = address.getText().toString();
+        String streetNumString = addressStreetNumber.getText().toString();
+        String cityString = addressCity.getText().toString();
+        String stateString = addressState.getText().toString();
+        String zipcodeString = addressZipCode.getText().toString();
         String priceString = price.getText().toString();
         String startDateString = startDate.getText().toString();
         String endDateString = endDate.getText().toString();
@@ -124,7 +129,7 @@ public class NewListingActivity extends AppCompatActivity {
         String endTimeString = endTime.getText().toString();
 
         //Making sure all fields are filled by user
-        if (addressString.isEmpty()) {
+        if (streetNumString.isEmpty() || cityString.isEmpty() || stateString.isEmpty() || zipcodeString.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Address cannot be blank...", Toast.LENGTH_SHORT).show();
         } else if (priceString.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Price cannot be blank...", Toast.LENGTH_SHORT).show();
@@ -137,19 +142,25 @@ public class NewListingActivity extends AppCompatActivity {
         } else if (endTimeString.isEmpty()) {
             Toast.makeText(getApplicationContext(), "End time cannot be blank...", Toast.LENGTH_SHORT).show();
         } else {
-            i.putExtra("address", addressString);
+            i.putExtra("streetNum", streetNumString);
+            i.putExtra("city", cityString);
+            i.putExtra("state", startDateString);
+            i.putExtra("zipcode", zipcodeString);
             i.putExtra("price", Double.parseDouble(priceString));
             i.putExtra("startDate", startDateString);
             i.putExtra("endDate", endDateString);
+
+
 
             Geocoder geocoder = new Geocoder(this);
             List<android.location.Address> addressList;
             LatLng point = null;
 
             try {
+                String addressString = streetNumString + ", " + cityString + ", " + stateString + " " + zipcodeString;
                 addressList = geocoder.getFromLocationName(addressString, 5);
-                if (addressList != null) {
-                    Address location = addressList.get(0);
+                if (addressList.size() > 0) {
+                    android.location.Address location = addressList.get(0);
                     location.getLatitude();
                     location.getLongitude();
                     point = new LatLng(location.getLatitude(), location.getLongitude());
@@ -159,6 +170,7 @@ public class NewListingActivity extends AppCompatActivity {
             }
 
             addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString, point);
+//            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString);
 
             setResult(RESULT_OK, i);
             finish();
@@ -232,6 +244,8 @@ public class NewListingActivity extends AppCompatActivity {
             ampm = "PM";
         } else if (hour == 0) {
             hour = 12;
+        } else if (hour == 12) {
+            ampm = "PM";
         }
 
         hourString = Integer.toString(hour);
@@ -250,6 +264,8 @@ public class NewListingActivity extends AppCompatActivity {
             ampm = "PM";
         } else if (hour == 0) {
             hour = 12;
+        } else if (hour == 12) {
+            ampm = "PM";
         }
 
         hourString = Integer.toString(hour);
@@ -286,7 +302,7 @@ public class NewListingActivity extends AppCompatActivity {
      * @param startTime start time
      * @param endTime   end time
      */
-    public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime, LatLng latLng) {
+    public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime, LatLng point) {
         String startDateList[] = startDate.split("-");
         String endDateList[] = endDate.split("-");
 
@@ -295,7 +311,7 @@ public class NewListingActivity extends AppCompatActivity {
         int startYear = Integer.parseInt(startDateList[2]);
 
         int endMonth = Integer.parseInt(endDateList[0]);
-        int endDay= Integer.parseInt(endDateList[1]);
+        int endDay = Integer.parseInt(endDateList[1]);
         int endYear = Integer.parseInt(endDateList[2]);
 
         String parentKey = "";
@@ -310,32 +326,47 @@ public class NewListingActivity extends AppCompatActivity {
             if(endMonth - startMonth == 0) {
                 //same month
                 if(endDay - startDay == 0) {
+
+
+
                     //same day, just add one key and value to database
                     String owner = this.owner.getText().toString();
                     String price = this.price.getText().toString();
-                    String address = this.address.getText().toString();
+                    //combine separate fields into full address
+                    String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
+                            + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
                     dataValue = getValue(startDate, endDate, startTime, endTime, this.userID, owner, price, address);
                     parentKey = startDate;
                     childKey = this.userID + "";
-                    databaseReference.child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                    databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
                 } else {
                     //more than one day in the same month
                     int i = endDay - startDay;
                     String owner = this.owner.getText().toString();
                     String price = this.price.getText().toString();
-                    String address = this.address.getText().toString();
+                    String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
+                            + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
                     childKey = this.userID + "";
                     while(i >= 0) {
-                        int newStartDay = startDay + i;
-                        int newEndDay = endDay;
-                        if(i != 0) {
-                            newEndDay += i;
+                        int newStartDayInt = startDay + i;
+                        int newEndDayInt = endDay;
+                        //if(i != 0) {
+                          //  newEndDayInt += i;
+                        //}
+                        String newStartDate = startMonth + "-" + newStartDayInt + "-" + startYear;
+                        //String newEndDate = endMonth + "-" + newEndDayInt + "-" + endYear;
+                        String newEndDate = newStartDate;  //making start date and end date the same.
+
+                        if(newStartDayInt < 10){
+                            newStartDate = startMonth + "-0" + newStartDayInt + "-" + startYear;
                         }
-                        String newStartDate = startMonth + "-" + newStartDay + "-" + startYear;
-                        String newEndDate = endMonth + "-" + newEndDay + "-" + endYear;
+                       // if(newEndDayInt < 10) {
+                        //    newEndDate = endMonth + "-0" + newEndDayInt + "-" + endYear;
+                       // }
+
                         dataValue = getValue(newStartDate, newEndDate, startTime, endTime, this.userID, owner, price, address);
                         parentKey = newStartDate;
-                        databaseReference.child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                        databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
                         i--;
                     }
                 }
@@ -357,8 +388,7 @@ public class NewListingActivity extends AppCompatActivity {
         //String result ="";
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
         edu.sjsu.team408.parkhere.Address addr = new edu.sjsu.team408.parkhere.Address(address);    //correct format later
-        User owner = new User(userID+"", ownerName, null,null,
-                null,null);
+        User owner = new User(userID+"", ownerName, null,null,null,null);
         String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
         String specialInstruction = "";
 

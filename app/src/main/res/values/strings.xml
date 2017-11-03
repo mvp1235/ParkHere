@@ -41,5 +41,9 @@
     <string name="signUp">Sign Up</string>
     <string name="signIn">Sign In</string>
     <string name="logOut">Log Out</string>
+    <string name="streetAddress">Street Address</string>
+    <string name="city">City</string>
+    <string name="state">State</string>
+    <string name="zipCode">Zip Code</string>
 
 </resources>

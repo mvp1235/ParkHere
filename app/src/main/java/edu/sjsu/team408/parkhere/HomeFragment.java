@@ -43,7 +43,7 @@ public class HomeFragment extends Fragment {
             // Use the current date as the default date in the picker
             Calendar c = Calendar.getInstance();
             int year = c.get(Calendar.YEAR);
-            int month = c.get(Calendar.MONTH) + 1;  //starts from 0 for no reason
+            int month = c.get(Calendar.MONTH);  //starts from 0 for no reason
             int day = c.get(Calendar.DAY_OF_MONTH);
 
             // Create a new instance of DatePickerDialog and return it
@@ -51,7 +51,7 @@ public class HomeFragment extends Fragment {
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            setDate(year, month, day);
+            setDate(year, month + 1, day);  // add one to month to get proper month number (0 for january , ...)
         }
     }
 
