@@ -194,7 +194,6 @@ public class ProfileFragment extends Fragment {
     private void signOut() {
         mAuth.signOut();
         refreshPage();
-//        updateUI(null);
     }
 
     private void refreshPage() {
@@ -203,7 +202,5 @@ public class ProfileFragment extends Fragment {
         transaction.replace(R.id.content, new ProfileFragment());
         transaction.commit();
     }
-
-
 
 }

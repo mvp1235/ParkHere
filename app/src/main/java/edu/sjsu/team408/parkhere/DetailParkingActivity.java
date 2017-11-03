@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.firebase.database.DataSnapshot;
@@ -40,6 +41,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveBtn = (Button) findViewById(R.id.reserveBtn);
 
         Intent intent = getIntent();
+
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
 
         clickedParking = new ParkingSpace(bundle);
@@ -65,6 +67,15 @@ public class DetailParkingActivity extends AppCompatActivity {
                 makeReservation();
             }
         });
+
+        //Hide distance if user is checking history
+        int request = intent.getIntExtra("requestCode", 0);
+        LinearLayout ll = findViewById(R.id.detailParkingDistanceLL);
+        if (request == BookingHistoryActivity.VIEW_DETAIL_BOOKING || request == ListingHistoryActivity.VIEW_DETAIL_LISTING) {
+            ll.setVisibility(View.GONE);
+        } else {
+            ll.setVisibility(View.VISIBLE);
+        }
     }
 
     /**

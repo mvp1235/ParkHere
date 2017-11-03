@@ -65,9 +65,6 @@ public class SearchResultActivity extends ListActivity {
                 //not supported
             }
         });
-
-        //showResult();
-
     }
 
     @Override
@@ -85,6 +82,7 @@ public class SearchResultActivity extends ListActivity {
         b.putDouble(PRICE, parking.getPrice());
 
         intent.putExtra(PARKING_BUNDLE, b);
+        intent.putExtra("requestCode", VIEW_DETAIL_PARKING);
         startActivityForResult(intent, VIEW_DETAIL_PARKING);
 
     }
@@ -99,35 +97,7 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    //Generate some parking spaces for testing
-    //Later on, we will generate an arraylist of parking spaces with datas in Firebase
-    public void populateDefaultParkingSpaces() {
-        //parkingSpaces = new ArrayList<ParkingSpace>();
-
-//        public Address(String streetAddress, String city, String state, String zipCode) {
-        Address address = new Address("1 Washington Square", "San Jose", "CA", "95112");
-
-//        public User(String id, String name, Address address, String phoneNumber, String emailAddress, String profileURL) {
-        //Assume one user is creating all the listing
-        User user = new User("huy123", "Huy Nguyen", address, "408-123-4567", "huy.nguyen@sjsu.edu",
-                "http://static2.businessinsider.com/image/5899ffcf6e09a897008b5c04-1200/.jpg");
-
-
-//    public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction, String startDate, String endDate, int price)
-        ParkingSpace p = new ParkingSpace(address, user, "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg",
-                "watch out for dogs", "1/1/2017", "2/2/2017", 5.99);
-
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-    }
-
     private void showResult (){
-        //Construct data source
-        populateDefaultParkingSpaces();
-
         // Create the adapter to convert the array to views
         ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces);
 

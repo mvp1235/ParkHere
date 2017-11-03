@@ -45,5 +45,7 @@
     <string name="city">City</string>
     <string name="state">State</string>
     <string name="zipCode">Zip Code</string>
+    <string name="bookings">Bookings</string>
+    <string name="listings">Listings</string>
 
 </resources>

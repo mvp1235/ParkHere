@@ -24,6 +24,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
 
+import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
+
 public class NewListingActivity extends AppCompatActivity {
 
     private final static int FROM_DATE = 0;
@@ -50,6 +52,10 @@ public class NewListingActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_listing);
 
+        databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
+        firebaseAuth = FirebaseAuth.getInstance();
+        userID = firebaseAuth.getCurrentUser().getUid();
+
         Intent intent = getIntent();
 
         //Referencing to the UI elements
@@ -64,6 +70,9 @@ public class NewListingActivity extends AppCompatActivity {
         startTime = (EditText) findViewById(R.id.listingStartTime);
         endTime = (EditText) findViewById(R.id.listingEndTime);
 
+        //For making new listing quicker
+        populateDefaultValuesForTesting();
+
         saveListingBtn = (Button) findViewById(R.id.saveListingBtn);
         saveListingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,8 +81,7 @@ public class NewListingActivity extends AppCompatActivity {
             }
         });
 
-        String ownerName = intent.getStringExtra("name");
-        owner.setText(ownerName);
+        owner.setText(userID);
 
         //Get the current day, month, and year
         calendar = Calendar.getInstance();
@@ -107,9 +115,6 @@ public class NewListingActivity extends AppCompatActivity {
             }
         });
 
-        databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
-        firebaseAuth = FirebaseAuth.getInstance();
-        userID = firebaseAuth.getCurrentUser().getUid();
 
     }
 
@@ -327,8 +332,6 @@ public class NewListingActivity extends AppCompatActivity {
                 //same month
                 if(endDay - startDay == 0) {
 
-
-
                     //same day, just add one key and value to database
                     String owner = this.owner.getText().toString();
                     String price = this.price.getText().toString();
@@ -397,6 +400,17 @@ public class NewListingActivity extends AppCompatActivity {
         return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, Double.parseDouble(price));
     }
 
+    public void populateDefaultValuesForTesting() {
+        addressStreetNumber.setText("1 Washington Square");
+        addressCity.setText("San Jose");
+        addressState.setText("CA");
+        addressZipCode.setText("95112");
+        price.setText("5.0");
+        startDate.setText("11-10-2017");
+        endDate.setText("11-10-2017");
+        startTime.setText("5:00 PM");
+        endTime.setText("10:00 PM");
 
+    }
 
 }

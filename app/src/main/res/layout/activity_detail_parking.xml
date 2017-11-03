@@ -144,6 +144,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:background="@color/light_gray_background"
+            android:id="@+id/detailParkingDistanceLL"
             android:orientation="horizontal">
 
             <TextView

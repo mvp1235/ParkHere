@@ -54,8 +54,7 @@ public class Address implements Parcelable {
     };
 
     public String toString(){
-        String address = streetAddress + ", " + city + ", " + state + " " + zipCode;        // state is null for some reason
-        Log.i("TEST", state + " SDSDS");    //FIX
+        String address = streetAddress + ", " + city + ", " + state + " " + zipCode;
         return address;
     }
 
