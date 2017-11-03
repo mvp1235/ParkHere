@@ -107,7 +107,7 @@ public class NewListingActivity extends AppCompatActivity {
 
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
         firebaseAuth = FirebaseAuth.getInstance();
-        userID = firebaseAuth.getCurrentUser().getUid(); //just random we will implement this later....
+        userID = firebaseAuth.getCurrentUser().getUid();
 
     }
 
@@ -155,13 +155,11 @@ public class NewListingActivity extends AppCompatActivity {
                     point = new LatLng(location.getLatitude(), location.getLongitude());
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Toast.makeText(getApplicationContext(), "The address is invalid, please try again", Toast.LENGTH_SHORT).show();
             }
 
-
-
             addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString, point);
-            
+
             setResult(RESULT_OK, i);
             finish();
         }
@@ -353,18 +351,20 @@ public class NewListingActivity extends AppCompatActivity {
         //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
     }
 
-    private static ParkingSpace getValue(String startDate, String endDate, String startTime, String endTime, String userID, String ownerName, String price, String address) {
+    private static ParkingSpace getValue(String startDate, String endDate, String startTime,
+                                         String endTime, String userID, String ownerName,
+                                         String price, String address) {
         //String result ="";
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
         edu.sjsu.team408.parkhere.Address addr = new edu.sjsu.team408.parkhere.Address(address);    //correct format later
-        User owner = new User(userID+"", ownerName, null,null,null,null);
+        User owner = new User(userID+"", ownerName, null,null,
+                null,null);
         String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
         String specialInstruction = "";
-        ParkingSpace newParkingSpace = new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, Double.parseDouble(price));
 
 
         //return result;
-        return newParkingSpace;
+        return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, Double.parseDouble(price));
     }
 
 
