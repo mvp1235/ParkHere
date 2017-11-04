@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.location.*;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -16,13 +17,17 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.ValueEventListener;
 
 import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 
@@ -45,7 +50,6 @@ public class NewListingActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private String userID;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -114,6 +118,9 @@ public class NewListingActivity extends AppCompatActivity {
                 showDialog(TO_TIME);
             }
         });
+
+
+
 
 
     }
@@ -310,6 +317,7 @@ public class NewListingActivity extends AppCompatActivity {
     public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime, LatLng point) {
         String startDateList[] = startDate.split("-");
         String endDateList[] = endDate.split("-");
+        ArrayList<ParkingSpace> listOfParkings = new ArrayList<>();
 
         int startMonth = Integer.parseInt(startDateList[0]);
         int startDay = Integer.parseInt(startDateList[1]);
@@ -342,6 +350,7 @@ public class NewListingActivity extends AppCompatActivity {
                     parentKey = startDate;
                     childKey = this.userID + "";
                     databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                    listOfParkings.add(dataValue);
                 } else {
                     //more than one day in the same month
                     int i = endDay - startDay;
@@ -350,6 +359,7 @@ public class NewListingActivity extends AppCompatActivity {
                     String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                             + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
                     childKey = this.userID + "";
+
                     while(i >= 0) {
                         int newStartDayInt = startDay + i;
                         int newEndDayInt = endDay;
@@ -370,8 +380,10 @@ public class NewListingActivity extends AppCompatActivity {
                         dataValue = getValue(newStartDate, newEndDate, startTime, endTime, this.userID, owner, price, address);
                         parentKey = newStartDate;
                         databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                        listOfParkings.add(dataValue);
                         i--;
                     }
+
                 }
             } else {
                 //not within the same month
@@ -383,6 +395,10 @@ public class NewListingActivity extends AppCompatActivity {
         //*******   Process so far: Complete listing for one day and multiple days in a row.
         //technique - making start day as parent key and userID for child key.
         //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
+
+        addListingToUser(listOfParkings);
+
+
     }
 
     private static ParkingSpace getValue(String startDate, String endDate, String startTime,
@@ -413,4 +429,32 @@ public class NewListingActivity extends AppCompatActivity {
 
     }
 
+
+    private void addListingToUser(ArrayList<ParkingSpace> list) {
+        final ArrayList<ParkingSpace> newList = list;
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("asd", "asdfa");
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            User currentUser = null;
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                            currentUser.addToListingHistory(newList);
+                            databaseReference.child("Users").child(currentUser.getId()).setValue(currentUser);
+                        }
+                    }
+                }
+
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
 }

@@ -7,6 +7,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 public class ListingHistoryActivity extends ListActivity {
@@ -14,24 +21,48 @@ public class ListingHistoryActivity extends ListActivity {
     public static final int VIEW_DETAIL_LISTING = 2001;
 
     private ArrayList<ParkingSpace> parkingSpaces;
+    private DatabaseReference databaseReference;
+    private FirebaseAuth firebaseAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_listing_history);
-
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
         parkingSpaces = new ArrayList<>();
 
-        populateDataForTesting();
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            User currentUser = null;
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+
+
+                            parkingSpaces = currentUser.getMyListingHistory();
+
+                            showMyListingHistory();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        //populateDataForTesting();
 
         //Populate parking spaces with user's reserved parking spaces
 
 
-        // Create the adapter to convert the array to views
-        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
 
-        // Attach the adapter to a ListView
-        setListAdapter(adapter);
     }
 
     public void populateDataForTesting(){
@@ -78,5 +109,17 @@ public class ListingHistoryActivity extends ListActivity {
 
             }
         }
+    }
+
+    private void showMyListingHistory() {
+        if(parkingSpaces == null) {
+            //empty
+            return;
+        }
+        // Create the adapter to convert the array to views
+        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
+
+        // Attach the adapter to a ListView
+        setListAdapter(adapter);
     }
 }

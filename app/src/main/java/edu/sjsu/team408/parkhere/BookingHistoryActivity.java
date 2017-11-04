@@ -111,7 +111,10 @@ public class BookingHistoryActivity extends ListActivity {
 
 
     private void showCurrentlyReservedParkings() {
-
+        if(parkingSpaces == null) {
+            //empty
+            return;
+        }
         // Create the adapter to convert the array to views
         HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
 

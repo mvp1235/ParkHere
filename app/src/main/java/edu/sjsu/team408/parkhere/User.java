@@ -18,6 +18,7 @@ public class User implements Parcelable{
     private String emailAddress;
     private String profileURL;
     private ArrayList<ParkingSpace> myCurrentReservedParkings;
+    private ArrayList<ParkingSpace> myListingHistory;
 
     public User(){};
 
@@ -29,6 +30,7 @@ public class User implements Parcelable{
         this.emailAddress = emailAddress;
         this.profileURL = profileURL;
         this.myCurrentReservedParkings = new ArrayList<>();     //empty first created
+        this.myListingHistory = new ArrayList<>();
     }
 
 
@@ -127,4 +129,9 @@ public class User implements Parcelable{
         return myCurrentReservedParkings;
     }
 
+    public void addToListingHistory(ArrayList<ParkingSpace> newList) {
+        this.myListingHistory = newList;
+    }
+
+    public ArrayList<ParkingSpace> getMyListingHistory() {return this.myListingHistory;}
 }
