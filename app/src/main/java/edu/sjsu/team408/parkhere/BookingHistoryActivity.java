@@ -7,6 +7,13 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
 
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 import java.util.ArrayList;
 
 public class BookingHistoryActivity extends ListActivity {
@@ -14,24 +21,46 @@ public class BookingHistoryActivity extends ListActivity {
     public static final int VIEW_DETAIL_BOOKING = 5000;
 
     private ArrayList<ParkingSpace> parkingSpaces;
+    private DatabaseReference databaseReference;
+    private FirebaseAuth firebaseAuth;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_booking_history);
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
+
 
         parkingSpaces = new ArrayList<>();
 
-        populateDataForTesting();
+        //populateDataForTesting();
 
         //Populate parking spaces with user's reserved parking spaces
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
 
 
-        // Create the adapter to convert the array to views
-        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
+                            parkingSpaces = currentUser.getMyCurrentReservedParkings();
+                            showCurrentlyReservedParkings();
+                        }
+                    }
+                }
+            }
 
-        // Attach the adapter to a ListView
-        setListAdapter(adapter);
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
     }
 
     public void populateDataForTesting(){
@@ -42,11 +71,11 @@ public class BookingHistoryActivity extends ListActivity {
         ParkingSpace p = new ParkingSpace(address, user, "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg",
                 "watch out for dogs", "1/1/2017", "1/1/2017", 5.99);
 
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
-        parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
+        //parkingSpaces.add(p);
 
     }
 
@@ -80,4 +109,13 @@ public class BookingHistoryActivity extends ListActivity {
         }
     }
 
+
+    private void showCurrentlyReservedParkings() {
+
+        // Create the adapter to convert the array to views
+        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
+
+        // Attach the adapter to a ListView
+        setListAdapter(adapter);
+    }
 }

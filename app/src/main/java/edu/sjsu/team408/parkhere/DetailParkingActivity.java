@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -23,14 +24,16 @@ public class DetailParkingActivity extends AppCompatActivity {
     private ImageView parkingPhoto;
     private Button reserveBtn;
     private DatabaseReference databaseReference;
+    private FirebaseAuth firebaseAuth;
     private ParkingSpace clickedParking;
+    private User currentUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_parking);
-        //databaseReference = FirebaseDatabase.getInstance().getReference();
-
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
         //Reference to the UI elements
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
         ownerTV = (TextView) findViewById(R.id.detailParkingOwner);
@@ -82,14 +85,47 @@ public class DetailParkingActivity extends AppCompatActivity {
      * Implement reservation functionality here
      */
     public void makeReservation() {
-        //for now make reservation will just delete the listing on database.
-        String startDate = clickedParking.getStartDate();
-        databaseReference = FirebaseDatabase.getInstance().getReference();
-        databaseReference.child("AvailableParkings").child(startDate).removeValue();
-        //now just need to transition to home Fragment...
-        //Huy can you do this in the morning?
-        setResult(RESULT_OK);
-        finish();
+        final String startDate = clickedParking.getStartDate();
+
+        //here add the reserved parking to user's myCurrentReservedParkings lists
+
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+
+
+                            currentUser.addReservedParking(clickedParking);
+
+                            //for now make reservation will just delete the listing on database.
+
+                            //databaseReference = FirebaseDatabase.getInstance().getReference();
+                            String currentUserID = currentUser.getId();
+                            databaseReference.child("AvailableParkings").child(startDate).removeValue();
+                            databaseReference.child("Users").child(currentUserID).setValue(currentUser);
+                            //now just need to transition to home Fragment...
+                            //Huy can you do this in the morning?
+                            setResult(RESULT_OK);
+
+                            finish();
+
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
     }
 

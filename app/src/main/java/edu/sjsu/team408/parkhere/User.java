@@ -3,6 +3,9 @@ package edu.sjsu.team408.parkhere;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 /**
  * Created by MVP on 10/31/17.
  */
@@ -14,6 +17,7 @@ public class User implements Parcelable{
     private String phoneNumber;
     private String emailAddress;
     private String profileURL;
+    private ArrayList<ParkingSpace> myCurrentReservedParkings;
 
     public User(){};
 
@@ -24,6 +28,7 @@ public class User implements Parcelable{
         this.phoneNumber = phoneNumber;
         this.emailAddress = emailAddress;
         this.profileURL = profileURL;
+        this.myCurrentReservedParkings = new ArrayList<>();     //empty first created
     }
 
 
@@ -109,6 +114,17 @@ public class User implements Parcelable{
 
     public void setProfileURL(String profileURL) {
         this.profileURL = profileURL;
+    }
+
+    public void addReservedParking(ParkingSpace p) {
+        if(myCurrentReservedParkings == null) {
+            myCurrentReservedParkings = new ArrayList<ParkingSpace>();
+        }
+        myCurrentReservedParkings.add(p);
+    }
+
+    public ArrayList<ParkingSpace> getMyCurrentReservedParkings() {
+        return myCurrentReservedParkings;
     }
 
 }

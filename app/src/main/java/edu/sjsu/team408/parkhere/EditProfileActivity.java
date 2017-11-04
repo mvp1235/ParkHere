@@ -41,7 +41,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
 
 
-        //I'll do this later. Please don't edit this class - Duoc
+        //I'll do this later. Please don't edit this class - Duoc i'll take care of both UI and backend
         /**
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
