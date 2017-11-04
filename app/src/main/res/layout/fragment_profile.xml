@@ -71,8 +71,7 @@
             android:id="@+id/userFullName"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="Huy Nguyen" />
+            android:layout_weight="3" />
 
     </LinearLayout>
 
@@ -95,8 +94,7 @@
             android:id="@+id/userEmail"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="huy.nguyen@sjsu.edu" />
+            android:layout_weight="3" />
 
     </LinearLayout>
 
@@ -119,8 +117,7 @@
             android:id="@+id/userPhone"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="(408) 123-4567" />
+            android:layout_weight="3" />
 
     </LinearLayout>
 
@@ -143,8 +140,7 @@
             android:id="@+id/userAddress"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="3"
-            android:text="One Washington Square Hall, San Jose CA 95112" />
+            android:layout_weight="3" />
 
     </LinearLayout>
 

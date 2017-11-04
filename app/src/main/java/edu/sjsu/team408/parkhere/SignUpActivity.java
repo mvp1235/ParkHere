@@ -14,6 +14,8 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 import static edu.sjsu.team408.parkhere.ProfileFragment.TAG_SIGN_IN;
@@ -22,7 +24,7 @@ public class SignUpActivity extends AppCompatActivity {
 
     private EditText emailET, passwordET;
     private Button signUpBtn;
-
+    private DatabaseReference databaseReference;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +40,8 @@ public class SignUpActivity extends AppCompatActivity {
                 signUp();
             }
         });
+
+        databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
     private void signUp() {
@@ -62,6 +66,9 @@ public class SignUpActivity extends AppCompatActivity {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 Toast.makeText(SignUpActivity.this, "Signed up successfully.", Toast.LENGTH_SHORT).show();
 
+                                //stores userID in database
+                                storeUserInDatabase();
+
                                 Intent intent = new Intent();
                                 setResult(RESULT_OK);
                                 finish();
@@ -77,6 +84,16 @@ public class SignUpActivity extends AppCompatActivity {
                         }
                     });
         }
+    }
+
+
+    private void storeUserInDatabase() {
+        User newUser = new User();
+        String ID = mAuth.getCurrentUser().getUid();
+        String email = mAuth.getCurrentUser().getEmail();
+        newUser.setEmailAddress(email);
+        newUser.setId(ID);
+        databaseReference.child("Users").child(ID).setValue(newUser);
     }
 
 

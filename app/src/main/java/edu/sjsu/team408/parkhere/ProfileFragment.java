@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.style.TtsSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,7 +20,13 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
 import static android.app.Activity.RESULT_OK;
@@ -42,8 +49,9 @@ public class ProfileFragment extends Fragment {
     private TextView name, email, phone, address;
     private ImageView profile;
     private Button signUpBtn, signInBtn, logOutBtn;
-
-
+    private DatabaseReference databaseReference;
+    private FirebaseAuth firebaseAuth;
+    private User currentUser;
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -52,6 +60,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        databaseReference = FirebaseDatabase.getInstance().getReference();
+        firebaseAuth = FirebaseAuth.getInstance();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
@@ -65,7 +75,28 @@ public class ProfileFragment extends Fragment {
         logOutBtn = (Button) view.findViewById(R.id.profileLogoutBtn);
 
 
-        Picasso.with(getContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profile);
+
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    Log.d("asd", "asdfa");
+                    if(firebaseAuth.getCurrentUser() != null) {
+                        String targetID = firebaseAuth.getCurrentUser().getUid();
+                        if(!targetID.isEmpty()) {
+                            if (dataSnapshot.child("Users").hasChild(targetID)) {
+                                currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                                setCurrentUserProfile();
+                            }
+                        }
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+            });
+
 
         //Setting up editing profile button
         Button editBtn = (Button) view.findViewById(R.id.editProfileBtn);
@@ -108,6 +139,10 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+
+
+
+
         //Hiding/Showing elements based on whether user is logged in or not
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
@@ -119,6 +154,7 @@ public class ProfileFragment extends Fragment {
             view.findViewById(R.id.profileEmailLL).setVisibility(View.VISIBLE);
             view.findViewById(R.id.profilePhoneLL).setVisibility(View.VISIBLE);
             view.findViewById(R.id.profileAddressLL).setVisibility(View.VISIBLE);
+
         } else {
             view.findViewById(R.id.profileLL).setVisibility(View.GONE);
             view.findViewById(R.id.profileNameLL).setVisibility(View.GONE);
@@ -129,6 +165,8 @@ public class ProfileFragment extends Fragment {
             signUpBtn.setVisibility(View.VISIBLE);
             signInBtn.setVisibility(View.VISIBLE);
         }
+
+
         
         return view;
     }
@@ -201,6 +239,29 @@ public class ProfileFragment extends Fragment {
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.content, new ProfileFragment());
         transaction.commit();
+    }
+
+    private void setCurrentUserProfile() {
+
+        if(this.currentUser == null) {
+            return;
+        }
+
+        //String id = currentUser.getId();
+        String name = currentUser.getName();
+        Address address = currentUser.getAddress();
+        String phoneNumber = currentUser.getPhoneNumber();
+        String emailAddress = currentUser.getEmailAddress();
+        String profileURL = currentUser.getProfileURL();
+
+        this.name.setText(name);
+        if(address != null) {
+            this.address.setText(address.toString());
+        }
+        this.phone.setText(phoneNumber);
+        this.email.setText(emailAddress);
+        Picasso.with(getContext()).load(profileURL).into(profile);
+
     }
 
 }
