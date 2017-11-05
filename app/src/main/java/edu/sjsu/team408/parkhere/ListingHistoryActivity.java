@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class ListingHistoryActivity extends ListActivity {
 
-    public static final int VIEW_DETAIL_LISTING = 2001;
+    public static final int VIEW_DETAIL_HISTORY_LISTING = 2001;
 
     private ArrayList<ParkingSpace> parkingSpaces;
     private DatabaseReference databaseReference;
@@ -96,15 +96,15 @@ public class ListingHistoryActivity extends ListActivity {
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
 
         intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
-        intent.putExtra("requestCode", VIEW_DETAIL_LISTING);
-        startActivityForResult(intent, VIEW_DETAIL_LISTING);
+        intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_LISTING);
+        startActivityForResult(intent, VIEW_DETAIL_HISTORY_LISTING);
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == VIEW_DETAIL_LISTING) {
+        if(requestCode == VIEW_DETAIL_HISTORY_LISTING) {
             if (resultCode == RESULT_OK) {
 
             }

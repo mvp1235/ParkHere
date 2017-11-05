@@ -18,7 +18,7 @@ import java.util.ArrayList;
 
 public class BookingHistoryActivity extends ListActivity {
 
-    public static final int VIEW_DETAIL_BOOKING = 5000;
+    public static final int VIEW_DETAIL_HISTORY_BOOKING_ = 5000;
 
     private ArrayList<ParkingSpace> parkingSpaces;
     private DatabaseReference databaseReference;
@@ -94,15 +94,15 @@ public class BookingHistoryActivity extends ListActivity {
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
 
         intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
-        intent.putExtra("requestCode", VIEW_DETAIL_BOOKING);
-        startActivityForResult(intent, VIEW_DETAIL_BOOKING);
+        intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_BOOKING_);
+        startActivityForResult(intent, VIEW_DETAIL_HISTORY_BOOKING_);
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == VIEW_DETAIL_BOOKING) {
+        if(requestCode == VIEW_DETAIL_HISTORY_BOOKING_) {
             if (resultCode == RESULT_OK) {
 
             }
