@@ -32,7 +32,7 @@ public class SearchResultActivity extends ListActivity {
     static final String PRICE = "price";
 
 
-    private static final int VIEW_DETAIL_PARKING = 101;
+    static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
     private ArrayList<ParkingSpace> parkingSpaces;
     private DatabaseReference databaseReference;
 
@@ -82,15 +82,15 @@ public class SearchResultActivity extends ListActivity {
         b.putDouble(PRICE, parking.getPrice());
 
         intent.putExtra(PARKING_BUNDLE, b);
-        intent.putExtra("requestCode", VIEW_DETAIL_PARKING);
-        startActivityForResult(intent, VIEW_DETAIL_PARKING);
+        intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);
+        startActivityForResult(intent, VIEW_DETAIL_PARKING_FROM_RESULT);
 
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == VIEW_DETAIL_PARKING) {
+        if(requestCode == VIEW_DETAIL_PARKING_FROM_RESULT) {
             if (resultCode == RESULT_OK) {
                 finish();
             }

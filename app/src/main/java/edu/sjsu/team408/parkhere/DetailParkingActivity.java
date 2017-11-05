@@ -64,17 +64,30 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         priceTV.setText("$" + String.valueOf(clickedParking.getPrice()));
 
-        reserveBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                makeReservation();
-            }
-        });
+        int request = intent.getIntExtra("requestCode", 0);
+
+        //Add reservation functionality to reserve button only when the detailed page was requested from search result page
+        if (request == SearchResultActivity.VIEW_DETAIL_PARKING_FROM_RESULT) {
+            reserveBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    makeReservation();
+                }
+            });
+        }
+
+        // Set appropriate text for button
+        if (request == SearchResultActivity.VIEW_DETAIL_PARKING_FROM_RESULT) {
+            reserveBtn.setText("Reserve");
+        } else if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_) {
+            reserveBtn.setText("Book Again");
+        } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
+            reserveBtn.setText("List Again");
+        }
 
         //Hide distance if user is checking history
-        int request = intent.getIntExtra("requestCode", 0);
         LinearLayout ll = findViewById(R.id.detailParkingDistanceLL);
-        if (request == BookingHistoryActivity.VIEW_DETAIL_BOOKING || request == ListingHistoryActivity.VIEW_DETAIL_LISTING) {
+        if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_ || request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
             ll.setVisibility(View.GONE);
         } else {
             ll.setVisibility(View.VISIBLE);
