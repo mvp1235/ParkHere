@@ -328,8 +328,11 @@ public class NewListingActivity extends AppCompatActivity {
         int endYear = Integer.parseInt(endDateList[2]);
 
         String parentKey = "";
-        String childKey = "";
+        String parkingSpaceUidKey = "";
         ParkingSpace dataValue = null;
+
+        parkingSpaceUidKey = FirebaseDatabase.getInstance().getReference()
+
 
         //i'll clean up code later....
         //for now restriction is owner can post 1 listing per day.
@@ -348,8 +351,7 @@ public class NewListingActivity extends AppCompatActivity {
                             + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
                     dataValue = getValue(startDate, endDate, startTime, endTime, this.userID, owner, price, address);
                     parentKey = startDate;
-                    childKey = this.userID + "";
-                    databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                    databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
                     listOfParkings.add(dataValue);
                 } else {
                     //more than one day in the same month
@@ -358,8 +360,6 @@ public class NewListingActivity extends AppCompatActivity {
                     String price = this.price.getText().toString();
                     String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                             + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
-                    childKey = this.userID + "";
-
                     while(i >= 0) {
                         int newStartDayInt = startDay + i;
                         int newEndDayInt = endDay;
@@ -379,7 +379,8 @@ public class NewListingActivity extends AppCompatActivity {
 
                         dataValue = getValue(newStartDate, newEndDate, startTime, endTime, this.userID, owner, price, address);
                         parentKey = newStartDate;
-                        databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                        databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
+                        databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
                         listOfParkings.add(dataValue);
                         i--;
                     }

@@ -41,8 +41,8 @@ public class ListingHistoryActivity extends ListActivity {
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             User currentUser = null;
-                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-
+                            currentUser = dataSnapshot.child("Users").child(targetID).
+                                    getValue(User.class);
 
                             parkingSpaces = currentUser.getMyListingHistory();
 
