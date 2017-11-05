@@ -331,7 +331,12 @@ public class NewListingActivity extends AppCompatActivity {
         String parkingSpaceUidKey = "";
         ParkingSpace dataValue = null;
 
-        parkingSpaceUidKey = FirebaseDatabase.getInstance().getReference()
+//        parkingSpaceUidKey = FirebaseDatabase.getInstance().getReference()
+        parkingSpaceUidKey = FirebaseDatabase.getInstance().getReference().child("parkingSpaces")
+                .push().getKey();
+//        parentKey = databaseReference.child("parkingSpaces").push().getKey();
+
+
 
 
         //i'll clean up code later....
