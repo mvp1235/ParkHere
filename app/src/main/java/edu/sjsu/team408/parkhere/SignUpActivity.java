@@ -89,11 +89,20 @@ public class SignUpActivity extends AppCompatActivity {
 
     private void storeUserInDatabase() {
         User newUser = new User();
-        String ID = mAuth.getCurrentUser().getUid();
         String email = mAuth.getCurrentUser().getEmail();
+        String ID = mAuth.getCurrentUser().getUid();
+        String name = usernameFromEmail(email);
         newUser.setEmailAddress(email);
         newUser.setId(ID);
+        newUser.setName(name);
         databaseReference.child("Users").child(ID).setValue(newUser);
+    }
+    private String usernameFromEmail(String email) {
+        if (email.contains("@")) {
+            return email.split("@")[0];
+        } else {
+            return email;
+        }
     }
 
 

@@ -32,6 +32,7 @@ import com.google.firebase.database.ValueEventListener;
 import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 
 public class NewListingActivity extends AppCompatActivity {
+    private static final String TAG = NewListingActivity.class.getSimpleName();
 
     private final static int FROM_DATE = 0;
     private final static int TO_DATE = 1;
@@ -85,7 +86,27 @@ public class NewListingActivity extends AppCompatActivity {
             }
         });
 
-        owner.setText(userID);
+        // setting TextView of owner's name
+        databaseReference.child("Users").child(userID).addListenerForSingleValueEvent(
+                new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        User user = dataSnapshot.getValue(User.class);
+                        if (user == null) {
+                            // User is null, error out
+                            Log.e(TAG, "User " + userID + " is unexpectedly null");
+                            Toast.makeText(NewListingActivity.this,
+                                    "Error: could not fetch user.",
+                                    Toast.LENGTH_SHORT).show();
+                        } else {
+                            owner.setText(user.getName());
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                }
+        );
 
         //Get the current day, month, and year
         calendar = Calendar.getInstance();
@@ -331,13 +352,7 @@ public class NewListingActivity extends AppCompatActivity {
         String parkingSpaceUidKey = "";
         ParkingSpace dataValue = null;
 
-//        parkingSpaceUidKey = FirebaseDatabase.getInstance().getReference()
-        parkingSpaceUidKey = FirebaseDatabase.getInstance().getReference().child("parkingSpaces")
-                .push().getKey();
-//        parentKey = databaseReference.child("parkingSpaces").push().getKey();
-
-
-
+        parkingSpaceUidKey = databaseReference.child("parkingSpaces").push().getKey();
 
         //i'll clean up code later....
         //for now restriction is owner can post 1 listing per day.
