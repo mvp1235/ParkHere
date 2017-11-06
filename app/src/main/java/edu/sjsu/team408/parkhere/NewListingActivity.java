@@ -183,14 +183,13 @@ public class NewListingActivity extends AppCompatActivity {
             i.putExtra("startDate", startDateString);
             i.putExtra("endDate", endDateString);
 
-
-
+            // Getting latitude and longitude of an address
             Geocoder geocoder = new Geocoder(this);
             List<android.location.Address> addressList;
             LatLng point = null;
-
             try {
-                String addressString = streetNumString + ", " + cityString + ", " + stateString + " " + zipcodeString;
+                String addressString = streetNumString + ", " + cityString + ", "
+                        + stateString + " " + zipcodeString;
                 addressList = geocoder.getFromLocationName(addressString, 5);
                 if (addressList.size() > 0) {
                     android.location.Address location = addressList.get(0);
@@ -199,11 +198,12 @@ public class NewListingActivity extends AppCompatActivity {
                     point = new LatLng(location.getLatitude(), location.getLongitude());
                 }
             } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "The address is invalid, please try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "The address is invalid, " +
+                        "please try again", Toast.LENGTH_SHORT).show();
             }
 
-            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString, point);
-//            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString);
+            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString,
+                    point);
 
             setResult(RESULT_OK, i);
             finish();
@@ -335,7 +335,8 @@ public class NewListingActivity extends AppCompatActivity {
      * @param startTime start time
      * @param endTime   end time
      */
-    public void addListingToDatabase(String startDate, String endDate, String startTime, String endTime, LatLng point) {
+    public void addListingToDatabase(String startDate, String endDate, String startTime,
+                                     String endTime, LatLng point) {
         String startDateList[] = startDate.split("-");
         String endDateList[] = endDate.split("-");
         ArrayList<ParkingSpace> listOfParkings = new ArrayList<>();
@@ -348,11 +349,11 @@ public class NewListingActivity extends AppCompatActivity {
         int endDay = Integer.parseInt(endDateList[1]);
         int endYear = Integer.parseInt(endDateList[2]);
 
-        String parentKey = "";
-        String parkingSpaceUidKey = "";
-        ParkingSpace dataValue = null;
+        String parentKey;
+        String parkingSpaceUidKey;
+        ParkingSpace dataValue;
 
-        parkingSpaceUidKey = databaseReference.child("parkingSpaces").push().getKey();
+        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();
 
         //i'll clean up code later....
         //for now restriction is owner can post 1 listing per day.
@@ -369,7 +370,8 @@ public class NewListingActivity extends AppCompatActivity {
                     //combine separate fields into full address
                     String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                             + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
-                    dataValue = getValue(startDate, endDate, startTime, endTime, this.userID, owner, price, address);
+                    dataValue = getValue(startDate, endDate, startTime, endTime, this.userID, owner,
+                            price, address, point);
                     parentKey = startDate;
                     databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
                     listOfParkings.add(dataValue);
@@ -382,7 +384,7 @@ public class NewListingActivity extends AppCompatActivity {
                             + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
                     while(i >= 0) {
                         int newStartDayInt = startDay + i;
-                        int newEndDayInt = endDay;
+//                        int newEndDayInt = endDay;
                         //if(i != 0) {
                           //  newEndDayInt += i;
                         //}
@@ -397,10 +399,17 @@ public class NewListingActivity extends AppCompatActivity {
                         //    newEndDate = endMonth + "-0" + newEndDayInt + "-" + endYear;
                        // }
 
-                        dataValue = getValue(newStartDate, newEndDate, startTime, endTime, this.userID, owner, price, address);
+                        dataValue = getValue(newStartDate, newEndDate, startTime, endTime,
+                                this.userID, owner, price, address, point);
                         parentKey = newStartDate;
-                        databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
-                        databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
+
+                        //add listing to database
+                        databaseReference
+                                .child("AvailableParkings")
+                                .child(parentKey)
+                                .child(parkingSpaceUidKey)
+                                .setValue(dataValue);
+
                         listOfParkings.add(dataValue);
                         i--;
                     }
@@ -424,10 +433,10 @@ public class NewListingActivity extends AppCompatActivity {
 
     private static ParkingSpace getValue(String startDate, String endDate, String startTime,
                                          String endTime, String userID, String ownerName,
-                                         String price, String address) {
+                                         String price, String address, LatLng point) {
         //String result ="";
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
-        edu.sjsu.team408.parkhere.Address addr = new edu.sjsu.team408.parkhere.Address(address);    //correct format later
+        Address addr = new Address(address, point);    //correct format later
         User owner = new User(userID+"", ownerName, null,null,null,null);
         String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
         String specialInstruction = "";
@@ -449,7 +458,6 @@ public class NewListingActivity extends AppCompatActivity {
         endTime.setText("10:00 PM");
 
     }
-
 
     private void addListingToUser(ArrayList<ParkingSpace> list) {
         final ArrayList<ParkingSpace> newList = list;

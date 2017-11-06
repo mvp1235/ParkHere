@@ -65,6 +65,7 @@ public class ListingHistoryActivity extends ListActivity {
 
     }
 
+    /*
     public void populateDataForTesting(){
         //Populate default parking space for testing
         Address address = new Address("1 Washington Square", "San Jose", "CA", "95112");
@@ -80,6 +81,7 @@ public class ListingHistoryActivity extends ListActivity {
         parkingSpaces.add(p);
 
     }
+    */
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {

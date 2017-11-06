@@ -1,6 +1,5 @@
 package edu.sjsu.team408.parkhere;
 
-import android.*;
 import android.Manifest;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -8,21 +7,14 @@ import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
-import android.widget.Toast;
 
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.location.LocationSettingsRequest;
-import com.google.android.gms.location.LocationSettingsResult;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -32,7 +24,6 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * Created by DuocNguyen on 11/1/17.
@@ -75,7 +66,8 @@ public class SearchResultActivity extends ListActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child("AvailableParkings").hasChild(searchTerm)) {
-                    for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings").child(searchTerm).getChildren()) {
+                    for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings")
+                            .child(searchTerm).getChildren()) {
                         ParkingSpace p = userIDList.getValue(ParkingSpace.class);
                         parkingSpaces.add(p);
                         showResult();
@@ -109,13 +101,6 @@ public class SearchResultActivity extends ListActivity {
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             mLastLocation = task.getResult();
-
-//                            mLatitudeText.setText(String.format(Locale.ENGLISH, "%s: %f",
-//                                    mLatitudeLabel,
-//                                    mLastLocation.getLatitude()));
-//                            mLongitudeText.setText(String.format(Locale.ENGLISH, "%s: %f",
-//                                    mLongitudeLabel,
-//                                    mLastLocation.getLongitude()));
                         } else {
                             Log.w(TAG, "getLastLocation:exception", task.getException());
                             showSnackbar(getString(R.string.no_location_detected));
@@ -173,9 +158,6 @@ public class SearchResultActivity extends ListActivity {
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
-
-
-
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {

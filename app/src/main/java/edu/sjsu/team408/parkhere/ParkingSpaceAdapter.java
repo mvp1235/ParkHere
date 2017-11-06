@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 /**
  * Created by MVP on 11/1/2017.
@@ -21,13 +22,13 @@ import java.util.ArrayList;
 
 public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
     private Context mContext;
-    private Location mLocation;
+    private Location currentLocation;
 
     public ParkingSpaceAdapter(@NonNull Context context, ArrayList<ParkingSpace> parkingSpaces,
                                Location currentLocation) {
         super(context, 0, parkingSpaces);
         mContext = context;
-        mLocation = currentLocation;
+        this.currentLocation = currentLocation;
     }
 
     @NonNull
@@ -60,8 +61,9 @@ public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
 
         parkingPrice.setText("$" + String.valueOf(parking.getPrice()));
 
-        //For now, we will have every as 1 mile away, since we dont have google api implemented yet
-        parkingDistance.setText("1 mile away");
+        double distance = parking.getAddress().getDistanceBetweenThisAnd(currentLocation);
+        String distanceString = String.format(Locale.US,"%.2f miles away", distance);
+        parkingDistance.setText(distanceString);
 
         return convertView;
     }
