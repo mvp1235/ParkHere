@@ -51,7 +51,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Picasso.with(getApplicationContext()).load(clickedParking.getParkingImageUrl()).into(parkingPhoto);
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
-        ownerTV.setText(clickedParking.getOwner().getId());
+        ownerTV.setText(clickedParking.getOwner().getName());
         specialInstructionTV.setText(clickedParking.getSpecialInstruction());
 
         //If start date and end date are the same, only display the start date
