@@ -6,39 +6,50 @@ package edu.sjsu.team408.parkhere;
  * Address on detailed parking page is showing null
  */
 
+import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
+
+import com.google.android.gms.maps.model.LatLng;
 
 /**
  * Created by MVP on 10/31/17.
  */
 
 public class Address implements Parcelable {
+    private static final double MILES_TO_METER = 1609.344;
+
     private String streetAddress;
     private String city;
     private String state;
     private String zipCode;
+    private double latitude;
+    private double longitude;
 
-    public Address(){}
+    public Address() {
+    }
 
-    public Address(String streetAddress, String city, String state, String zipCode) {
+    public Address(String streetAddress, String city, String state, String zipCode,
+                   double latitude, double longitude) {
         this.streetAddress = streetAddress;
         this.city = city;
         this.state = state;
         this.zipCode = zipCode;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
-
 
     protected Address(Parcel in) {
         streetAddress = in.readString();
         city = in.readString();
         state = in.readString();
         zipCode = in.readString();
+        latitude = in.readDouble();
+        longitude = in.readDouble();
     }
 
-    public Address(String address) {
-        formatAddress(address);
+    public Address(String address, LatLng point) {
+        formatAddress(address, point);
     }
 
     public static final Creator<Address> CREATOR = new Creator<Address>() {
@@ -54,7 +65,8 @@ public class Address implements Parcelable {
     };
 
     public String toString(){
-        String address = streetAddress + ", " + city + ", " + state + " " + zipCode;
+        String address = streetAddress + ", " + city + ", " + state + " " + zipCode +
+                " " + latitude + " " + longitude;
         return address;
     }
 
@@ -72,6 +84,14 @@ public class Address implements Parcelable {
 
     public void setState(String state) { this.state = state;}
 
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
     public String getState() { return state;}
 
     public String getStreetAddress() {
@@ -84,6 +104,14 @@ public class Address implements Parcelable {
 
     public String getZipCode() {
         return zipCode;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
     }
 
     /**
@@ -114,6 +142,8 @@ public class Address implements Parcelable {
         dest.writeString(city);
         dest.writeString(state);
         dest.writeString(zipCode);
+        dest.writeDouble(latitude);
+        dest.writeDouble(longitude);
     }
 
     //The address should follow this format:
@@ -122,7 +152,7 @@ public class Address implements Parcelable {
     // Token 2 = San Jose
     // Token 3 = CA 95112
     // Separate Token 3 to get state code and zip code
-    public void formatAddress(String address){
+    public void formatAddress(String address, LatLng point){
         String addressToken[] = address.split(",");
         String stateAndZipCode[] = addressToken[2].trim().split(" ");
 
@@ -131,12 +161,20 @@ public class Address implements Parcelable {
         String state = stateAndZipCode[0].trim();
         String zipcode = stateAndZipCode[1].trim();
 
-
         setStreetAddress(streetAddress);
         setCity(city);
         setState(state);
         setZipCode(zipcode);
+        setLatitude(point.latitude);
+        setLongitude(point.longitude);
+    }
 
+    public double getDistanceBetweenThisAnd(Location thatLocation) {
+        Location thisLocation = new Location("");
 
+        thisLocation.setLatitude(this.latitude);
+        thisLocation.setLongitude(this.longitude);
+
+        return thisLocation.distanceTo(thatLocation) / MILES_TO_METER;
     }
 }

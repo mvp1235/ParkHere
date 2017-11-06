@@ -19,7 +19,7 @@ public class ParkingSpace implements Parcelable{
     private double price;
 
 
-    public ParkingSpace(){};
+    public ParkingSpace(){}
 
     public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction, String startDate, String endDate, double price) {
         this.address = address;

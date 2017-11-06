@@ -63,21 +63,21 @@ public class BookingHistoryActivity extends ListActivity {
 
     }
 
-    public void populateDataForTesting(){
-        //Populate default parking space for testing
-        Address address = new Address("1 Washington Square", "San Jose", "CA", "95112");
-        User user = new User("huy123", "Huy Nguyen", address, "408-123-4567", "huy.nguyen@sjsu.edu",
-                "http://static2.businessinsider.com/image/5899ffcf6e09a897008b5c04-1200/.jpg");
-        ParkingSpace p = new ParkingSpace(address, user, "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg",
-                "watch out for dogs", "1/1/2017", "1/1/2017", 5.99);
-
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-        //parkingSpaces.add(p);
-
-    }
+//    public void populateDataForTesting(){
+//        //Populate default parking space for testing
+//        Address address = new Address("1 Washington Square", "San Jose", "CA", "95112");
+//        User user = new User("huy123", "Huy Nguyen", address, "408-123-4567", "huy.nguyen@sjsu.edu",
+//                "http://static2.businessinsider.com/image/5899ffcf6e09a897008b5c04-1200/.jpg");
+//        ParkingSpace p = new ParkingSpace(address, user, "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg",
+//                "watch out for dogs", "1/1/2017", "1/1/2017", 5.99);
+//
+//        //parkingSpaces.add(p);
+//        //parkingSpaces.add(p);
+//        //parkingSpaces.add(p);
+//        //parkingSpaces.add(p);
+//        //parkingSpaces.add(p);
+//
+//    }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
