@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,6 +23,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private EditText emailET, passwordET;
     private Button signInBtn;
+    private TextView signInPromptsTV;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +33,7 @@ public class SignInActivity extends AppCompatActivity {
         emailET = (EditText) findViewById(R.id.signInEmail);
         passwordET = (EditText) findViewById(R.id.signInPassword);
         signInBtn = (Button) findViewById(R.id.signInBtn);
+        signInPromptsTV = (TextView) findViewById(R.id.signInPrompts);
 
         signInBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,13 +71,19 @@ public class SignInActivity extends AppCompatActivity {
                                 Intent intent = new Intent();
                                 setResult(RESULT_OK);
                                 finish();
-//                            updateUI(user);
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(TAG_SIGN_IN, "signInWithEmail:failure", task.getException());
-                                Toast.makeText(SignInActivity.this, "Login failed...Incorrect email or password",
-                                        Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
+                                if (task.getException().toString().contains("There is no user record corresponding to this identifier. The user may have been deleted.")) {
+                                    signInPromptsTV.setText("The email address provided is not associated with any user account.");
+                                } else if (task.getException().toString().contains("The password is invalid or the user does not have a password.")) {
+                                    signInPromptsTV.setText("Invalid password.");
+                                } else if (task.getException().toString().contains("The email address is badly formatted.")) {
+                                    signInPromptsTV.setText("The email address is not in valid format.");
+                                } else {
+                                    signInPromptsTV.setText("There are some problems with the server. Please try again later.");
+                                }
+
                             }
                         }
                     });

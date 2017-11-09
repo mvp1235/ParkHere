@@ -34,7 +34,7 @@ public class SignInTest {
     public ActivityTestRule<MainActivity> signInActivityActivityTestRule =
             new ActivityTestRule<MainActivity>(MainActivity.class);
 
-    /**
+    /*
      * An existing user with email huy123@gmail.com and password yolo123 has already existed in data base
      * Expected to sign in successfully and the profile page should load up all the user's profile information
      * Assuming that no current user login session is active
@@ -66,13 +66,13 @@ public class SignInTest {
     }
 
 
-    /**
+    /*
      * There is no such user with email "huy1@gmail.com" and password "yolo" in the user database
      * Expected not to successfully sign in, and the sign in page will remain in focus, waiting for user to enter another email/password combination
      * Assuming that no current user login session is active
      */
     @Test
-    public void signInFail() {
+    public void signInFailNotExist() {
         email = "huy1@gmail.com";
         password = "yolo123";
 
@@ -86,7 +86,6 @@ public class SignInTest {
         closeSoftKeyboard();
         onView(withId(R.id.signInBtn)).perform(click());
 
-
         //Allows enough time for the check method below to perform its action
         //Otherwise, the test activity just ends before it can access the email textview on the profile fragment
         try {
@@ -98,4 +97,34 @@ public class SignInTest {
         onView(withId(R.id.signInBtn)).check(matches(isDisplayed()));
     }
 
+    /*
+     * There is a user associated with the email "huy123@gmail.com", but the provided password "yolo12345" does not match.
+     * Expected not to successfully sign in, and the sign in page will remain in focus, waiting for user to enter the correct password
+     * Assuming that no current user login session is active
+     */
+    @Test
+    public void signInFailWrongPassword() {
+        email = "huy123@gmail.com";
+        password = "yolo12345";
+
+        //Click on profile fragment
+        onView(withId(R.id.navigation_profile)).perform(click());
+        //Click on sign in button (assuming no current login session exists)
+        onView(withId(R.id.profileSignInBtn)).perform(click());
+
+        onView(withId(R.id.signInEmail)).perform(typeText(email));
+        onView(withId(R.id.signInPassword)).perform(typeText(password));
+        closeSoftKeyboard();
+        onView(withId(R.id.signInBtn)).perform(click());
+
+        //Allows enough time for the check method below to perform its action
+        //Otherwise, the test activity just ends before it can access the email textview on the profile fragment
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.signInBtn)).check(matches(isDisplayed()));
+    }
 }

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,7 +23,12 @@ import static edu.sjsu.team408.parkhere.ProfileFragment.TAG_SIGN_IN;
 
 public class SignUpActivity extends AppCompatActivity {
 
+
+    static String EMAIL_EXIST_PROMPT = "The email address is already in use. Please choose another email.";
+    static String SERVER_PROBLEM_PROMPT = "There are some server problems. Please try again later.";
+    static String INVALID_EMAIL_FORMAT_PROMPT = "The email address is not in valid format.";
     private EditText emailET, passwordET;
+    private TextView signUpPromptsTV;
     private Button signUpBtn;
     private DatabaseReference databaseReference;
     @Override
@@ -33,6 +39,7 @@ public class SignUpActivity extends AppCompatActivity {
         emailET = (EditText) findViewById(R.id.signUpEmail);
         passwordET = (EditText) findViewById(R.id.signUpPassword);
         signUpBtn = (Button) findViewById(R.id.signUpBtn);
+        signUpPromptsTV = (TextView) findViewById(R.id.signUpPrompts);
 
         signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,13 +79,16 @@ public class SignUpActivity extends AppCompatActivity {
                                 Intent intent = new Intent();
                                 setResult(RESULT_OK);
                                 finish();
-//                            updateUI(user);
                             } else {
                                 // If sign in fails, display a message to the user.
                                 Log.w(ProfileFragment.TAG_SIGN_UP, "createUserWithEmail:failure", task.getException());
-                                Toast.makeText(SignUpActivity.this, "Authentication failed.",
-                                        Toast.LENGTH_SHORT).show();
-//                            updateUI(null);
+                                if (task.getException().toString().contains("The email address is already in use by another account")) {
+                                    signUpPromptsTV.setText(EMAIL_EXIST_PROMPT);
+                                } else if (task.getException().toString().contains("The email address is badly formatted.")) {
+                                    signUpPromptsTV.setText(INVALID_EMAIL_FORMAT_PROMPT);
+                                } else {
+                                    signUpPromptsTV.setText(SERVER_PROBLEM_PROMPT);
+                                }
                             }
 
                         }

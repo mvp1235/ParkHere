@@ -57,4 +57,9 @@
         android:layout_gravity="end"
         android:text="@string/signUp" />
 
+    <TextView
+        android:id="@+id/signUpPrompts"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
 </LinearLayout>
