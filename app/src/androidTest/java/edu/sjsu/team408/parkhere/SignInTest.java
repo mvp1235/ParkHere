@@ -16,9 +16,11 @@ import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.intent.Intents.intended;
 import static android.support.test.espresso.intent.matcher.IntentMatchers.hasComponent;
+import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
 import static android.support.test.espresso.matcher.ViewMatchers.withText;
 import static junit.framework.Assert.assertTrue;
+import static org.hamcrest.Matchers.not;
 
 /**
  * Created by MVP on 11/8/2017.
@@ -60,8 +62,40 @@ public class SignInTest {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-//        intended(hasComponent(MainActivity.class.getName()));
         onView(withId(R.id.userEmail)).check(matches(withText(email)));
+    }
+
+
+    /**
+     * There is no such user with email "huy1@gmail.com" and password "yolo" in the user database
+     * Expected not to successfully sign in, and the sign in page will remain in focus, waiting for user to enter another email/password combination
+     * Assuming that no current user login session is active
+     */
+    @Test
+    public void signInFail() {
+        email = "huy1@gmail.com";
+        password = "yolo123";
+
+        //Click on profile fragment
+        onView(withId(R.id.navigation_profile)).perform(click());
+        //Click on sign in button (assuming no current login session exists)
+        onView(withId(R.id.profileSignInBtn)).perform(click());
+
+        onView(withId(R.id.signInEmail)).perform(typeText(email));
+        onView(withId(R.id.signInPassword)).perform(typeText(password));
+        closeSoftKeyboard();
+        onView(withId(R.id.signInBtn)).perform(click());
+
+
+        //Allows enough time for the check method below to perform its action
+        //Otherwise, the test activity just ends before it can access the email textview on the profile fragment
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        onView(withId(R.id.signInBtn)).check(matches(isDisplayed()));
     }
 
 }
