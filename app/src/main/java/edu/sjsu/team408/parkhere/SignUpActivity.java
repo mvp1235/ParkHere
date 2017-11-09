@@ -107,7 +107,8 @@ public class SignUpActivity extends AppCompatActivity {
         newUser.setName(name);
         databaseReference.child("Users").child(ID).setValue(newUser);
     }
-    private String usernameFromEmail(String email) {
+
+    public static String usernameFromEmail(String email) {
         if (email.contains("@")) {
             return email.split("@")[0];
         } else {

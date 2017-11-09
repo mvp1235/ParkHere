@@ -95,6 +95,10 @@ public class Address implements Parcelable {
         this.longitude = longitude;
     }
 
+    public String getFullLatLngString() {
+        return latitude + ", " + longitude;
+    }
+
     public String getState() { return state;}
 
     public String getStreetAddress() {

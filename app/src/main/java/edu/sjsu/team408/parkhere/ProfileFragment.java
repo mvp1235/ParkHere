@@ -76,26 +76,26 @@ public class ProfileFragment extends Fragment {
 
 
 
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    Log.d("asd", "asdfa");
-                    if(firebaseAuth.getCurrentUser() != null) {
-                        String targetID = firebaseAuth.getCurrentUser().getUid();
-                        if(!targetID.isEmpty()) {
-                            if (dataSnapshot.child("Users").hasChild(targetID)) {
-                                currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                                setCurrentUserProfile();
-                            }
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Log.d("asd", "asdfa");
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                            setCurrentUserProfile();
                         }
                     }
                 }
+            }
 
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
 
-                }
-            });
+            }
+        });
 
 
         //Setting up editing profile button
@@ -138,9 +138,6 @@ public class ProfileFragment extends Fragment {
                 signOut();
             }
         });
-
-
-
 
 
         //Hiding/Showing elements based on whether user is logged in or not

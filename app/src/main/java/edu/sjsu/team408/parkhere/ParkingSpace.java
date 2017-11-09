@@ -24,7 +24,7 @@ public class ParkingSpace implements Parcelable{
     public ParkingSpace(){}
 
     public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction,
-                        String startDate, String endDate, String startTime, String endTime ,double price) {
+                        String startDate, String endDate, String startTime, String endTime, double price) {
         this.address = address;
         this.owner = owner;
         this.parkingImageUrl = parkingImageUrl;

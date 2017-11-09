@@ -51,7 +51,8 @@ public class HomeFragment extends Fragment {
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
-            setDate(year, month + 1, day);  // add one to month to get proper month number (0 for january , ...)
+            String completeDate = getDate(year, month+1, day);
+            setDate(completeDate);  // add one to month to get proper month number (0 for january , ...)
         }
     }
 
@@ -96,11 +97,6 @@ public class HomeFragment extends Fragment {
         intent.putExtra("date", searchDateET.getText().toString());   //instead of location it's just date for now.
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
 
-
-
-
-
-
     }
 
     public void showDatePickerDialog(View v) {
@@ -108,14 +104,17 @@ public class HomeFragment extends Fragment {
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
-
-    public static void setDate(int year, int month, int day) {
+    public static String getDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
         monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
         dayString = (day < 10) ? "0" + Integer.toString(day) : Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
+        return completeDate;
+    }
+
+    public static void setDate(String completeDate) {
         searchDateET.setText(completeDate);
     }
 }
