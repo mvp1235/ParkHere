@@ -35,7 +35,6 @@ public class SearchResultActivityTest {
     public void clickSearchBeforeFillingLocationAndDate() {
         onView(withId(R.id.searchBtn))
                 .perform(click());
-        intended(hasComponent(SearchResultActivity.class.getName()));
     }
     @Test
     public void clickSearchWithFillingOnlyDateButNoLocation() {}

@@ -176,7 +176,6 @@ public class SearchResultActivity extends ListActivity {
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);
         startActivityForResult(intent, VIEW_DETAIL_PARKING_FROM_RESULT);
-
     }
 
     @Override

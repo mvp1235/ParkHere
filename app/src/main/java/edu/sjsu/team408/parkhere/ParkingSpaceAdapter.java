@@ -53,17 +53,21 @@ public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
 
         //If start date and end date are the same, only display the start date
         //otherwise, have it in the format of "startDate - endDate"
-        String availableDate = parking.getStartDate();
-        if (!parking.getStartDate().equalsIgnoreCase(parking.getEndDate())) {
-            availableDate += " - " + parking.getEndDate();
+        try {
+            String availableDate = parking.getStartDate();
+            if (!parking.getStartDate().equalsIgnoreCase(parking.getEndDate())) {
+                availableDate += " - " + parking.getEndDate();
+            }
+            parkingDate.setText(availableDate);
+
+            parkingPrice.setText("$" + String.valueOf(parking.getPrice()));
+
+            double distance = parking.getAddress().getDistanceBetweenThisAnd(currentLocation);
+            String distanceString = String.format(Locale.US, "%.2f miles away", distance);
+            parkingDistance.setText(distanceString);
+        } catch (NullPointerException e) {
+
         }
-        parkingDate.setText(availableDate);
-
-        parkingPrice.setText("$" + String.valueOf(parking.getPrice()));
-
-        double distance = parking.getAddress().getDistanceBetweenThisAnd(currentLocation);
-        String distanceString = String.format(Locale.US,"%.2f miles away", distance);
-        parkingDistance.setText(distanceString);
 
         return convertView;
     }

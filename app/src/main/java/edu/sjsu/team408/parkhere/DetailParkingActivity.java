@@ -32,8 +32,10 @@ public class DetailParkingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_parking);
+
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+
         //Reference to the UI elements
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
         ownerTV = (TextView) findViewById(R.id.detailParkingOwner);
@@ -102,7 +104,6 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         //here add the reserved parking to user's myCurrentReservedParkings lists
 
-
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -126,20 +127,13 @@ public class DetailParkingActivity extends AppCompatActivity {
                             setResult(RESULT_OK);
 
                             finish();
-
                         }
                     }
                 }
             }
-
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
-
-
-
     }
-
 }
