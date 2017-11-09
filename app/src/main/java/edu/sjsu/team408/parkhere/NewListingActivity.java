@@ -431,9 +431,13 @@ public class NewListingActivity extends AppCompatActivity {
 
     }
 
-    private static ParkingSpace getValue(String startDate, String endDate, String startTime,
+    public static ParkingSpace getValue(String startDate, String endDate, String startTime,
                                          String endTime, String userID, String ownerName,
                                          String price, String address, LatLng point) {
+        if(startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty() ||
+                userID.isEmpty() || price.isEmpty() || address.isEmpty()) {
+            return null;
+        }
         //String result ="";
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
         Address addr = new Address(address, point);    //correct format later
@@ -443,7 +447,7 @@ public class NewListingActivity extends AppCompatActivity {
 
 
         //return result;
-        return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, Double.parseDouble(price));
+        return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price));
     }
 
     public void populateDefaultValuesForTesting() {

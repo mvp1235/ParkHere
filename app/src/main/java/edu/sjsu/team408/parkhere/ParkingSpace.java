@@ -16,12 +16,15 @@ public class ParkingSpace implements Parcelable{
     private String specialInstruction;
     private String startDate;
     private String endDate;
+    private String startTime;
+    private String endTime;
     private double price;
 
 
     public ParkingSpace(){}
 
-    public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction, String startDate, String endDate, double price) {
+    public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction,
+                        String startDate, String endDate, String startTime, String endTime ,double price) {
         this.address = address;
         this.owner = owner;
         this.parkingImageUrl = parkingImageUrl;
@@ -29,6 +32,8 @@ public class ParkingSpace implements Parcelable{
         this.startDate = startDate;
         this.endDate = endDate;
         this.price = price;
+        this.startTime = startTime;
+        this.endTime = endTime;
     }
 
     public ParkingSpace(Bundle b) {
@@ -118,6 +123,14 @@ public class ParkingSpace implements Parcelable{
     public void setPrice(double price) {
         this.price = price;
     }
+
+    public String getStartTime() {return this.startTime;}
+
+    public void setStartTime(String startTime) {this.startTime = startTime;}
+
+    public String getEndTime() { return this.endTime;}
+
+    public void setEndTime(String endTime) {this.endTime = endTime;}
 
     @Override
     public int describeContents() {
