@@ -5,21 +5,15 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.firebase.database.DatabaseReference;
 
 import java.util.Calendar;
 
@@ -33,7 +27,7 @@ public class HomeFragment extends Fragment {
 
     private Button searchBtn;
     private static EditText searchDateET;
-    private EditText searchTerm;
+    private EditText locationSearchTerm;
 
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
@@ -66,7 +60,7 @@ public class HomeFragment extends Fragment {
         // Inflate the layout for this fragment
 
         View view = inflater.inflate(R.layout.fragment_home, container, false);
-        searchTerm = (EditText) view.findViewById(R.id.searchTerm);
+        locationSearchTerm = (EditText) view.findViewById(R.id.locationSearchTerm);
 
 
         searchDateET = (EditText) view.findViewById(R.id.searchDate);
@@ -82,7 +76,7 @@ public class HomeFragment extends Fragment {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String searchQuery = searchTerm.getText().toString();
+                String searchQuery = locationSearchTerm.getText().toString();
                 searchListing(searchQuery);
             }
         });
@@ -91,12 +85,16 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
-
     public void searchListing(String location) {
+        String searchDate = searchDateET.getText().toString();
+        if (searchDate.isEmpty()) {
+            Toast.makeText(getContext(), "Please select a date.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
-        intent.putExtra("date", searchDateET.getText().toString());   //instead of location it's just date for now.
+        intent.putExtra("date", searchDate);
+        intent.putExtra("location", location);
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
-
     }
 
     public void showDatePickerDialog(View v) {
