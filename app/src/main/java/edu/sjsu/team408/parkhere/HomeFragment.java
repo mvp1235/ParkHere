@@ -92,7 +92,8 @@ public class HomeFragment extends Fragment {
             return;
         }
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
-        intent.putExtra("date", searchDate);   //instead of location it's just date for now.
+        intent.putExtra("date", searchDate);
+        intent.putExtra("location", location);
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
     }
 

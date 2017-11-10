@@ -4,7 +4,7 @@ import android.Manifest;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.Location;
+import android.location.*;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
@@ -12,9 +12,11 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -23,7 +25,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by DuocNguyen on 11/1/17.
@@ -48,7 +52,8 @@ public class SearchResultActivity extends ListActivity {
     private DatabaseReference databaseReference;
 
     private FusedLocationProviderClient mFusedLocationClient;
-    private Location mLastLocation;
+    private Location mLocation;
+    private boolean userHasDesiredLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,14 +65,20 @@ public class SearchResultActivity extends ListActivity {
 
         parkingSpaces = new ArrayList<ParkingSpace>();
         //get user input for location
-        final String searchTerm = intent.getStringExtra("date");
+        final String dateSearchTerm = intent.getStringExtra("date");
+        final String locationSearchTerm = intent.getStringExtra("location");
+
+        if (locationSearchTerm.isEmpty())
+            userHasDesiredLocation = false;
+        else
+            userHasDesiredLocation = true;
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("AvailableParkings").hasChild(searchTerm)) {
+                if(dataSnapshot.child("AvailableParkings").hasChild(dateSearchTerm)) {
                     for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings")
-                            .child(searchTerm).getChildren()) {
+                            .child(dateSearchTerm).getChildren()) {
                         ParkingSpace p = userIDList.getValue(ParkingSpace.class);
                         parkingSpaces.add(p);
                         showResult();
@@ -81,7 +92,27 @@ public class SearchResultActivity extends ListActivity {
             }
         });
 
-        mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        if (userHasDesiredLocation) {
+            // Getting latitude and longitude of an address
+            Geocoder geocoder = new Geocoder(this);
+            List<android.location.Address> addressList;
+            LatLng point = null;
+            try {
+                addressList = geocoder.getFromLocationName(locationSearchTerm, 5);
+                if (addressList.size() > 0) {
+                    android.location.Address address = addressList.get(0);
+                    address.getLatitude();
+                    address.getLongitude();
+                    mLocation = new Location("");
+                    mLocation.setLatitude(address.getLatitude());
+                    mLocation.setLongitude(address.getLongitude());
+                }
+            } catch (IOException e) {
+                Toast.makeText(getApplicationContext(), "The address is invalid, " +
+                        "please try again", Toast.LENGTH_SHORT).show();
+            }
+        } else // get current location
+            mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
     }
 
     @Override
@@ -89,7 +120,7 @@ public class SearchResultActivity extends ListActivity {
         super.onStart();
         if (!checkPermissions()) {
             requestPermissions();
-        } else {
+        } else if (!userHasDesiredLocation){
             getLastLocation();
         }
     }
@@ -100,7 +131,7 @@ public class SearchResultActivity extends ListActivity {
                     @Override
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
-                            mLastLocation = task.getResult();
+                            mLocation = task.getResult();
                         } else {
                             Log.w(TAG, "getLastLocation:exception", task.getException());
                             showSnackbar(getString(R.string.no_location_detected));
@@ -189,9 +220,10 @@ public class SearchResultActivity extends ListActivity {
     }
 
     private void showResult (){
+
         // Create the adapter to convert the array to views
         ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces,
-                mLastLocation);
+                mLocation);
 
         // Attach the adapter to a ListView
         setListAdapter(adapter);
