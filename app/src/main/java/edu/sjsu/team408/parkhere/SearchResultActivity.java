@@ -219,14 +219,17 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    private void showResult (){
+    private void showResult () {
+        // if a location is specified
+        if (mLocation != null) {
+            // Create the adapter to convert the array to views
+            ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces,
+                    mLocation);
 
-        // Create the adapter to convert the array to views
-        ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces,
-                mLocation);
-
-        // Attach the adapter to a ListView
-        setListAdapter(adapter);
+            // Attach the adapter to a ListView
+            setListAdapter(adapter);
+        } else {
+            Toast.makeText(this, R.string.addressInvalid, Toast.LENGTH_SHORT).show();
+        }
     }
-
 }

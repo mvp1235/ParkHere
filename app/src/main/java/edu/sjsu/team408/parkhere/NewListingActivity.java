@@ -198,8 +198,8 @@ public class NewListingActivity extends AppCompatActivity {
                     point = new LatLng(location.getLatitude(), location.getLongitude());
                 }
             } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "The address is invalid, " +
-                        "please try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.addressInvalid,
+                        Toast.LENGTH_SHORT).show();
             }
 
             addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString,
