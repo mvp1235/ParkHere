@@ -1,7 +1,10 @@
 package edu.sjsu.team408.parkhere;
 
+import android.location.Location;
+
 import com.google.android.gms.maps.model.LatLng;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertEquals;
@@ -10,6 +13,54 @@ import static junit.framework.Assert.assertEquals;
  * Created by DuocNguyen on 11/9/17.
  */
 public class AddressClassTest {
+    private Address testAddress;
+    @Before
+    public void createAddress() {
+        testAddress = new Address();
+    }
+
+    @Test
+    public void testSetAndGetCity() {
+        String city = "San Jose";
+        testAddress.setCity(city);
+        assertEquals(city, testAddress.getCity());
+    }
+
+    @Test
+    public void testSetAndGetState() {
+        String state = "California";
+        testAddress.setState(state);
+        assertEquals(state, testAddress.getState());
+    }
+
+    @Test
+    public void testSetAndGetLatitudeAndLongitude() {
+        double latitude = 37.348040;
+        double longitude = -121.894169;
+        testAddress.setLatitude(latitude);
+        testAddress.setLongitude(longitude);
+        assertEquals(latitude, testAddress.getLatitude());
+        assertEquals(longitude, testAddress.getLongitude());
+    }
+
+    @Test
+    public void testGetFullLatLngString() {
+        double latitude = 37.348040;
+        double longitude = -121.894169;
+        testAddress.setLatitude(latitude);
+        testAddress.setLongitude(longitude);
+        assertEquals(latitude + ", " + longitude,
+                testAddress.getFullLatLngString());
+    }
+
+    @Test
+    public void testGetStreetAddress() {
+        String streetAddress = "1 Washington Sq, San Jose, CA 95192";
+        testAddress.setStreetAddress(streetAddress);
+        assertEquals(streetAddress, testAddress.getStreetAddress());
+    }
+
+
     /**
      * Test the formatAddress function in Address Class
      * Providing expectedAdress comparing with formatAddress function Address object

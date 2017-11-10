@@ -67,5 +67,4 @@ public class WhiteBoxTesting {
         expectedString = "37.312646, -121.851722";
         assertEquals(computedString, expectedString);
     }
-
 }
