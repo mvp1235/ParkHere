@@ -4,6 +4,8 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.security.acl.Owner;
+
 /**
  * Created by MVP on 10/31/17.
  */
@@ -146,5 +148,10 @@ public class ParkingSpace implements Parcelable{
         dest.writeString(startDate);
         dest.writeString(endDate);
         dest.writeDouble(price);
+    }
+
+    public String toString() {
+
+        return address.toString() + " " + owner.toString() + " " + startDate + " " + endDate + " "+ startTime + " " + endTime + "" + price;
     }
 }

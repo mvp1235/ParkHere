@@ -31,6 +31,9 @@ public class Address implements Parcelable {
 
     public Address(String streetAddress, String city, String state, String zipCode,
                    double latitude, double longitude) {
+        if(streetAddress.isEmpty()) {
+            return;
+        }
         this.streetAddress = streetAddress;
         this.city = city;
         this.state = state;
@@ -65,7 +68,7 @@ public class Address implements Parcelable {
     };
 
     public String toString(){
-        if(streetAddress.isEmpty() || city.isEmpty() || state.isEmpty() || zipCode.isEmpty()) {
+        if(streetAddress == null || city == null || state == null || zipCode == null) {
             return "";
         }
         String address = streetAddress + ", " + city + ", " + state + " " + zipCode +
@@ -160,7 +163,7 @@ public class Address implements Parcelable {
     // Token 3 = CA 95112
     // Separate Token 3 to get state code and zip code
     public void formatAddress(String address, LatLng point){
-        if(address.isEmpty()) {
+        if(address.isEmpty() || point == null) {
             return;
         }
         String addressToken[] = address.split(",");

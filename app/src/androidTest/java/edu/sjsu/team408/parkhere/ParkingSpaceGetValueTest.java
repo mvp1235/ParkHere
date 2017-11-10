@@ -38,8 +38,9 @@ public class ParkingSpaceGetValueTest extends ActivityUnitTestCase<MainActivity>
         User u = new User();
         u.setName(ownerName);
         ParkingSpace expectedParkingSpace = new ParkingSpace(a, u, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime, Double.parseDouble(price));
+        String expected = expectedParkingSpace.toString();
 
-        assertEquals(expectedParkingSpace, NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point ));
+        assertEquals(expected, NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point ).toString());
     }
 
     @Test

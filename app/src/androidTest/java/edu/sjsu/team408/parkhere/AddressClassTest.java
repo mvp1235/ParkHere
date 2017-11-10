@@ -28,16 +28,18 @@ public class AddressClassTest  extends ActivityUnitTestCase<MainActivity> {
         String city = "San Jose";
         String state = "CA";
         String zipCode = "95127";
-        double latitude = 0;
-        double longitude = 0;
+        double latitude = 37.347750;
+        double longitude = -121.822458;
 
         Address expectedAddress = new Address(streetAddress, city, state, zipCode, latitude, longitude);
-        Address actual = new Address();
+        String expected = expectedAddress.toString();
+        Address actualAddress = new Address();
 
         String fullStreetAddress = "2770 Bristol Dr, San Jose, CA 95127";
-
-        actual.formatAddress(fullStreetAddress, null);
-        assertEquals(expectedAddress, actual);
+        LatLng point = new LatLng(latitude, longitude);
+        actualAddress.formatAddress(fullStreetAddress, point);
+        String actual = actualAddress.toString();
+        assertEquals(expected, actual);
     }
 
 
@@ -54,14 +56,10 @@ public class AddressClassTest  extends ActivityUnitTestCase<MainActivity> {
         String zipCode = "";
         double latitude = 0;
         double longitude = 0;
-
+        //LatLng point = new LatLng(latitude, longitude);
         Address expectedAddress = new Address(streetAddress, city, state, zipCode, latitude, longitude);
-        Address actual = new Address();
-
-        String fullStreetAddress = "";  //empty street address should return Address object with no attributes
-
-        actual.formatAddress(fullStreetAddress, null);
-        assertEquals(expectedAddress, actual);
+        String expected = expectedAddress.toString();
+        assertEquals(expected, "");
     }
 
     /**
@@ -70,8 +68,11 @@ public class AddressClassTest  extends ActivityUnitTestCase<MainActivity> {
     @Test
     public void toStringTest1() {
         String fullAddress = "2770 Bristol Dr, San Jose, CA 95127";
-        Address a = new Address(fullAddress, null);
-        assertEquals(fullAddress, a.toString());
+        LatLng point = new LatLng(37.347750, -121.822458);
+        Address a = new Address(fullAddress, point);
+        String expected = "2770 Bristol Dr, San Jose, CA 95127 37.34775 -121.822458";
+        String actual = a.toString();
+        assertEquals(expected, actual);
     }
 
     /**
@@ -82,7 +83,10 @@ public class AddressClassTest  extends ActivityUnitTestCase<MainActivity> {
     public void toStringTest2() {
         String fullAddress = "2770 Bristol Dr, CA 95127";   //missing City
         Address a = new Address(fullAddress, null);
-        assertEquals("", a.toString());
+        String expected = "";
+        String actual = a.toString();
+
+        assertEquals(expected, actual);
     }
 
 

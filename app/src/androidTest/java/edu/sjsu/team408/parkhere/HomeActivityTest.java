@@ -11,8 +11,7 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
-
-import static android.support.test.espresso.action.ViewActions.click;
+import static android.support.test.espresso.action.ViewActions.*;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.assertion.ViewAssertions.matches;
 import static android.support.test.espresso.matcher.ViewMatchers.isDisplayed;
@@ -45,10 +44,27 @@ public class HomeActivityTest {
 
         onView(withId(R.id.navigation_profile)).perform(click());
 
-        onView(withId(R.id.newListingBtn)).perform(click());
+
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
         onView(withId(R.id.navigation_profile)).check(matches(isDisplayed()));
     }
+
+    @Test
+    public void ListingButtonTest() {
+        onView(withId(R.id.navigation_profile)).perform(click());
+
+        onView(withId(R.id.newListingBtn)).perform(click());
+
+        onView(withId(R.id.listingAddressStreetNumber)).perform(click());
+
+        onView(withId(R.id.listingAddressStreetNumber)).check(matches(isDisplayed()));
+    }
+
 
     @Test
     public void listingCorrectStreetAddressInputTest(){
@@ -58,29 +74,12 @@ public class HomeActivityTest {
 
         onView(withId(R.id.newListingBtn)).perform(click());
 
-        onView(withId(R.id.listingAddressStreetNumber)).perform(typeText(streetAdress));
-
-        closeSoftKeyboard();
+        onView(withId(R.id.listingAddressStreetNumber)).perform(click(), clearText(), replaceText(streetAdress));
 
         onView(withId(R.id.listingAddressStreetNumber)).check(matches(withText(streetAdress)));
 
     }
 
-    @Test
-    public void listingCorrectPriceInputTest(){
-        String price = "100";
-
-        onView(withId(R.id.navigation_profile)).perform(click());
-
-        onView(withId(R.id.newListingBtn)).perform(click());
-
-        onView(withId(R.id.listingPrice)).perform(typeText(price));
-
-        closeSoftKeyboard();
-
-        onView(withId(R.id.listingPrice)).check(matches(withText(price)));
-
-    }
 
     @Test
     public void listingCorrectCityInputTest() {
@@ -90,9 +89,7 @@ public class HomeActivityTest {
 
         onView(withId(R.id.newListingBtn)).perform(click());
 
-        onView(withId(R.id.listingAddressCity)).perform(typeText(city));
-
-        closeSoftKeyboard();
+        onView(withId(R.id.listingAddressCity)).perform(click(), clearText(), replaceText(city));
 
         onView(withId(R.id.listingAddressCity)).check(matches(withText(city)));
 
@@ -107,25 +104,8 @@ public class HomeActivityTest {
 
         onView(withId(R.id.newListingBtn)).perform(click());
 
-        onView(withId(R.id.listingAddressState)).perform(typeText(state));
-
-        closeSoftKeyboard();
+        onView(withId(R.id.listingAddressState)).perform(click(), clearText(), replaceText(state));
 
         onView(withId(R.id.listingAddressState)).check(matches(withText(state)));
-    }
-
-    @Test
-    public void listingCorrectZipCodeInputTest() {
-        String zipcode = "95127";
-
-        onView(withId(R.id.navigation_profile)).perform(click());
-
-        onView(withId(R.id.newListingBtn)).perform(click());
-
-        onView(withId(R.id.listingAddressZipCode)).perform(typeText(zipcode));
-
-        closeSoftKeyboard();
-
-        onView(withId(R.id.listingAddressZipCode)).check(matches(withText(zipcode)));
     }
 }

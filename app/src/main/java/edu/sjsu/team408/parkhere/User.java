@@ -134,4 +134,8 @@ public class User implements Parcelable{
     }
 
     public ArrayList<ParkingSpace> getMyListingHistory() {return this.myListingHistory;}
+
+    public String toString () {
+        return getName();
+    }
 }
