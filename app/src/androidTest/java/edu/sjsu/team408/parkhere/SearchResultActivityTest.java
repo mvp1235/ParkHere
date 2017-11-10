@@ -26,6 +26,7 @@ public class SearchResultActivityTest {
     private String dateStringToBeEntered;
     private String locationStringToBeTyped;
     private String altLocationStringToBeTyped;
+    private String invalidLocationStringToBeTyped;
 
     @Rule
     public ActivityTestRule<MainActivity> activityActivityTestRule = new
@@ -35,6 +36,7 @@ public class SearchResultActivityTest {
         dateStringToBeEntered = "11-10-2017";
         locationStringToBeTyped = "64 S 4th St, San Jose";
         altLocationStringToBeTyped = "447 Great Mall Dr, Milpitas, CA 95035";
+        invalidLocationStringToBeTyped = "66S5th";
     }
 
     @Test
@@ -55,6 +57,19 @@ public class SearchResultActivityTest {
         slowDown2Secs();
         onView(withId(R.id.locationSearchTerm))
                 .perform(typeText(locationStringToBeTyped));
+        slowDown2Secs();
+        closeSoftKeyboard();
+        HomeFragment.setDate(dateStringToBeEntered);
+        slowDown2Secs();
+        onView(withId(R.id.searchBtn))
+                .perform(click());
+        slowDown2Secs();
+    }
+    @Test
+    public void clickSearchWithFillingDateButInvalidLocation() {
+        slowDown2Secs();
+        onView(withId(R.id.locationSearchTerm))
+                .perform(typeText(invalidLocationStringToBeTyped));
         slowDown2Secs();
         closeSoftKeyboard();
         HomeFragment.setDate(dateStringToBeEntered);

@@ -108,8 +108,7 @@ public class SearchResultActivity extends ListActivity {
                     mLocation.setLongitude(address.getLongitude());
                 }
             } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), "The address is invalid, " +
-                        "please try again", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), R.string.addressInvalid, Toast.LENGTH_SHORT).show();
             }
         } else // get current location
             mFusedLocationClient = LocationServices.getFusedLocationProviderClient(this);

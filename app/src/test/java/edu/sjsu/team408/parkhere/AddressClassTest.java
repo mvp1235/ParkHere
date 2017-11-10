@@ -1,23 +1,15 @@
 package edu.sjsu.team408.parkhere;
 
-import android.support.test.runner.AndroidJUnit4;
-import android.test.ActivityUnitTestCase;
-
 import com.google.android.gms.maps.model.LatLng;
 
 import org.junit.Test;
-import org.junit.runner.RunWith;
+
+import static junit.framework.Assert.assertEquals;
 
 /**
  * Created by DuocNguyen on 11/9/17.
  */
-@RunWith(AndroidJUnit4.class)
-public class AddressClassTest  extends ActivityUnitTestCase<MainActivity> {
-    public AddressClassTest(){
-        super(MainActivity.class);
-    }
-
-
+public class AddressClassTest {
     /**
      * Test the formatAddress function in Address Class
      * Providing expectedAdress comparing with formatAddress function Address object
@@ -88,6 +80,4 @@ public class AddressClassTest  extends ActivityUnitTestCase<MainActivity> {
 
         assertEquals(expected, actual);
     }
-
-
 }

@@ -1,8 +1,6 @@
 package edu.sjsu.team408.parkhere;
 
-import android.support.test.runner.AndroidJUnit4;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static edu.sjsu.team408.parkhere.SignUpActivity.usernameFromEmail;
 import static org.junit.Assert.*;
@@ -10,7 +8,6 @@ import static org.junit.Assert.*;
 /**
  * Created by MVP on 11/9/2017.
  */
-@RunWith(AndroidJUnit4.class)
 public class WhiteBoxTesting {
 
     /**

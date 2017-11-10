@@ -1,21 +1,16 @@
 package edu.sjsu.team408.parkhere;
 
-import android.support.test.runner.AndroidJUnit4;
 import android.test.ActivityUnitTestCase;
 import com.google.android.gms.maps.model.LatLng;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+
+import static org.junit.Assert.*;
+
 /**
  * Created by DuocNguyen on 11/8/17.
  */
-
-@RunWith(AndroidJUnit4.class)
-public class ParkingSpaceGetValueTest extends ActivityUnitTestCase<MainActivity>{
-    public ParkingSpaceGetValueTest() {
-        super(MainActivity.class);
-    }
-
-
+public class ParkingSpaceGetValueTest {
     @Test
     /**
      * Tests the helper function getValue() in NewListingActivity.java class.
