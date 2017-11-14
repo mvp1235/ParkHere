@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:layout_weight="2"
             android:contentDescription="@string/userProfilePictureDescription"
-            android:src="@drawable/common_google_signin_btn_icon_dark_normal" />
+            android:src="@mipmap/default_profile_photo" />
 
         <Button
             android:id="@+id/editProfileBtn"

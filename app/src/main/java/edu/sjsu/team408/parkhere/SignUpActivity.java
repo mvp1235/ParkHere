@@ -102,7 +102,7 @@ public class SignUpActivity extends AppCompatActivity {
         String email = mAuth.getCurrentUser().getEmail();
         String ID = mAuth.getCurrentUser().getUid();
         String name = usernameFromEmail(email);
-        String defaullProfileURL = "https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png";
+        String defaullProfileURL = "http://www.havoca.org/wp-content/uploads/2016/03/icon-user-default-300x300.png";
         newUser.setEmailAddress(email);
         newUser.setId(ID);
         newUser.setName(name);
