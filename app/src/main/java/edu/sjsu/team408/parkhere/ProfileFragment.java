@@ -76,7 +76,7 @@ public class ProfileFragment extends Fragment {
 
 
 
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 Log.d("asd", "asdfa");
@@ -85,7 +85,7 @@ public class ProfileFragment extends Fragment {
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                            setCurrentUserProfile();
+                            setCurrentUserProfile(currentUser);
                         }
                     }
                 }
@@ -238,18 +238,17 @@ public class ProfileFragment extends Fragment {
         transaction.commit();
     }
 
-    private void setCurrentUserProfile() {
+    private void setCurrentUserProfile(User user) {
 
-        if(this.currentUser == null) {
+        if(user == null) {
             return;
         }
-
         //String id = currentUser.getId();
-        String name = currentUser.getName();
-        Address address = currentUser.getAddress();
-        String phoneNumber = currentUser.getPhoneNumber();
-        String emailAddress = currentUser.getEmailAddress();
-        String profileURL = currentUser.getProfileURL();
+        String name = user.getName();
+        Address address = user.getAddress();
+        String phoneNumber = user.getPhoneNumber();
+        String emailAddress = user.getEmailAddress();
+        String profileURL = user.getProfileURL();
 
         this.name.setText(name);
         if(address != null) {
@@ -258,7 +257,6 @@ public class ProfileFragment extends Fragment {
         this.phone.setText(phoneNumber);
         this.email.setText(emailAddress);
         Picasso.with(getContext()).load(profileURL).into(profile);
-
     }
 
 }

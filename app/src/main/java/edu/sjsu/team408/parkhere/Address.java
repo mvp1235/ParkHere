@@ -6,11 +6,16 @@ package edu.sjsu.team408.parkhere;
  * Address on detailed parking page is showing null
  */
 
+import android.location.Geocoder;
 import android.location.Location;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * Created by MVP on 10/31/17.
@@ -31,7 +36,7 @@ public class Address implements Parcelable {
 
     public Address(String streetAddress, String city, String state, String zipCode,
                    double latitude, double longitude) {
-        if(streetAddress.isEmpty()) {
+        if(streetAddress.isEmpty() || city.isEmpty() || state.isEmpty() || zipCode.isEmpty()) {
             return;
         }
         this.streetAddress = streetAddress;
@@ -50,6 +55,7 @@ public class Address implements Parcelable {
         latitude = in.readDouble();
         longitude = in.readDouble();
     }
+
 
     public Address(String address, LatLng point) {
         formatAddress(address, point);
@@ -71,8 +77,7 @@ public class Address implements Parcelable {
         if(streetAddress == null || city == null || state == null || zipCode == null) {
             return "";
         }
-        String address = streetAddress + ", " + city + ", " + state + " " + zipCode +
-                " " + latitude + " " + longitude;
+        String address = streetAddress + ", " + city + ", " + state + " " + zipCode;
         return address;
     }
 
@@ -181,6 +186,8 @@ public class Address implements Parcelable {
         setLatitude(point.latitude);
         setLongitude(point.longitude);
     }
+
+
 
     public double getDistanceBetweenThisAnd(Location thatLocation) {
         Location thisLocation = new Location("");

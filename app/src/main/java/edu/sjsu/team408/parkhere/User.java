@@ -138,4 +138,5 @@ public class User implements Parcelable{
     public String toString () {
         return getName();
     }
+
 }
