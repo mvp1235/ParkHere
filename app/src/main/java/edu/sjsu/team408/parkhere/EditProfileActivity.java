@@ -79,13 +79,10 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
-
-
         nameET.setText(name);
         emailET.setText(email);
         phoneET.setText(phone);
         addressET.setText(address);
-//        Picasso.with(getApplicationContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
 
         //load profile URL into profile ImageView
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -96,10 +93,10 @@ public class EditProfileActivity extends AppCompatActivity {
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                            if (currentUser != null)
+                            if (currentUser != null)    //If the user has set an image
                                 loadUserProfilePhoto(currentUser.getProfileURL());
-                            else
-                                Picasso.with(getApplicationContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
+                            else    // if the user never set an image, use default one
+                                profileIV.setImageResource(R.mipmap.default_profile_photo);
                         }
                     }
                 }
@@ -185,21 +182,22 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private void loadUserProfilePhoto(String encodedPhoto) {
 
-        if (!encodedPhoto.contains("http")) {
-            try {
-                Bitmap imageBitmap = decodeFromFirebaseBase64(encodedPhoto);
-                profileIV.setImageBitmap(imageBitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
+        if (encodedPhoto != null) {
+            if (!encodedPhoto.contains("http")) {
+                try {
+                    Bitmap imageBitmap = decodeFromFirebaseBase64(encodedPhoto);
+                    profileIV.setImageBitmap(imageBitmap);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } else {
+                // This block of code should already exist, we're just moving it to the 'else' statement:
+                profileIV.setImageResource(R.mipmap.default_profile_photo);
             }
         } else {
-            // This block of code should already exist, we're just moving it to the 'else' statement:
-            Picasso.with(getApplicationContext())
-                    .load(encodedPhoto)
-                    .resize(100, 100)
-                    .centerCrop()
-                    .into(profileIV);
+            profileIV.setImageResource(R.mipmap.default_profile_photo);
         }
+
     }
 
     private static Bitmap decodeFromFirebaseBase64(String image) throws IOException {

@@ -92,10 +92,11 @@ public class ProfileFragment extends Fragment {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
                             setCurrentUserProfile(currentUser);
 
-                            if (currentUser != null)
+                            if (currentUser != null && currentUser.getProfileURL() != null)
                                 loadUserProfilePhoto(currentUser.getProfileURL());
                             else
-                                Picasso.with(getContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
+                                profileIV.setImageResource(R.mipmap.default_profile_photo);
+//                                Picasso.with(getContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
                         }
                     }
                 }
