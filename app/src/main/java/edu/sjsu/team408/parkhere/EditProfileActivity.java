@@ -2,9 +2,11 @@ package edu.sjsu.team408.parkhere;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Geocoder;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -33,6 +35,8 @@ import java.util.List;
 
 public class EditProfileActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 9000;
+    private static final int REQUEST_GALLERY_PHOTO = 9001;
+
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
@@ -120,7 +124,8 @@ public class EditProfileActivity extends AppCompatActivity {
         galleryLL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQUEST_GALLERY_PHOTO);
             }
         });
 
@@ -151,6 +156,19 @@ public class EditProfileActivity extends AppCompatActivity {
             profileIV.setImageBitmap(imageBitmap);
             photoActionDialog.dismiss();
             encodeAndSaveToFirebase(imageBitmap);
+        } else if (requestCode == REQUEST_GALLERY_PHOTO && resultCode == RESULT_OK) {
+            Uri imageUri = data.getData();
+            Bitmap imageBitmap = null;
+            try {
+                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (imageBitmap != null) {
+                profileIV.setImageBitmap(imageBitmap);
+                photoActionDialog.dismiss();
+                encodeAndSaveToFirebase(imageBitmap);
+            }
         }
     }
 
@@ -178,6 +196,8 @@ public class EditProfileActivity extends AppCompatActivity {
             // This block of code should already exist, we're just moving it to the 'else' statement:
             Picasso.with(getApplicationContext())
                     .load(encodedPhoto)
+                    .resize(100, 100)
+                    .centerCrop()
                     .into(profileIV);
         }
     }
