@@ -2,11 +2,14 @@ package edu.sjsu.team408.parkhere;
 
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.style.TtsSpan;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -29,6 +32,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+
 import static android.app.Activity.RESULT_OK;
 import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 
@@ -47,7 +52,7 @@ public class ProfileFragment extends Fragment {
     private static final int SIGN_IN_CODE = 10004;
 
     private TextView name, email, phone, address;
-    private ImageView profile;
+    private ImageView profileIV;
     private Button signUpBtn, signInBtn, logOutBtn;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
@@ -69,7 +74,7 @@ public class ProfileFragment extends Fragment {
         email = (TextView) view.findViewById(R.id.userEmail);
         phone = (TextView) view.findViewById(R.id.userPhone);
         address = (TextView) view.findViewById(R.id.userAddress);
-        profile = (ImageView) view.findViewById(R.id.profilePicture);
+        profileIV = (ImageView) view.findViewById(R.id.profilePicture);
         signUpBtn = (Button) view.findViewById(R.id.profileSignUpBtn);
         signInBtn = (Button) view.findViewById(R.id.profileSignInBtn);
         logOutBtn = (Button) view.findViewById(R.id.profileLogoutBtn);
@@ -86,6 +91,11 @@ public class ProfileFragment extends Fragment {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
                             setCurrentUserProfile(currentUser);
+
+                            if (currentUser != null)
+                                loadUserProfilePhoto(currentUser.getProfileURL());
+                            else
+                                Picasso.with(getContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
                         }
                     }
                 }
@@ -166,6 +176,29 @@ public class ProfileFragment extends Fragment {
 
         
         return view;
+    }
+
+
+    private void loadUserProfilePhoto(String encodedPhoto) {
+
+        if (!encodedPhoto.contains("http")) {
+            try {
+                Bitmap imageBitmap = decodeFromFirebaseBase64(encodedPhoto);
+                profileIV.setImageBitmap(imageBitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // This block of code should already exist, we're just moving it to the 'else' statement:
+            Picasso.with(getContext())
+                    .load(encodedPhoto)
+                    .into(profileIV);
+        }
+    }
+
+    private static Bitmap decodeFromFirebaseBase64(String image) throws IOException {
+        byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
     }
 
     //Applying changes on the edit screen to the actual data
@@ -256,7 +289,7 @@ public class ProfileFragment extends Fragment {
         }
         this.phone.setText(phoneNumber);
         this.email.setText(emailAddress);
-        Picasso.with(getContext()).load(profileURL).into(profile);
+        Picasso.with(getContext()).load(profileURL).into(profileIV);
     }
 
 }

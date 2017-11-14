@@ -1,15 +1,21 @@
 package edu.sjsu.team408.parkhere;
 
+import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Geocoder;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Base64;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -21,16 +27,19 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
 public class EditProfileActivity extends AppCompatActivity {
+    private static final int REQUEST_IMAGE_CAPTURE = 9000;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
     private EditText nameET, emailET, phoneET, addressET;
     private ImageView profileIV;
-    private Button saveButton;
+    private Button saveButton, editProfilePictureBtn;
+    private AlertDialog photoActionDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,6 +67,13 @@ public class EditProfileActivity extends AppCompatActivity {
                 finish();
             }
         });
+        editProfilePictureBtn = (Button) findViewById(R.id.profileEditPhotoBtn);
+        editProfilePictureBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPhotoActionDialog();
+            }
+        });
 
 
 
@@ -65,10 +81,110 @@ public class EditProfileActivity extends AppCompatActivity {
         emailET.setText(email);
         phoneET.setText(phone);
         addressET.setText(address);
-        Picasso.with(getApplicationContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
+//        Picasso.with(getApplicationContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
+
+        //load profile URL into profile ImageView
+        databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                            if (currentUser != null)
+                                loadUserProfilePhoto(currentUser.getProfileURL());
+                            else
+                                Picasso.with(getApplicationContext()).load("https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png").into(profileIV);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
 
 
+    }
+
+    private void showPhotoActionDialog() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(EditProfileActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
+        LinearLayout galleryLL = mView.findViewById(R.id.galleryLL);
+        LinearLayout cameraLL = mView.findViewById(R.id.cameraLL);
+
+        galleryLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+            }
+        });
+
+        cameraLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
+
+        mBuilder.setView(mView);
+        photoActionDialog = mBuilder.create();
+        photoActionDialog.show();
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            Bitmap imageBitmap = (Bitmap) extras.get("data");
+            profileIV.setImageBitmap(imageBitmap);
+            photoActionDialog.dismiss();
+            encodeAndSaveToFirebase(imageBitmap);
+        }
+    }
+
+    private void encodeAndSaveToFirebase(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("Users")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("profileURL");
+        ref.setValue(imageEncoded);
+    }
+
+    private void loadUserProfilePhoto(String encodedPhoto) {
+
+        if (!encodedPhoto.contains("http")) {
+            try {
+                Bitmap imageBitmap = decodeFromFirebaseBase64(encodedPhoto);
+                profileIV.setImageBitmap(imageBitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // This block of code should already exist, we're just moving it to the 'else' statement:
+            Picasso.with(getApplicationContext())
+                    .load(encodedPhoto)
+                    .into(profileIV);
+        }
+    }
+
+    private static Bitmap decodeFromFirebaseBase64(String image) throws IOException {
+        byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
+        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
     }
 
     public void updateProfile() {

@@ -53,6 +53,9 @@
         functionality.</string>
     <string name="permission_rationale">Location permission is needed for core functionality</string>
     <string name="addressInvalid">The address is invalid, please try again</string>
+    <string name="editProfile">Edit Photo</string>
+    <string name="chooseFromGallery">Choose From Gallery</string>
+    <string name="takeAPhoto">Take A Photo</string>
 
 
 </resources>

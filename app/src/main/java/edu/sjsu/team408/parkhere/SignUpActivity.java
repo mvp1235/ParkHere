@@ -102,9 +102,11 @@ public class SignUpActivity extends AppCompatActivity {
         String email = mAuth.getCurrentUser().getEmail();
         String ID = mAuth.getCurrentUser().getUid();
         String name = usernameFromEmail(email);
+        String defaullProfileURL = "https://orig00.deviantart.net/4c5d/f/2015/161/b/6/untitled_by_victoriastylinson-d8wt3ew.png";
         newUser.setEmailAddress(email);
         newUser.setId(ID);
         newUser.setName(name);
+        newUser.setProfileURL(defaullProfileURL);       // add a default user profile picture for the user. He/she can edit it later on the edit profile screen
         databaseReference.child("Users").child(ID).setValue(newUser);
     }
 
