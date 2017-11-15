@@ -5,20 +5,25 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.location.*;
+import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -48,6 +53,7 @@ public class NewListingActivity extends AppCompatActivity {
     private TextView owner;
     private EditText addressStreetNumber, addressCity, addressState, addressZipCode, price, startDate, endDate, startTime, endTime;
     private Button saveListingBtn, editListingPhotoBtn;
+    private ImageView listingPhoto;
 
     //For picking date of availability
     private DatePicker datePicker;
@@ -58,6 +64,7 @@ public class NewListingActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private String userID;
     private AlertDialog photoActionDialog;
+    private Bitmap parkingBitmap = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +88,7 @@ public class NewListingActivity extends AppCompatActivity {
         endDate = (EditText) findViewById(R.id.listingEndDate);
         startTime = (EditText) findViewById(R.id.listingStartTime);
         endTime = (EditText) findViewById(R.id.listingEndTime);
+        listingPhoto = (ImageView) findViewById(R.id.listingPhoto);
 
         //For making new listing quicker
         populateDefaultValuesForTesting();
@@ -156,14 +164,28 @@ public class NewListingActivity extends AppCompatActivity {
         });
 
 
-
-
-
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Bundle extras = data.getExtras();
+            parkingBitmap = (Bitmap) extras.get("data");
+            listingPhoto.setImageBitmap(parkingBitmap);
+            photoActionDialog.dismiss();
+
+        } else if (requestCode == REQUEST_GALLERY_PHOTO && resultCode == RESULT_OK) {
+            Uri imageUri = data.getData();
+            try {
+                parkingBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            if (parkingBitmap != null) {
+                listingPhoto.setImageBitmap(parkingBitmap);
+                photoActionDialog.dismiss();
+            }
+        }
     }
 
     private void showPhotoActionDialog() {
@@ -428,6 +450,13 @@ public class NewListingActivity extends AppCompatActivity {
                     price, address, point);
             parentKey = currentDate;
 
+            //add parking photo to database
+            String encodedParkingPhoto = encodeBitmap(parkingBitmap);
+            if (encodedParkingPhoto != null)
+                dataValue.setParkingImageUrl(encodedParkingPhoto);
+            else
+                dataValue.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
+
             databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
             listOfParkings.add(dataValue);
 
@@ -439,11 +468,31 @@ public class NewListingActivity extends AppCompatActivity {
                     price, address, point);
             parentKey = endDate;
 
+            //add parking photo to database
+            String encodedParkingPhoto = encodeBitmap(parkingBitmap);
+            if (encodedParkingPhoto != null)
+                dataValue.setParkingImageUrl(encodedParkingPhoto);
+            else
+                dataValue.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
+
             databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
             listOfParkings.add(dataValue);
         }
         addListingToUser(listOfParkings);
     }
+
+
+    private String encodeBitmap(Bitmap bitmap) {
+        if (bitmap == null)
+            return null;
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
+
+        return imageEncoded;
+    }
+
 
     public static ParkingSpace getValue(String startDate, String endDate, String startTime,
                                          String endTime, String userID, String ownerName,
@@ -456,7 +505,8 @@ public class NewListingActivity extends AppCompatActivity {
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
         Address addr = new Address(address, point);    //correct format later
         User owner = new User(userID+"", ownerName, null,null,null,null);
-        String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
+        String parkingImageUrl = "https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png";   //default for testing
+
         String specialInstruction = "";
 
 
@@ -470,8 +520,8 @@ public class NewListingActivity extends AppCompatActivity {
         addressState.setText("CA");
         addressZipCode.setText("95112");
         price.setText("5.0");
-        startDate.setText("11-10-2017");
-        endDate.setText("11-10-2017");
+        startDate.setText("11-15-2017");
+        endDate.setText("11-15-2017");
         startTime.setText("5:00 PM");
         endTime.setText("10:00 PM");
 

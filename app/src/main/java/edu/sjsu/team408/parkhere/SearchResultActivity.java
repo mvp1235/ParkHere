@@ -197,11 +197,13 @@ public class SearchResultActivity extends ListActivity {
         Bundle b = new Bundle();
         b.putParcelable(ADDRESS, parking.getAddress());
         b.putParcelable(OWNER, parking.getOwner());
-        b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
         b.putString(SPECIAL_INSTRUCTION, parking.getSpecialInstruction());
         b.putString(START_DATE, parking.getStartDate());
         b.putString(END_DATE, parking.getEndDate());
         b.putDouble(PRICE, parking.getPrice());
+
+        //Passing the encoded parking photo string takes too much space, so we will retrieve it manually on the detail page straight from firebase
+//        b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
 
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);

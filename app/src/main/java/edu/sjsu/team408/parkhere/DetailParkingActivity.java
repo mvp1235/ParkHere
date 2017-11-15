@@ -1,6 +1,7 @@
 package edu.sjsu.team408.parkhere;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -51,7 +52,12 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         clickedParking = new ParkingSpace(bundle);
 
+        //Retrieve parking photo encoded string and convert back to bitmap and set it to the image view
+
+
         Picasso.with(getApplicationContext()).load(clickedParking.getParkingImageUrl()).into(parkingPhoto);
+
+
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
         ownerTV.setText(clickedParking.getOwner().getName());
         specialInstructionTV.setText(clickedParking.getSpecialInstruction());
@@ -96,6 +102,24 @@ public class DetailParkingActivity extends AppCompatActivity {
         }
     }
 
+//    public Bitmap getParkingBitmap() {
+//        final String startDate = clickedParking.getStartDate();
+//
+//        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(DataSnapshot dataSnapshot) {
+//                if (dataSnapshot.child("Users").hasChild(targetID)) {
+//                    currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+//
+//
+//                }
+//            }
+//            @Override
+//            public void onCancelled(DatabaseError databaseError) {
+//            }
+//        });
+//    }
+
     /**
      * Implement reservation functionality here
      */
@@ -113,7 +137,6 @@ public class DetailParkingActivity extends AppCompatActivity {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
 
-
                             currentUser.addReservedParking(clickedParking);
 
                             //for now make reservation will just delete the listing on database.
@@ -122,8 +145,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                             String currentUserID = currentUser.getId();
                             databaseReference.child("AvailableParkings").child(startDate).removeValue();
                             databaseReference.child("Users").child(currentUserID).setValue(currentUser);
-                            //now just need to transition to home Fragment...
-                            //Huy can you do this in the morning?
+
                             setResult(RESULT_OK);
 
                             finish();
