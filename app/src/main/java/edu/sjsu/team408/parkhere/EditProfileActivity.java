@@ -244,13 +244,16 @@ public class EditProfileActivity extends AppCompatActivity {
         Geocoder geocoder = new Geocoder(this);
 
         try {
+            if (Geocoder.isPresent()) {
             List<android.location.Address> addressList = geocoder.getFromLocationName(address, 1);
+
             if (addressList.size() > 0) {
                 android.location.Address location = addressList.get(0);
                 location.getLatitude();
                 location.getLongitude();
                 LatLng point = new LatLng(location.getLatitude(), location.getLongitude());
                 newAddress = new Address(address, point);
+            }
             }
         } catch (IOException e) {
             //Toast.makeText(getApplicationContext(), R.string.addressInvalid,

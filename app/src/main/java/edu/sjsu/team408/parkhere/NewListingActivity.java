@@ -19,6 +19,7 @@ import android.widget.Toast;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -349,86 +350,47 @@ public class NewListingActivity extends AppCompatActivity {
         int endDay = Integer.parseInt(endDateList[1]);
         int endYear = Integer.parseInt(endDateList[2]);
 
+        GregorianCalendar startDateCalendar = new GregorianCalendar(startYear, startMonth - 1, startDay);
+        GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
+
+
+        String owner = this.owner.getText().toString();
+        String price = this.price.getText().toString();
+        String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
+                + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
+
         String parentKey;
         String parkingSpaceUidKey;
         ParkingSpace dataValue;
-
         parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();
 
-        //i'll clean up code later....
-        //for now restriction is owner can post 1 listing per day.
-        //doesn't support same day different time listing yet. Ex available 2-3 and 5-6. Will implement later
-        if(endYear - startYear == 0) {
-            //same year
-            if(endMonth - startMonth == 0) {
-                //same month
-                if(endDay - startDay == 0) {
+        while(!startDateCalendar.equals(endDateCalendar)) {
+            int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
+            int currentYear = startDateCalendar.get(Calendar.YEAR);
+            int currentDay = startDateCalendar.get(Calendar.DAY_OF_MONTH);
 
-                    //same day, just add one key and value to database
-                    String owner = this.owner.getText().toString();
-                    String price = this.price.getText().toString();
-                    //combine separate fields into full address
-                    String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
-                            + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
-                    dataValue = getValue(startDate, endDate, startTime, endTime, this.userID, owner,
-                            price, address, point);
-                    parentKey = startDate;
-                    databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
-                    listOfParkings.add(dataValue);
-                } else {
-                    //more than one day in the same month
-                    int i = endDay - startDay;
-                    String owner = this.owner.getText().toString();
-                    String price = this.price.getText().toString();
-                    String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
-                            + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
-                    while(i >= 0) {
-                        int newStartDayInt = startDay + i;
-//                        int newEndDayInt = endDay;
-                        //if(i != 0) {
-                          //  newEndDayInt += i;
-                        //}
-                        String newStartDate = startMonth + "-" + newStartDayInt + "-" + startYear;
-                        //String newEndDate = endMonth + "-" + newEndDayInt + "-" + endYear;
-                        String newEndDate = newStartDate;  //making start date and end date the same.
 
-                        if(newStartDayInt < 10){
-                            newStartDate = startMonth + "-0" + newStartDayInt + "-" + startYear;
-                        }
-                       // if(newEndDayInt < 10) {
-                        //    newEndDate = endMonth + "-0" + newEndDayInt + "-" + endYear;
-                       // }
+            String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-                        dataValue = getValue(newStartDate, newEndDate, startTime, endTime,
-                                this.userID, owner, price, address, point);
-                        parentKey = newStartDate;
+            dataValue = getValue(currentDate, currentDate, startTime, endTime, this.userID, owner,
+                    price, address, point);
+            parentKey = currentDate;
 
-                        //add listing to database
-                        databaseReference
-                                .child("AvailableParkings")
-                                .child(parentKey)
-                                .child(parkingSpaceUidKey)
-                                .setValue(dataValue);
+            databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
+            listOfParkings.add(dataValue);
 
-                        listOfParkings.add(dataValue);
-                        i--;
-                    }
 
-                }
-            } else {
-                //not within the same month
-            }
-        } else {
-            //available more than 1 year....
+            startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
         }
-        //userID = 4;   //we will fix this later.... purpose is to simulate different userID for every listing //this doesn't change value for testing
-        //*******   Process so far: Complete listing for one day and multiple days in a row.
-        //technique - making start day as parent key and userID for child key.
-        //suppose we have 2 owners put up listing for same day. We can still differentiate them by userID child key.
+        if(startDateCalendar.equals(endDateCalendar)) {
+            dataValue = getValue(endDate, endDate, startTime, endTime, this.userID, owner,
+                    price, address, point);
+            parentKey = endDate;
 
+            databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
+            listOfParkings.add(dataValue);
+        }
         addListingToUser(listOfParkings);
-
-
     }
 
     public static ParkingSpace getValue(String startDate, String endDate, String startTime,

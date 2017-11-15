@@ -130,7 +130,15 @@ public class User implements Parcelable{
     }
 
     public void addToListingHistory(ArrayList<ParkingSpace> newList) {
-        this.myListingHistory = newList;
+        if(myListingHistory == null) {
+            this.myListingHistory = newList;
+        } else {
+            ArrayList<ParkingSpace> newListHistory = newList;
+            for (ParkingSpace ps : myListingHistory) {
+                newList.add(ps);
+            }
+            this.myListingHistory = newListHistory;
+        }
     }
 
     public ArrayList<ParkingSpace> getMyListingHistory() {return this.myListingHistory;}
