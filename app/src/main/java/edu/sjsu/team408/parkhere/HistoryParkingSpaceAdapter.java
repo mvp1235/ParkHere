@@ -2,6 +2,7 @@ package edu.sjsu.team408.parkhere;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 /**
@@ -47,7 +49,17 @@ public class HistoryParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
         TextView parkingPrice = (TextView) convertView.findViewById(R.id.hitoryParkingPrice);
 
         //Load URL into image view
-        Picasso.with(mContext).load(parking.getParkingImageUrl()).into(parkingPhoto);
+        String parkingURL = parking.getParkingImageUrl();
+        if (parkingURL.contains("http")) {
+            Picasso.with(mContext).load(parking.getParkingImageUrl()).into(parkingPhoto);
+        } else {
+            try {
+                Bitmap bitmap = EditProfileActivity.decodeFromFirebaseBase64(parkingURL);
+                parkingPhoto.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         //If start date and end date are the same, only display the start date
         //otherwise, have it in the format of "startDate - endDate"

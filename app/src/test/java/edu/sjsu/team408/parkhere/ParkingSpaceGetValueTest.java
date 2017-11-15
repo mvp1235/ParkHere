@@ -28,14 +28,15 @@ public class ParkingSpaceGetValueTest {
         LatLng point = null; //don't really care about this because JUnit test is isolate. Not going to use Google API
         String parkingImageUrl = "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg";   //default for testing
         String specialInstruction = ""; //null default
+        String parkingID = "-Kz-f056Hj-V47CpDlPM"; //a random value
 
         Address a = new Address(address,point);
         User u = new User();
         u.setName(ownerName);
-        ParkingSpace expectedParkingSpace = new ParkingSpace(a, u, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime, Double.parseDouble(price));
+        ParkingSpace expectedParkingSpace = new ParkingSpace(a, u, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime, Double.parseDouble(price), parkingID);
         String expected = expectedParkingSpace.toString();
 
-        assertEquals(expected, NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point ).toString());
+        assertEquals(expected, NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point, parkingID).toString());
     }
 
     @Test
@@ -53,7 +54,8 @@ public class ParkingSpaceGetValueTest {
         String price = "";
         String address = "";
         LatLng point = null;
-        assertNull(NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point ));
+        String parkingID = "";
+        assertNull(NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point, parkingID));
     }
 
 }

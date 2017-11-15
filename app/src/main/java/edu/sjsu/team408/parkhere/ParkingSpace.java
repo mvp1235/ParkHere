@@ -21,12 +21,13 @@ public class ParkingSpace implements Parcelable{
     private String startTime;
     private String endTime;
     private double price;
+    private String parkingID;
 
 
     public ParkingSpace(){}
 
     public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction,
-                        String startDate, String endDate, String startTime, String endTime, double price) {
+                        String startDate, String endDate, String startTime, String endTime, double price, String parkingID) {
         this.address = address;
         this.owner = owner;
         this.parkingImageUrl = parkingImageUrl;
@@ -36,6 +37,7 @@ public class ParkingSpace implements Parcelable{
         this.price = price;
         this.startTime = startTime;
         this.endTime = endTime;
+        this.parkingID = parkingID;
     }
 
     public ParkingSpace(Bundle b) {
@@ -46,6 +48,7 @@ public class ParkingSpace implements Parcelable{
         this.startDate = b.getString(SearchResultActivity.START_DATE, "");
         this.endDate = b.getString(SearchResultActivity.END_DATE, "");
         this.price = b.getDouble(SearchResultActivity.PRICE, 0);
+        this.parkingID = b.getString(SearchResultActivity.PARKING_ID, "");
     }
 
     protected ParkingSpace(Parcel in) {
@@ -56,6 +59,7 @@ public class ParkingSpace implements Parcelable{
         startDate = in.readString();
         endDate = in.readString();
         price = in.readDouble();
+        parkingID = in.readString();
     }
 
     public static final Creator<ParkingSpace> CREATOR = new Creator<ParkingSpace>() {
@@ -69,6 +73,14 @@ public class ParkingSpace implements Parcelable{
             return new ParkingSpace[size];
         }
     };
+
+    public String getParkingID() {
+        return parkingID;
+    }
+
+    public void setParkingID(String parkingID) {
+        this.parkingID = parkingID;
+    }
 
     public Address getAddress() {
         return address;
@@ -148,10 +160,10 @@ public class ParkingSpace implements Parcelable{
         dest.writeString(startDate);
         dest.writeString(endDate);
         dest.writeDouble(price);
+        dest.writeString(parkingID);
     }
 
     public String toString() {
-
         return address.toString() + " " + owner.toString() + " " + startDate + " " + endDate + " "+ startTime + " " + endTime + "" + price;
     }
 }

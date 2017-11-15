@@ -19,6 +19,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
+import java.io.IOException;
+
 public class DetailParkingActivity extends AppCompatActivity {
 
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV;
@@ -28,6 +30,8 @@ public class DetailParkingActivity extends AppCompatActivity {
     private FirebaseAuth firebaseAuth;
     private ParkingSpace clickedParking;
     private User currentUser;
+    private ParkingSpace chosenParking;
+    private static String parkingPhotoString = "https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,10 +57,18 @@ public class DetailParkingActivity extends AppCompatActivity {
         clickedParking = new ParkingSpace(bundle);
 
         //Retrieve parking photo encoded string and convert back to bitmap and set it to the image view
-
-
-        Picasso.with(getApplicationContext()).load(clickedParking.getParkingImageUrl()).into(parkingPhoto);
-
+        getParkingURL(clickedParking.getParkingID());
+        //Parking photo is the default one, user has not set a photo for the listing yet
+        if (parkingPhotoString.contains("http")) {
+            Picasso.with(getApplicationContext()).load(parkingPhotoString).into(parkingPhoto);
+        } else {    // parking photo URL is the actual encoded string, decode here and obtain bitmap
+            try {
+                Bitmap bitmap = EditProfileActivity.decodeFromFirebaseBase64(parkingPhotoString);
+                parkingPhoto.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
 
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
         ownerTV.setText(clickedParking.getOwner().getName());
@@ -102,23 +114,28 @@ public class DetailParkingActivity extends AppCompatActivity {
         }
     }
 
-//    public Bitmap getParkingBitmap() {
-//        final String startDate = clickedParking.getStartDate();
-//
-//        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(DataSnapshot dataSnapshot) {
-//                if (dataSnapshot.child("Users").hasChild(targetID)) {
-//                    currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-//
-//
-//                }
-//            }
-//            @Override
-//            public void onCancelled(DatabaseError databaseError) {
-//            }
-//        });
-//    }
+
+    /**
+     * Get the parking URL for a listing with a certain id
+     * @param parkingID the id of the listing to be retrieved from database
+     * @return the default url of the parking photo if not set, the encoded string of bitmap if the user has set one photo for the listing
+     */
+    public void getParkingURL(final String parkingID) {
+        final String startDate = clickedParking.getStartDate();
+
+        databaseReference.child("AvailableParkings").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.hasChild(startDate)) {
+                    chosenParking = dataSnapshot.child(startDate).child(parkingID).getValue(ParkingSpace.class);
+                    parkingPhotoString = chosenParking.getParkingImageUrl();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
 
     /**
      * Implement reservation functionality here

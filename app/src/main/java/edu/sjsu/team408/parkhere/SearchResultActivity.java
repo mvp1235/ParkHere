@@ -45,6 +45,7 @@ public class SearchResultActivity extends ListActivity {
     static final String START_DATE = "startDate";
     static final String END_DATE = "endDate";
     static final String PRICE = "price";
+    static final String PARKING_ID = "parkingID";
 
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
@@ -201,7 +202,7 @@ public class SearchResultActivity extends ListActivity {
         b.putString(START_DATE, parking.getStartDate());
         b.putString(END_DATE, parking.getEndDate());
         b.putDouble(PRICE, parking.getPrice());
-
+        b.putString(PARKING_ID, parking.getParkingID());
         //Passing the encoded parking photo string takes too much space, so we will retrieve it manually on the detail page straight from firebase
 //        b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
 

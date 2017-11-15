@@ -447,7 +447,7 @@ public class NewListingActivity extends AppCompatActivity {
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
             dataValue = getValue(currentDate, currentDate, startTime, endTime, this.userID, owner,
-                    price, address, point);
+                    price, address, point, parkingSpaceUidKey);
             parentKey = currentDate;
 
             //add parking photo to database
@@ -465,7 +465,7 @@ public class NewListingActivity extends AppCompatActivity {
         }
         if(startDateCalendar.equals(endDateCalendar)) {
             dataValue = getValue(endDate, endDate, startTime, endTime, this.userID, owner,
-                    price, address, point);
+                    price, address, point, parkingSpaceUidKey);
             parentKey = endDate;
 
             //add parking photo to database
@@ -493,10 +493,10 @@ public class NewListingActivity extends AppCompatActivity {
         return imageEncoded;
     }
 
-
+    //This method containis parkingID
     public static ParkingSpace getValue(String startDate, String endDate, String startTime,
                                          String endTime, String userID, String ownerName,
-                                         String price, String address, LatLng point) {
+                                         String price, String address, LatLng point, String parkingID) {
         if(startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty() ||
                 userID.isEmpty() || price.isEmpty() || address.isEmpty()) {
             return null;
@@ -511,14 +511,14 @@ public class NewListingActivity extends AppCompatActivity {
 
 
         //return result;
-        return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price));
+        return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
     public void populateDefaultValuesForTesting() {
-        addressStreetNumber.setText("1 Washington Square");
+        addressStreetNumber.setText("2300 Senter Rd");
         addressCity.setText("San Jose");
         addressState.setText("CA");
-        addressZipCode.setText("95112");
+        addressZipCode.setText("95111");
         price.setText("5.0");
         startDate.setText("11-15-2017");
         endDate.setText("11-15-2017");
