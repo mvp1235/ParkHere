@@ -515,10 +515,10 @@ public class NewListingActivity extends AppCompatActivity {
     }
 
     public void populateDefaultValuesForTesting() {
-        addressStreetNumber.setText("2300 Senter Rd");
+        addressStreetNumber.setText("1 Washington Square");
         addressCity.setText("San Jose");
         addressState.setText("CA");
-        addressZipCode.setText("95111");
+        addressZipCode.setText("95112");
         price.setText("5.0");
         startDate.setText("11-15-2017");
         endDate.setText("11-15-2017");

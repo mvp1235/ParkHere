@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:contentDescription="@string/userProfilePictureDescription"
-            android:src="@drawable/common_google_signin_btn_icon_dark_normal" />
+            app:srcCompat="@mipmap/default_profile_photo" />
 
         <Button
             android:id="@+id/profileEditPhotoBtn"
@@ -127,6 +127,7 @@
         <EditText
             android:id="@+id/editUserAddress"
             android:layout_width="0dp"
+            android:inputType="textCapWords"
             android:layout_height="wrap_content"
             android:layout_weight="3"/>
 

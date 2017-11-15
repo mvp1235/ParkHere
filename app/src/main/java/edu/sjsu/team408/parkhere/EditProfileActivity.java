@@ -229,7 +229,7 @@ public class EditProfileActivity extends AppCompatActivity {
                             if (parkingPhotoEncoded != null)
                                 currentUser.setProfileURL(parkingPhotoEncoded);
                             else
-                                currentUser.setProfileURL("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");   // default parking photo if user didn't set a photo for parking
+                                currentUser.setProfileURL("http://www.havoca.org/wp-content/uploads/2016/03/icon-user-default-300x300.png");   // default parking photo if user didn't set a photo for parking
 
                             databaseReference.child("Users").child(targetID).setValue(currentUser);
                         }
