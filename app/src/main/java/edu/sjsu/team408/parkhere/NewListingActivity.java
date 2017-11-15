@@ -1,10 +1,12 @@
 package edu.sjsu.team408.parkhere;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.location.*;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -35,6 +38,8 @@ import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 public class NewListingActivity extends AppCompatActivity {
     private static final String TAG = NewListingActivity.class.getSimpleName();
 
+    private final static int REQUEST_GALLERY_PHOTO = 9000;
+    private final static int REQUEST_IMAGE_CAPTURE = 9001;
     private final static int FROM_DATE = 0;
     private final static int TO_DATE = 1;
     private final static int FROM_TIME = 2;
@@ -42,7 +47,7 @@ public class NewListingActivity extends AppCompatActivity {
 
     private TextView owner;
     private EditText addressStreetNumber, addressCity, addressState, addressZipCode, price, startDate, endDate, startTime, endTime;
-    private Button saveListingBtn;
+    private Button saveListingBtn, editListingPhotoBtn;
 
     //For picking date of availability
     private DatePicker datePicker;
@@ -52,6 +57,7 @@ public class NewListingActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private String userID;
+    private AlertDialog photoActionDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +90,14 @@ public class NewListingActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 saveNewListing();
+            }
+        });
+
+        editListingPhotoBtn = (Button) findViewById(R.id.listingEditPhotoBtn);
+        editListingPhotoBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showPhotoActionDialog();
             }
         });
 
@@ -145,6 +159,44 @@ public class NewListingActivity extends AppCompatActivity {
 
 
 
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void showPhotoActionDialog() {
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(NewListingActivity.this);
+        View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
+        LinearLayout galleryLL = mView.findViewById(R.id.galleryLL);
+        LinearLayout cameraLL = mView.findViewById(R.id.cameraLL);
+
+        galleryLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                startActivityForResult(intent, REQUEST_GALLERY_PHOTO);
+            }
+        });
+
+        cameraLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dispatchTakePictureIntent();
+            }
+        });
+
+        mBuilder.setView(mView);
+        photoActionDialog = mBuilder.create();
+        photoActionDialog.show();
+    }
+
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+        }
     }
 
     /**

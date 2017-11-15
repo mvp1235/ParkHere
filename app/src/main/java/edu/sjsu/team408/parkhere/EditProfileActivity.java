@@ -44,6 +44,9 @@ public class EditProfileActivity extends AppCompatActivity {
     private ImageView profileIV;
     private Button saveButton, editProfilePictureBtn;
     private AlertDialog photoActionDialog;
+    private Bitmap profileBitmap = null;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -149,35 +152,33 @@ public class EditProfileActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
-            Bitmap imageBitmap = (Bitmap) extras.get("data");
-            profileIV.setImageBitmap(imageBitmap);
+            profileBitmap = (Bitmap) extras.get("data");
+            profileIV.setImageBitmap(profileBitmap);
             photoActionDialog.dismiss();
-            encodeAndSaveToFirebase(imageBitmap);
+
         } else if (requestCode == REQUEST_GALLERY_PHOTO && resultCode == RESULT_OK) {
             Uri imageUri = data.getData();
-            Bitmap imageBitmap = null;
             try {
-                imageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
+                profileBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            if (imageBitmap != null) {
-                profileIV.setImageBitmap(imageBitmap);
+            if (profileBitmap != null) {
+                profileIV.setImageBitmap(profileBitmap);
                 photoActionDialog.dismiss();
-                encodeAndSaveToFirebase(imageBitmap);
             }
         }
     }
 
-    private void encodeAndSaveToFirebase(Bitmap bitmap) {
+    private String encodeBitmap(Bitmap bitmap) {
+        if (bitmap == null)
+            return null;
+
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
         String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-        DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("Users")
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("profileURL");
-        ref.setValue(imageEncoded);
+
+        return imageEncoded;
     }
 
     private void loadUserProfilePhoto(String encodedPhoto) {
@@ -185,8 +186,8 @@ public class EditProfileActivity extends AppCompatActivity {
         if (encodedPhoto != null) {
             if (!encodedPhoto.contains("http")) {
                 try {
-                    Bitmap imageBitmap = decodeFromFirebaseBase64(encodedPhoto);
-                    profileIV.setImageBitmap(imageBitmap);
+                    profileBitmap = decodeFromFirebaseBase64(encodedPhoto);
+                    profileIV.setImageBitmap(profileBitmap);
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -200,7 +201,7 @@ public class EditProfileActivity extends AppCompatActivity {
 
     }
 
-    private static Bitmap decodeFromFirebaseBase64(String image) throws IOException {
+    public static Bitmap decodeFromFirebaseBase64(String image) throws IOException {
         byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
         return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
     }
@@ -219,11 +220,16 @@ public class EditProfileActivity extends AppCompatActivity {
                             String email = emailET.getText().toString();
                             String phone = phoneET.getText().toString();
                             String address = addressET.getText().toString();
+                            String parkingPhotoEncoded = encodeBitmap(profileBitmap);
 
                             currentUser.setName(fullName);
                             currentUser.setEmailAddress(email);
                             currentUser.setPhoneNumber(phone);
                             currentUser.setAddress(getAddress(address));
+                            if (parkingPhotoEncoded != null)
+                                currentUser.setProfileURL(parkingPhotoEncoded);
+                            else
+                                currentUser.setProfileURL("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");   // default parking photo if user didn't set a photo for parking
 
                             databaseReference.child("Users").child(targetID).setValue(currentUser);
                         }
