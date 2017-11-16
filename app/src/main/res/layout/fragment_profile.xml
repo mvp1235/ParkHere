@@ -37,15 +37,17 @@
         <Button
             android:id="@+id/editProfileBtn"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:text="@string/edit" />
 
         <Button
             android:id="@+id/newListingBtn"
             android:layout_width="0dp"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:text="@string/newListing" />
 
 

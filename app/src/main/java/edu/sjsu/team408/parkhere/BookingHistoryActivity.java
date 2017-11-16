@@ -47,7 +47,6 @@ public class BookingHistoryActivity extends ListActivity {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
 
-
                             parkingSpaces = currentUser.getMyCurrentReservedParkings();
                             showCurrentlyReservedParkings();
                         }
@@ -56,28 +55,10 @@ public class BookingHistoryActivity extends ListActivity {
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
 
     }
-
-//    public void populateDataForTesting(){
-//        //Populate default parking space for testing
-//        Address address = new Address("1 Washington Square", "San Jose", "CA", "95112");
-//        User user = new User("huy123", "Huy Nguyen", address, "408-123-4567", "huy.nguyen@sjsu.edu",
-//                "http://static2.businessinsider.com/image/5899ffcf6e09a897008b5c04-1200/.jpg");
-//        ParkingSpace p = new ParkingSpace(address, user, "https://media-cdn.tripadvisor.com/media/photo-s/0f/ae/73/2f/private-parking-right.jpg",
-//                "watch out for dogs", "1/1/2017", "1/1/2017", 5.99);
-//
-//        //parkingSpaces.add(p);
-//        //parkingSpaces.add(p);
-//        //parkingSpaces.add(p);
-//        //parkingSpaces.add(p);
-//        //parkingSpaces.add(p);
-//
-//    }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
@@ -92,23 +73,13 @@ public class BookingHistoryActivity extends ListActivity {
         b.putString(SearchResultActivity.START_DATE, parking.getStartDate());
         b.putString(SearchResultActivity.END_DATE, parking.getEndDate());
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
+        b.putString(SearchResultActivity.PARKING_ID, parking.getParkingID());
 
         intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_BOOKING_);
         startActivityForResult(intent, VIEW_DETAIL_HISTORY_BOOKING_);
 
     }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == VIEW_DETAIL_HISTORY_BOOKING_) {
-            if (resultCode == RESULT_OK) {
-
-            }
-        }
-    }
-
 
     private void showCurrentlyReservedParkings() {
         if(parkingSpaces == null) {

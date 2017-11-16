@@ -65,15 +65,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         clickedParking = new ParkingSpace(bundle);
 
-        //Retrieve parking photo encoded string and convert back to bitmap and set it to the image view
         setParkingPhoto(clickedParking.getParkingID());
-        //Parking photo is the default one, user has not set a photo for the listing yet
-
-//        if (parkingURI != null) {
-//            parkingPhoto.setImageURI(parkingURI);
-//        } else {
-//            Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
-//        }
 
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
         ownerTV.setText(clickedParking.getOwner().getName());
@@ -129,14 +121,15 @@ public class DetailParkingActivity extends AppCompatActivity {
         storageReference.child("parkingPhotos/" + parkingID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png'
+                //Parking photo is set by user
                 Picasso.with(getApplicationContext()).load(uri.toString()).into(parkingPhoto);
                 Log.i("SET PARKING PHOTO", "Success");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
+                //Handle any errors
+                //Parking photo is the default one, user has not set a photo for the listing yet
                 Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
                 Log.i("SET PARKING PHOTO", "Fail");
             }

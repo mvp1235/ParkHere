@@ -26,7 +26,7 @@
                 android:layout_height="200dp"
                 android:layout_marginTop="30dp"
                 android:scaleType="fitXY"
-                app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+                app:srcCompat="@mipmap/default_parking_photo" />
 
             <Button
                 android:id="@+id/reserveBtn"
@@ -161,8 +161,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="3"
-                android:gravity="center_vertical"
-                android:text="@string/sampleDistance" />
+                android:gravity="center_vertical" />
 
         </LinearLayout>
 
