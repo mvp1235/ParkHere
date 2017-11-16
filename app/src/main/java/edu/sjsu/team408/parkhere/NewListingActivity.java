@@ -319,7 +319,7 @@ public class NewListingActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
 
-            addListingToDatabase(startDateString, endDateString, startTimeString, endTimeString,
+            addListingToDatabaseNew(startDateString, endDateString, startTimeString, endTimeString,
                     point);
 
             setResult(RESULT_OK, i);
@@ -445,18 +445,28 @@ public class NewListingActivity extends AppCompatActivity {
         endDate.setText(completeDate);
     }
 
+
+
     /**
-     * Adds listing to database
+     * Adds listing to database more efficient way.
      * @param startDate start date
      * @param endDate   end date
      * @param startTime start time
      * @param endTime   end time
      */
-    public void addListingToDatabase(String startDate, String endDate, String startTime,
+    public void addListingToDatabaseNew(String startDate, String endDate, String startTime,
                                      String endTime, LatLng point) {
         String startDateList[] = startDate.split("-");
         String endDateList[] = endDate.split("-");
-        ArrayList<ParkingSpace> listOfParkings = new ArrayList<>();
+        int startTimeSystem[] = get24HoursTimeSystem(startTime);
+        int endTimeSystem[] = get24HoursTimeSystem(endTime);
+
+        int starthour = startTimeSystem[0];
+        int startMinutes = startTimeSystem[1];
+        int endHour = endTimeSystem[0];
+        int endMinutes = endTimeSystem[1];
+
+        String dataValue = starthour + "-" + startMinutes + "-" + endHour + "-" + endMinutes; //starthour-startminutes-endhour-endminutes
 
         int startMonth = Integer.parseInt(startDateList[0]);
         int startDay = Integer.parseInt(startDateList[1]);
@@ -477,7 +487,8 @@ public class NewListingActivity extends AppCompatActivity {
 
         String parentKey;
 //        String parkingSpaceUidKey;
-        ParkingSpace dataValue;
+        ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingID);
+        String childKey;
 //        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();    // no longer using these, gonna use the member variable currentParkingID
 
         while(!startDateCalendar.equals(endDateCalendar)) {
@@ -488,29 +499,49 @@ public class NewListingActivity extends AppCompatActivity {
 
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-            dataValue = getValue(currentDate, currentDate, startTime, endTime, this.userID, owner,
-                    price, address, point, currentParkingID);
+            childKey = currentParkingID;
             parentKey = currentDate;
 
-            databaseReference.child("AvailableParkings").child(parentKey).child(currentParkingID).setValue(dataValue); //add listing to database
-            listOfParkings.add(dataValue);
+            databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
 
 
             startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
         }
         if(startDateCalendar.equals(endDateCalendar)) {
-            dataValue = getValue(endDate, endDate, startTime, endTime, this.userID, owner,
-                    price, address, point, currentParkingID);
+            childKey = currentParkingID;
             parentKey = endDate;
 
-            databaseReference.child("AvailableParkings").child(parentKey).child(currentParkingID).setValue(dataValue); //add listing to database
-            listOfParkings.add(dataValue);
+            databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
         }
-        addListingToUser(listOfParkings);
+        addListingToUser(parking);
+        databaseReference.child("Listings").child(currentParkingID).setValue(parking);
     }
 
+
+    /**
+     * Converts time string into 24 hours time system
+     * @param time
+     * @return
+     */
+    private static int[] get24HoursTimeSystem(String time) {
+        int result[] = new int[2];    // out of bounds. Check if it's 25 that means it's wrong.
+        String timeList[] = time.split(":");
+        int hour = Integer.parseInt(timeList[0]);
+        int minutes = Integer.parseInt(timeList[1].substring(0,2));
+        String hourSystem = timeList[1].substring(timeList[1].length()-2, timeList[1].length());    //AM or PM
+        if(hourSystem.equals("PM")) {
+            hour = hour + 12;
+        }
+        result[0] = Integer.parseInt(hour + "");
+        result[1] = Integer.parseInt(minutes + "");
+        return result;
+    }
+
+
+
+
     //This method containis parkingID
-    public static ParkingSpace getValue(String startDate, String endDate, String startTime,
+    public static ParkingSpace getParkingSpace(String startDate, String endDate, String startTime,
                                          String endTime, String userID, String ownerName,
                                          String price, String address, LatLng point, String parkingID) {
         if(startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty() ||
@@ -543,8 +574,9 @@ public class NewListingActivity extends AppCompatActivity {
 
     }
 
-    private void addListingToUser(ArrayList<ParkingSpace> list) {
-        final ArrayList<ParkingSpace> newList = list;
+    private void addListingToUser(ParkingSpace ps) {
+        final ArrayList<ParkingSpace> newList = new ArrayList<ParkingSpace>();
+        newList.add(ps);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -564,7 +596,6 @@ public class NewListingActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-
             }
         });
     }
