@@ -74,11 +74,9 @@ public class NewListingActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private String userID;
     private AlertDialog photoActionDialog;
-
     private ProgressDialog progressDialog;
 
     private String currentParkingID;
-    private String parkingURL;
 
 
     @Override
@@ -205,6 +203,7 @@ public class NewListingActivity extends AppCompatActivity {
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
                     Toast.makeText(getApplicationContext(), "Photo uploaded.", Toast.LENGTH_SHORT).show();
                     progressDialog.dismiss();
                 }
@@ -477,9 +476,9 @@ public class NewListingActivity extends AppCompatActivity {
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
 
         String parentKey;
-        String parkingSpaceUidKey;
+//        String parkingSpaceUidKey;
         ParkingSpace dataValue;
-//        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();
+//        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();    // no longer using these, gonna use the member variable currentParkingID
 
         while(!startDateCalendar.equals(endDateCalendar)) {
             int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
@@ -493,16 +492,6 @@ public class NewListingActivity extends AppCompatActivity {
                     price, address, point, currentParkingID);
             parentKey = currentDate;
 
-            //add parking photo to database
-            getParkingURL(currentParkingID);
-
-            Log.i("TEST", parkingURL + "??");
-            if (parkingURL != null) {
-                dataValue.setParkingImageUrl(parkingURL);
-            } else {
-                dataValue.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
-            }
-
             databaseReference.child("AvailableParkings").child(parentKey).child(currentParkingID).setValue(dataValue); //add listing to database
             listOfParkings.add(dataValue);
 
@@ -514,46 +503,11 @@ public class NewListingActivity extends AppCompatActivity {
                     price, address, point, currentParkingID);
             parentKey = endDate;
 
-            //add parking photo to database
-            getParkingURL(currentParkingID);
-            Log.i("TEST", parkingURL + "??");
-            if (parkingURL != null) {
-                dataValue.setParkingImageUrl(parkingURL);
-            } else {
-                dataValue.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
-            }
-
             databaseReference.child("AvailableParkings").child(parentKey).child(currentParkingID).setValue(dataValue); //add listing to database
             listOfParkings.add(dataValue);
         }
         addListingToUser(listOfParkings);
     }
-
-    /**
-     * Get the parking URL for a listing with a certain id
-     * @param parkingID the id of the listing to be retrieved from database
-     * @return the default url of the parking photo if not set, the encoded string of bitmap if the user has set one photo for the listing
-     */
-    public void getParkingURL(final String parkingID) {
-        storageReference.child("parkingPhotos/" + parkingID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-            @Override
-            public void onSuccess(Uri uri) {
-                // Got the download URL for 'users/me/profile.png'
-                parkingURL = uri.toString();
-
-                Log.i("TEST", "SUCCESS: " + parkingURL);
-//                Log.i("TEST 123", parkingURL);
-
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Handle any errors
-                Log.i("TEST", "FAILURE");
-            }
-        });
-    }
-
 
     //This method containis parkingID
     public static ParkingSpace getValue(String startDate, String endDate, String startTime,
