@@ -2,6 +2,8 @@ package edu.sjsu.team408.parkhere;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -11,12 +13,16 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -28,10 +34,12 @@ public class DetailParkingActivity extends AppCompatActivity {
     private Button reserveBtn;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
+    private StorageReference storageReference;
     private ParkingSpace clickedParking;
     private User currentUser;
     private ParkingSpace chosenParking;
     private static String parkingPhotoString = "https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png";
+    private Uri parkingURI = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +48,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
 
         //Reference to the UI elements
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
@@ -57,18 +66,14 @@ public class DetailParkingActivity extends AppCompatActivity {
         clickedParking = new ParkingSpace(bundle);
 
         //Retrieve parking photo encoded string and convert back to bitmap and set it to the image view
-        getParkingURL(clickedParking.getParkingID());
+        setParkingPhoto(clickedParking.getParkingID());
         //Parking photo is the default one, user has not set a photo for the listing yet
-        if (parkingPhotoString.contains("http")) {
-            Picasso.with(getApplicationContext()).load(parkingPhotoString).into(parkingPhoto);
-        } else {    // parking photo URL is the actual encoded string, decode here and obtain bitmap
-            try {
-                Bitmap bitmap = EditProfileActivity.decodeFromFirebaseBase64(parkingPhotoString);
-                parkingPhoto.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+
+//        if (parkingURI != null) {
+//            parkingPhoto.setImageURI(parkingURI);
+//        } else {
+//            Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
+//        }
 
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
         ownerTV.setText(clickedParking.getOwner().getName());
@@ -120,21 +125,23 @@ public class DetailParkingActivity extends AppCompatActivity {
      * @param parkingID the id of the listing to be retrieved from database
      * @return the default url of the parking photo if not set, the encoded string of bitmap if the user has set one photo for the listing
      */
-    public void getParkingURL(final String parkingID) {
-        final String startDate = clickedParking.getStartDate();
-
-        databaseReference.child("AvailableParkings").addListenerForSingleValueEvent(new ValueEventListener() {
+    public void setParkingPhoto(final String parkingID) {
+        storageReference.child("parkingPhotos/" + parkingID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(startDate)) {
-                    chosenParking = dataSnapshot.child(startDate).child(parkingID).getValue(ParkingSpace.class);
-                    parkingPhotoString = chosenParking.getParkingImageUrl();
-                }
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                Picasso.with(getApplicationContext()).load(uri.toString()).into(parkingPhoto);
+                Log.i("SET PARKING PHOTO", "Success");
             }
+        }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
+                Log.i("SET PARKING PHOTO", "Fail");
             }
         });
+
     }
 
     /**

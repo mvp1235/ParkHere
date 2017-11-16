@@ -3,8 +3,10 @@ package edu.sjsu.team408.parkhere;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.location.Location;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +14,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -46,24 +52,27 @@ public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
         }
 
         // Lookup view for data population
-        ImageView parkingPhoto = (ImageView) convertView.findViewById(R.id.parkingPhoto);
+        final ImageView parkingPhoto = (ImageView) convertView.findViewById(R.id.parkingPhoto);
         TextView parkingDate = (TextView) convertView.findViewById(R.id.parkingDate);
         TextView parkingPrice = (TextView) convertView.findViewById(R.id.parkingPrice);
         TextView parkingDistance = (TextView) convertView.findViewById(R.id.parkingDistance);
 
-        //Load URL into image view
-        String parkingURL = parking.getParkingImageUrl();
-        if (parkingURL.contains("http")) {
-            Picasso.with(mContext).load(parking.getParkingImageUrl()).into(parkingPhoto);
-        } else {
-            try {
-                Bitmap bitmap = EditProfileActivity.decodeFromFirebaseBase64(parkingURL);
-                parkingPhoto.setImageBitmap(bitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        storageReference.child("parkingPhotos/" + parking.getParkingID()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                Picasso.with(getContext()).load(uri.toString()).into(parkingPhoto);
+                Log.i("SET PARKING PHOTO", "Success");
             }
-        }
-
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Picasso.with(getContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
+                Log.i("SET PARKING PHOTO", "Fail");
+            }
+        });
 
         //If start date and end date are the same, only display the start date
         //otherwise, have it in the format of "startDate - endDate"
@@ -83,4 +92,6 @@ public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
 
         return convertView;
     }
+
 }
+

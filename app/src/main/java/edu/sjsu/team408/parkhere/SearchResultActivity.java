@@ -203,8 +203,7 @@ public class SearchResultActivity extends ListActivity {
         b.putString(END_DATE, parking.getEndDate());
         b.putDouble(PRICE, parking.getPrice());
         b.putString(PARKING_ID, parking.getParkingID());
-        //Passing the encoded parking photo string takes too much space, so we will retrieve it manually on the detail page straight from firebase
-//        b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
+        b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
 
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);

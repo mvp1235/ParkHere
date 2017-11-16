@@ -3,12 +3,14 @@ package edu.sjsu.team408.parkhere;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.location.*;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -31,12 +33,19 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
 import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 
@@ -62,9 +71,15 @@ public class NewListingActivity extends AppCompatActivity {
 
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
+    private StorageReference storageReference;
     private String userID;
     private AlertDialog photoActionDialog;
-    private Bitmap parkingBitmap = null;
+
+    private ProgressDialog progressDialog;
+
+    private String currentParkingID;
+    private String parkingURL;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +89,11 @@ public class NewListingActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
+        storageReference = FirebaseStorage.getInstance().getReference();
+        progressDialog = new ProgressDialog(this);
+
+        //Get the parking id and use it throughout the activity
+        currentParkingID = databaseReference.child("AvailableParkings").push().getKey();
 
         Intent intent = getIntent();
 
@@ -169,22 +189,45 @@ public class NewListingActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            progressDialog.setMessage("Processing the listing...");
+            progressDialog.show();
+
+
             Bundle extras = data.getExtras();
-            parkingBitmap = (Bitmap) extras.get("data");
+            Bitmap parkingBitmap = (Bitmap) extras.get("data");
+
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            parkingBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), parkingBitmap, "Title", null);
+            Uri imageUri = Uri.parse(path);
+
+            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    Toast.makeText(getApplicationContext(), "Photo uploaded.", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            });
+
             listingPhoto.setImageBitmap(parkingBitmap);
             photoActionDialog.dismiss();
 
         } else if (requestCode == REQUEST_GALLERY_PHOTO && resultCode == RESULT_OK) {
+            progressDialog.setMessage("Processing the listing...");
+            progressDialog.show();
+
             Uri imageUri = data.getData();
-            try {
-                parkingBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (parkingBitmap != null) {
-                listingPhoto.setImageBitmap(parkingBitmap);
-                photoActionDialog.dismiss();
-            }
+            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    Toast.makeText(getApplicationContext(), "Photo uploaded.", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            });
+            listingPhoto.setImageURI(imageUri);
+            photoActionDialog.dismiss();
         }
     }
 
@@ -436,7 +479,7 @@ public class NewListingActivity extends AppCompatActivity {
         String parentKey;
         String parkingSpaceUidKey;
         ParkingSpace dataValue;
-        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();
+//        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();
 
         while(!startDateCalendar.equals(endDateCalendar)) {
             int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
@@ -447,17 +490,20 @@ public class NewListingActivity extends AppCompatActivity {
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
             dataValue = getValue(currentDate, currentDate, startTime, endTime, this.userID, owner,
-                    price, address, point, parkingSpaceUidKey);
+                    price, address, point, currentParkingID);
             parentKey = currentDate;
 
             //add parking photo to database
-            String encodedParkingPhoto = encodeBitmap(parkingBitmap);
-            if (encodedParkingPhoto != null)
-                dataValue.setParkingImageUrl(encodedParkingPhoto);
-            else
-                dataValue.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
+            getParkingURL(currentParkingID);
 
-            databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
+            Log.i("TEST", parkingURL + "??");
+            if (parkingURL != null) {
+                dataValue.setParkingImageUrl(parkingURL);
+            } else {
+                dataValue.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
+            }
+
+            databaseReference.child("AvailableParkings").child(parentKey).child(currentParkingID).setValue(dataValue); //add listing to database
             listOfParkings.add(dataValue);
 
 
@@ -465,33 +511,49 @@ public class NewListingActivity extends AppCompatActivity {
         }
         if(startDateCalendar.equals(endDateCalendar)) {
             dataValue = getValue(endDate, endDate, startTime, endTime, this.userID, owner,
-                    price, address, point, parkingSpaceUidKey);
+                    price, address, point, currentParkingID);
             parentKey = endDate;
 
             //add parking photo to database
-            String encodedParkingPhoto = encodeBitmap(parkingBitmap);
-            if (encodedParkingPhoto != null)
-                dataValue.setParkingImageUrl(encodedParkingPhoto);
-            else
+            getParkingURL(currentParkingID);
+            Log.i("TEST", parkingURL + "??");
+            if (parkingURL != null) {
+                dataValue.setParkingImageUrl(parkingURL);
+            } else {
                 dataValue.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
+            }
 
-            databaseReference.child("AvailableParkings").child(parentKey).child(parkingSpaceUidKey).setValue(dataValue); //add listing to database
+            databaseReference.child("AvailableParkings").child(parentKey).child(currentParkingID).setValue(dataValue); //add listing to database
             listOfParkings.add(dataValue);
         }
         addListingToUser(listOfParkings);
     }
 
+    /**
+     * Get the parking URL for a listing with a certain id
+     * @param parkingID the id of the listing to be retrieved from database
+     * @return the default url of the parking photo if not set, the encoded string of bitmap if the user has set one photo for the listing
+     */
+    public void getParkingURL(final String parkingID) {
+        storageReference.child("parkingPhotos/" + parkingID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                parkingURL = uri.toString();
 
-    private String encodeBitmap(Bitmap bitmap) {
-        if (bitmap == null)
-            return null;
+                Log.i("TEST", "SUCCESS: " + parkingURL);
+//                Log.i("TEST 123", parkingURL);
 
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-
-        return imageEncoded;
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Log.i("TEST", "FAILURE");
+            }
+        });
     }
+
 
     //This method containis parkingID
     public static ParkingSpace getValue(String startDate, String endDate, String startTime,
@@ -544,8 +606,6 @@ public class NewListingActivity extends AppCompatActivity {
                         }
                     }
                 }
-
-
             }
 
             @Override
