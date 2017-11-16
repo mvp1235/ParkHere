@@ -46,10 +46,12 @@ public class SearchResultActivity extends ListActivity {
     static final String END_DATE = "endDate";
     static final String PRICE = "price";
     static final String PARKING_ID = "parkingID";
+    static final String START_TIME = "startTime";
+    static final String END_TIME = "endTime";
 
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
-    private ArrayList<ParkingSpace> parkingSpaces;
+    private ArrayList<String> availableParkingSpaces;
     private DatabaseReference databaseReference;
 
     private FusedLocationProviderClient mFusedLocationClient;
@@ -64,7 +66,7 @@ public class SearchResultActivity extends ListActivity {
         Intent intent = getIntent();
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
-        parkingSpaces = new ArrayList<ParkingSpace>();
+        availableParkingSpaces = new ArrayList<String>();
         //get user input for location
         final String dateSearchTerm = intent.getStringExtra("date");
         final String locationSearchTerm = intent.getStringExtra("location");
@@ -74,14 +76,17 @@ public class SearchResultActivity extends ListActivity {
         else
             userHasDesiredLocation = true;
 
+
+
+
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child("AvailableParkings").hasChild(dateSearchTerm)) {
                     for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings")
                             .child(dateSearchTerm).getChildren()) {
-                        ParkingSpace p = userIDList.getValue(ParkingSpace.class);
-                        parkingSpaces.add(p);
+                        String p = userIDList.getValue(String.class);
+                        availableParkingSpaces.add(p);
                         showResult();
                     }
                 }
@@ -92,6 +97,8 @@ public class SearchResultActivity extends ListActivity {
                 //not supported
             }
         });
+
+
 
         if (userHasDesiredLocation) {
             // Getting latitude and longitude of an address
@@ -201,6 +208,8 @@ public class SearchResultActivity extends ListActivity {
         b.putString(SPECIAL_INSTRUCTION, parking.getSpecialInstruction());
         b.putString(START_DATE, parking.getStartDate());
         b.putString(END_DATE, parking.getEndDate());
+        b.putString(START_TIME, parking.getStartTime());
+        b.putString(END_TIME, parking.getEndTime());
         b.putDouble(PRICE, parking.getPrice());
         b.putString(PARKING_ID, parking.getParkingID());
         b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
@@ -222,6 +231,30 @@ public class SearchResultActivity extends ListActivity {
 
     private void showResult () {
         // if a location is specified
+        final ArrayList<ParkingSpace> parkingSpaces = new ArrayList<>();  // get the parking spaces.
+        if(availableParkingSpaces.size() > 0) {
+            for(String available: availableParkingSpaces) {
+                String tokens[] = available.split("/"); //[0] contains time, [1] contains parkingID to search database
+                final String parkingID = tokens[1];
+
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.child("Listings").hasChild(parkingID)) {
+                            ParkingSpace p = dataSnapshot.child("Listings").child(parkingID).getValue(ParkingSpace.class);
+                            parkingSpaces.add(p);
+                        }
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+
+                    }
+                });
+
+
+            }
+        }
         if (mLocation != null) {
             // Create the adapter to convert the array to views
             ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces,

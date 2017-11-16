@@ -77,7 +77,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         if (!clickedParking.getStartDate().equalsIgnoreCase(clickedParking.getEndDate())) {
             availableDate += " - " + clickedParking.getEndDate();
         }
-        dateTV.setText(availableDate);
+        String availableTime = " From " + clickedParking.getStartTime() + " to " + clickedParking.getEndTime();
+
+        dateTV.setText(availableDate + availableTime);
 
         priceTV.setText("$" + String.valueOf(clickedParking.getPrice()));
 

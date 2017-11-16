@@ -90,8 +90,7 @@ public class NewListingActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
         progressDialog = new ProgressDialog(this);
 
-        //Get the parking id and use it throughout the activity
-        currentParkingID = databaseReference.child("AvailableParkings").push().getKey();
+
 
         Intent intent = getIntent();
 
@@ -466,7 +465,6 @@ public class NewListingActivity extends AppCompatActivity {
         int endHour = endTimeSystem[0];
         int endMinutes = endTimeSystem[1];
 
-        String dataValue = starthour + "-" + startMinutes + "-" + endHour + "-" + endMinutes; //starthour-startminutes-endhour-endminutes
 
         int startMonth = Integer.parseInt(startDateList[0]);
         int startDay = Integer.parseInt(startDateList[1]);
@@ -485,6 +483,9 @@ public class NewListingActivity extends AppCompatActivity {
         String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
 
+        //Get the parking id and use it throughout the activity
+        currentParkingID = databaseReference.child("AvailableParkings").push().getKey();
+        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingID; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 //        String parkingSpaceUidKey;
         ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingID);

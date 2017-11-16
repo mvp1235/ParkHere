@@ -47,6 +47,8 @@ public class ParkingSpace implements Parcelable{
         this.specialInstruction = b.getString(SearchResultActivity.SPECIAL_INSTRUCTION, "");
         this.startDate = b.getString(SearchResultActivity.START_DATE, "");
         this.endDate = b.getString(SearchResultActivity.END_DATE, "");
+        this.startTime = b.getString(SearchResultActivity.START_TIME, "");
+        this.endTime = b.getString(SearchResultActivity.END_TIME, "");
         this.price = b.getDouble(SearchResultActivity.PRICE, 0);
         this.parkingID = b.getString(SearchResultActivity.PARKING_ID, "");
     }

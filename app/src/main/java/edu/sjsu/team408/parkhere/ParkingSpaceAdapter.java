@@ -81,7 +81,10 @@ public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
         if (!parking.getStartDate().equalsIgnoreCase(parking.getEndDate())) {
             availableDate += " - " + parking.getEndDate();
         }
-        parkingDate.setText(availableDate);
+
+        String availableTime = " From " + parking.getStartTime() + " to " + parking.getEndTime();
+
+        parkingDate.setText(availableDate + availableTime);
 
         parkingPrice.setText("$" + String.valueOf(parking.getPrice()));
 
