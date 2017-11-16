@@ -53,6 +53,7 @@ public class SearchResultActivity extends ListActivity {
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
     private ArrayList<String> availableParkingSpaces;
     private DatabaseReference databaseReference;
+    private ArrayList<ParkingSpace> parkingSpaces;
 
     private FusedLocationProviderClient mFusedLocationClient;
     private Location mLocation;
@@ -70,6 +71,7 @@ public class SearchResultActivity extends ListActivity {
         //get user input for location
         final String dateSearchTerm = intent.getStringExtra("date");
         final String locationSearchTerm = intent.getStringExtra("location");
+        final String searchTimeTerm = intent.getStringExtra("time");
 
         if (locationSearchTerm.isEmpty())
             userHasDesiredLocation = false;
@@ -87,7 +89,7 @@ public class SearchResultActivity extends ListActivity {
                             .child(dateSearchTerm).getChildren()) {
                         String p = userIDList.getValue(String.class);
                         availableParkingSpaces.add(p);
-                        showResult();
+                        searchResult(searchTimeTerm);
                     }
                 }
             }
@@ -229,32 +231,38 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    private void showResult () {
-        // if a location is specified
-        final ArrayList<ParkingSpace> parkingSpaces = new ArrayList<>();  // get the parking spaces.
+    private void searchResult (String searchTimeTerm) {
+        parkingSpaces = new ArrayList<>();  // get the parking spaces.
         if(availableParkingSpaces.size() > 0) {
             for(String available: availableParkingSpaces) {
                 String tokens[] = available.split("/"); //[0] contains time, [1] contains parkingID to search database
                 final String parkingID = tokens[1];
-
-                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        if(dataSnapshot.child("Listings").hasChild(parkingID)) {
-                            ParkingSpace p = dataSnapshot.child("Listings").child(parkingID).getValue(ParkingSpace.class);
-                            parkingSpaces.add(p);
+                String availableTime = tokens[0];   //starthour-startminute-endhour-endminute
+                final boolean withinAvailableTime = isWithinAvailableTime(searchTimeTerm, availableTime);
+                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            if(withinAvailableTime) {
+                                if (dataSnapshot.child("Listings").hasChild(parkingID)) {
+                                    ParkingSpace p = dataSnapshot.child("Listings").child(parkingID).getValue(ParkingSpace.class);
+                                    parkingSpaces.add(p);
+                                    showResult();
+                                }
+                            }
                         }
-                    }
 
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-                    }
-                });
-
+                        }
+                    });
 
             }
         }
+    }
+
+    private void showResult() {
+        // if a location is specified
         if (mLocation != null) {
             // Create the adapter to convert the array to views
             ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces,
@@ -266,4 +274,19 @@ public class SearchResultActivity extends ListActivity {
             Toast.makeText(this, R.string.addressInvalid, Toast.LENGTH_SHORT).show();
         }
     }
+
+    private static boolean isWithinAvailableTime(String searchTime, String availableTime) {
+        String availableTimeTokens[] = availableTime.split(":");
+        int startHour = Integer.parseInt(availableTimeTokens[0]);
+        int startMinute = Integer.parseInt(availableTimeTokens[1]);
+        int endHour = Integer.parseInt(availableTimeTokens[2]);
+        int endMinute = Integer.parseInt(availableTimeTokens[3]);
+
+        int searchTimeSystem[] = NewListingActivity.get24HoursTimeSystem(searchTime);
+        int searchHour = searchTimeSystem[0];
+        int searchMinute = searchTimeSystem[1];
+
+        return (searchHour - startHour >= 0) && (searchHour - endHour <= 0);
+    }
+
 }

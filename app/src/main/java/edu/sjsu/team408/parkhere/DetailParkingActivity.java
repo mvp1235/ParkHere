@@ -90,7 +90,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    makeReservation();
+                    //makeReservation();    //Duoc -- i will continue fixing this part tmr. 
                 }
             });
         }

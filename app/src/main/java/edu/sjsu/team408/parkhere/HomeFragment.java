@@ -2,6 +2,7 @@ package edu.sjsu.team408.parkhere;
 
 
 import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,8 +14,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.TimePicker;
 import android.widget.Toast;
-
 import java.util.Calendar;
 
 
@@ -24,10 +25,12 @@ import java.util.Calendar;
 public class HomeFragment extends Fragment {
 
     private static final int VIEW_PARKINGS_CODE = 123;
+    private final static int SEARCH_TIME = 1;
 
     private Button searchBtn;
     private static EditText searchDateET;
     private EditText locationSearchTerm;
+    private static EditText searchTimeET;
 
     public static class DatePickerFragment extends DialogFragment
             implements DatePickerDialog.OnDateSetListener {
@@ -47,6 +50,20 @@ public class HomeFragment extends Fragment {
         public void onDateSet(DatePicker view, int year, int month, int day) {
             String completeDate = getDate(year, month+1, day);
             setDate(completeDate);  // add one to month to get proper month number (0 for january , ...)
+        }
+    }
+
+    public static class TimePickerFragment extends DialogFragment
+            implements TimePickerDialog.OnTimeSetListener {
+
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            return new TimePickerDialog(getContext(), this, 12, 0, false);
+        }
+
+        @Override
+        public void onTimeSet(TimePicker timePicker, int i, int i1) {
+            setSearchTime(i,i1);
         }
     }
 
@@ -81,12 +98,21 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        searchTimeET = (EditText) view.findViewById(R.id.searchTime);
+        searchTimeET.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog(v);
+            }
+        });
 
         return view;
     }
 
+
     public void searchListing(String location) {
         String searchDate = searchDateET.getText().toString();
+        String searchTime = searchTimeET.getText().toString();
         if (searchDate.isEmpty()) {
             Toast.makeText(getContext(), "Please select a date.", Toast.LENGTH_SHORT).show();
             return;
@@ -94,12 +120,18 @@ public class HomeFragment extends Fragment {
         Intent intent = new Intent(getActivity(), SearchResultActivity.class);
         intent.putExtra("date", searchDate);
         intent.putExtra("location", location);
+        intent.putExtra("time", searchTime);
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
     }
 
     public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getFragmentManager(), "datePicker");
+    }
+
+    public void showTimePickerDialog(View v) {
+        DialogFragment newFragment = new TimePickerFragment();
+        newFragment.show(getFragmentManager(), "timePicker");
     }
 
     public static String getDate(int year, int month, int day) {
@@ -114,5 +146,25 @@ public class HomeFragment extends Fragment {
 
     public static void setDate(String completeDate) {
         searchDateET.setText(completeDate);
+    }
+
+    public static void setSearchTime(int hour, int minute) {
+        String hourString, minuteString;
+        String ampm = "AM";
+
+        if (hour > 12) {
+            hour = hour % 12;
+            ampm = "PM";
+        } else if (hour == 0) {
+            hour = 12;
+        } else if (hour == 12) {
+            ampm = "PM";
+        }
+
+        hourString = Integer.toString(hour);
+        minuteString = (minute < 10) ? "0" + Integer.toString(minute) : Integer.toString(minute);
+        String completeTime = hourString + ":" + minuteString + " " + ampm;
+
+        searchTimeET.setText(completeTime);
     }
 }

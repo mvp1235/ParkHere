@@ -524,7 +524,7 @@ public class NewListingActivity extends AppCompatActivity {
      * @param time
      * @return
      */
-    private static int[] get24HoursTimeSystem(String time) {
+    public static int[] get24HoursTimeSystem(String time) {
         int result[] = new int[2];    // out of bounds. Check if it's 25 that means it's wrong.
         String timeList[] = time.split(":");
         int hour = Integer.parseInt(timeList[0]);
