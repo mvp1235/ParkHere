@@ -36,6 +36,7 @@ import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class DetailParkingActivity extends AppCompatActivity {
 
@@ -150,7 +151,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    //makeReservation();    //Duoc -- i will continue fixing this part tmr. 
+                    makeReservation();    //Duoc -- i will continue fixing this part tmr.
                 }
             });
         }
@@ -203,9 +204,26 @@ public class DetailParkingActivity extends AppCompatActivity {
      * Implement reservation functionality here
      */
     public void makeReservation() {
-        final String startDate = clickedParking.getStartDate();
+        final String parkingID = clickedParking.getParkingID();
 
         //here add the reserved parking to user's myCurrentReservedParkings lists
+
+        //0. Split the parking space depending on seeker's booking rage.
+        //1. Delete reference from AvailableParkings
+        //2. Delete parking from Listings then split it.
+        //3. Take seeker's desire booking range and reserve the space.
+        //4. Update seeker's object in database.
+        //5. Update owner that they have reserved which portion of the available time.
+        //6. add the splitted parking space to database if there are remainding ones.
+
+        ParkingSpace[] spaces = splitParkingSpace(clickedParking);  //0.
+        final ParkingSpace parkingSpaceToBook = spaces[0];
+        ParkingSpace parkingSpaceSplit1 = spaces[1];    //to be added back to database
+        ParkingSpace parkingSpaceSplit2 = spaces[2];    //to be added back to database
+        deleteParkingReference(clickedParking);     //1.
+        deleteParkingListing(parkingID);        //2.
+
+        addSplittedParkingsToDatabase(parkingSpaceSplit1, parkingSpaceSplit2);  //6
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -215,18 +233,13 @@ public class DetailParkingActivity extends AppCompatActivity {
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-
-                            currentUser.addReservedParking(clickedParking);
-
-                            //for now make reservation will just delete the listing on database.
-
-                            //databaseReference = FirebaseDatabase.getInstance().getReference();
+                            currentUser.addReservedParking(parkingSpaceToBook);     //3.
                             String currentUserID = currentUser.getId();
-                            databaseReference.child("AvailableParkings").child(startDate).removeValue();
-                            databaseReference.child("Users").child(currentUserID).setValue(currentUser);
+                            databaseReference.child("Users").child(currentUserID).setValue(currentUser); //4.
+                            notifyOwner(parkingSpaceToBook);  //5.
+
 
                             setResult(RESULT_OK);
-
                             finish();
                         }
                     }
@@ -237,6 +250,94 @@ public class DetailParkingActivity extends AppCompatActivity {
             }
         });
     }
+    public ParkingSpace[] splitParkingSpace(ParkingSpace clickedParking) {
+        ParkingSpace[] splitted = new ParkingSpace[3];      //[0] ps to book. [1]&[2] splitted ps
+        splitted[0] = clickedParking;
+
+        //for now just return the retire click parking space. Will implement split later.
+
+        return splitted;
+    }
+
+    public void deleteParkingReference(ParkingSpace clickedParking) {
+        final String parkingID = clickedParking.getParkingID();
+        String startDate = clickedParking.getStartDate();
+        String endDate = clickedParking.getEndDate();
+
+        final GregorianCalendar startDateRef = getGregorianCalendar(startDate);
+        final GregorianCalendar endDateRef = getGregorianCalendar(endDate);
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+
+                while(!startDateRef.equals(endDateRef)) {
+                    String dateRef = getDate(startDateRef);
+                    if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingID)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingID).removeValue();
+                        }
+                    }
+                    startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
+                }
+                if(startDateRef.equals(endDateRef)) {
+                    String dateRef = getDate(startDateRef);
+                    if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingID)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingID).removeValue();
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void deleteParkingListing(final String parkingID) {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("Listings").hasChild(parkingID)) {
+                    databaseReference.child("Listings").child(parkingID).removeValue();
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    public void notifyOwner(ParkingSpace bookedParkingSpace) {
+
+    }
+
+    public void addSplittedParkingsToDatabase(ParkingSpace p1, ParkingSpace p2) {
+
+    }
+
+    public String getDate(GregorianCalendar g) {
+        int month = g.get(Calendar.MONTH) + 1;
+        int day = g.get(Calendar.DAY_OF_MONTH);
+        int year = g.get(Calendar.YEAR);
+        return month + "-" + day + "-" + year;
+    }
+
+    public GregorianCalendar getGregorianCalendar(String date) {
+        String[] tokens = date.split("-");
+        int month = Integer.parseInt(tokens[0]);
+        int day = Integer.parseInt(tokens[1]);
+        int year = Integer.parseInt(tokens[2]);
+        return new GregorianCalendar(year, month -1 , day);
+    }
+
+
+
 
 
 
