@@ -39,7 +39,8 @@
             android:layout_height="wrap_content"
             android:layout_weight="3"
             android:hint="@string/searchParkingHint"
-            android:inputType="textPostalAddress" />
+            android:inputType="textPostalAddress"
+            android:text="1 washington square, san jose, ca 95112" />
 
 
     </LinearLayout>

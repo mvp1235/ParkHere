@@ -28,13 +28,47 @@
                 android:scaleType="fitXY"
                 app:srcCompat="@mipmap/default_parking_photo" />
 
-            <Button
-                android:id="@+id/reserveBtn"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_gravity="bottom"
-                android:text="@string/reserve" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/reserveFromDateTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="From Date:" />
+
+                <TextView
+                    android:id="@+id/reserveToDateTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="To Date:" />
+
+                <TextView
+                    android:id="@+id/reserveFromTimeTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="From Time:" />
+
+                <TextView
+                    android:id="@+id/reserveToTimeTV"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="To Time:" />
+
+                <Button
+                    android:id="@+id/reserveBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="38dp"
+                    android:layout_gravity="bottom"
+                    android:layout_weight="1"
+                    android:text="@string/reserve" />
+            </LinearLayout>
 
 
         </LinearLayout>
