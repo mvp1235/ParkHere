@@ -16,4 +16,9 @@
         android:icon="@drawable/profile_icon"
         android:title="@string/title_profile" />
 
+    <item
+        android:id="@+id/navigation_messaging"
+        android:icon="@drawable/messaging_icon"
+        android:title="@string/Messaging" />
+
 </menu>
