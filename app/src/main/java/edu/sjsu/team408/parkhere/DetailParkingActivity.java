@@ -35,6 +35,7 @@ import com.squareup.picasso.Picasso;
 import org.w3c.dom.Text;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
@@ -45,15 +46,16 @@ public class DetailParkingActivity extends AppCompatActivity {
     private final static int FROM_TIME = 2;
     private final static int TO_TIME = 3;
 
+    private final static int LISTING_EDIT_CODE = 10;
+
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV;
     private ImageView parkingPhoto;
-    private Button reserveBtn;
+    private Button reserveBtn, editBtn;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
     private ParkingSpace clickedParking;
     private User currentUser;
-    private ParkingSpace chosenParking;
     private static String parkingPhotoString = "https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png";
     private Uri parkingURI = null;
     private TextView reserveToTime, reserveFromDate, reserveToDate, reserveFromTime;
@@ -77,6 +79,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         priceTV = (TextView) findViewById(R.id.detailParkingPrice);
         parkingPhoto = (ImageView) findViewById(R.id.detailParkingPhoto);
         reserveBtn = (Button) findViewById(R.id.reserveBtn);
+        editBtn = (Button) findViewById(R.id.detailEditBtn);
 
         //seeker set reservation from date to date, from time to time.
         reserveFromDate = (TextView) findViewById(R.id.reserveFromDateTV);
@@ -158,11 +161,28 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         // Set appropriate text for button
         if (request == SearchResultActivity.VIEW_DETAIL_PARKING_FROM_RESULT) {
+            reserveBtn.setVisibility(View.VISIBLE);
+            editBtn.setVisibility(View.GONE);       // only show edit button on listing history
             reserveBtn.setText("Reserve");
         } else if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_) {
-            reserveBtn.setText("Book Again");
+            reserveBtn.setVisibility(View.GONE);    //book again should be taken out since it depends on the listing owner, i.e. you can't really book again if it's not up for listing
+            editBtn.setVisibility(View.GONE);       // only show edit button on listing history
+
+//            reserveBtn.setText("Book Again");
+
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
-            reserveBtn.setText("List Again");
+            reserveBtn.setText("List Again");     //list again will take user to the new listing activity, with all data pre-filled, and allow user to pick another data and time
+                                                    //To be implemented later
+
+            //An edit button will be shown on this screen as well to allow user to edit the listings he/she posted
+            editBtn.setVisibility(View.VISIBLE);
+            editBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    editListing();
+                }
+            });
+
         }
 
         //Hide distance if user is checking history
@@ -174,6 +194,54 @@ public class DetailParkingActivity extends AppCompatActivity {
         }
     }
 
+    private void editListing() {
+        Intent intent = new Intent(DetailParkingActivity.this, EditListingActivity.class);
+
+        ArrayList<String> parsedAddress = parseAddress(addressTV.getText().toString());
+        intent.putExtra("streetAddress", parsedAddress.get(0));
+        intent.putExtra("city", parsedAddress.get(1));
+        intent.putExtra("state", parsedAddress.get(2));
+        intent.putExtra("zipCode", parsedAddress.get(3));
+        intent.putExtra("owner", ownerTV.getText().toString());
+        intent.putExtra("price", priceTV.getText().toString().substring(1)); //get rid of substring before sending over intent to edit listing activity
+        intent.putExtra("specialInstructions", specialInstructionTV.getText().toString());
+        intent.putExtra("parkingID", clickedParking.getParkingID());
+
+        startActivityForResult(intent, LISTING_EDIT_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == LISTING_EDIT_CODE && resultCode == RESULT_OK) {      //take input from listing editting page and reflect changes to database here
+            finish();
+        }
+    }
+
+    /**
+     * Parse an address into separate fields, such as street number, city, state, zipCode
+     * @param fullAddress the adddress in full format (1 Washington Square, San Jose, CA 95112)
+     * @return An arraylist containing all the fields. [0] for street number, [1] for city, [2] for state, and [3] for zip code
+     */
+    private ArrayList<String> parseAddress(String fullAddress) {
+        ArrayList<String> result = new ArrayList<>();
+        String streetNumber, city, state, zipCode;
+        String[] splits = fullAddress.split(",");
+
+        streetNumber = splits[0].trim();
+        city = splits[1].trim();
+
+        String stateZipCode = splits[2].trim(); // get rid of preceding and proceding spaces first
+        state = stateZipCode.split(" ")[0];
+        zipCode = stateZipCode.split(" ")[1];
+
+        result.add(streetNumber);
+        result.add(city);
+        result.add(state);
+        result.add(zipCode);
+        return result;
+    }
 
     /**
      * Get the parking URL for a listing with a certain id

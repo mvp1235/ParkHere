@@ -57,6 +57,8 @@
     <string name="chooseFromGallery">Choose From Gallery</string>
     <string name="takeAPhoto">Take A Photo</string>
     <string name="specialInstructionHint">special instruction if any</string>
+    <string name="editListingPage">Edit Listing Page</string>
+    <string name="save">Save</string>
 
 
 </resources>

@@ -13,7 +13,6 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -25,13 +24,6 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
-
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -40,17 +32,22 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
-import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
+import java.util.List;
 
-public class NewListingActivity extends AppCompatActivity {
-    private static final String TAG = NewListingActivity.class.getSimpleName();
+public class EditListingActivity extends AppCompatActivity {
 
     private final static int REQUEST_GALLERY_PHOTO = 9000;
     private final static int REQUEST_IMAGE_CAPTURE = 9001;
@@ -78,11 +75,10 @@ public class NewListingActivity extends AppCompatActivity {
 
     private String currentParkingID;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_listing);
+        setContentView(R.layout.activity_edit_listing);
 
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
         firebaseAuth = FirebaseAuth.getInstance();
@@ -90,37 +86,30 @@ public class NewListingActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
         progressDialog = new ProgressDialog(this);
 
-        //Get the parking id and use it throughout the activity
-        currentParkingID = databaseReference.child("AvailableParkings").push().getKey();
 
-        Intent intent = getIntent();
+        owner = (TextView) findViewById(R.id.editListingOwner);
+        addressStreetNumber = (EditText) findViewById(R.id.editListingAddressStreetNumber);
+        addressCity = (EditText) findViewById(R.id.editListingAddressCity);
+        addressState = (EditText) findViewById(R.id.editListingAddressState);
+        addressZipCode = (EditText) findViewById(R.id.eidtListingAddressZipCode);
+        price = (EditText) findViewById(R.id.editListingPrice);
+        startDate = (EditText) findViewById(R.id.editListingStartDate);
+        endDate = (EditText) findViewById(R.id.editListingEndDate);
+        startTime = (EditText) findViewById(R.id.editListingStartTime);
+        endTime = (EditText) findViewById(R.id.editListingEndTime);
+        specialInstructions = (EditText) findViewById(R.id.editListingSpecialInstructions);
+        listingPhoto = (ImageView) findViewById(R.id.editListingPhoto);
 
-        //Referencing to the UI elements
-        owner = (TextView) findViewById(R.id.listingOwner);
-        addressStreetNumber = (EditText) findViewById(R.id.listingAddressStreetNumber);
-        addressCity = (EditText) findViewById(R.id.listingAddressCity);
-        addressState = (EditText) findViewById(R.id.listingAddressState);
-        addressZipCode = (EditText) findViewById(R.id.listingAddressZipCode);
-        price = (EditText) findViewById(R.id.listingPrice);
-        startDate = (EditText) findViewById(R.id.listingStartDate);
-        endDate = (EditText) findViewById(R.id.listingEndDate);
-        startTime = (EditText) findViewById(R.id.listingStartTime);
-        endTime = (EditText) findViewById(R.id.listingEndTime);
-        specialInstructions = (EditText) findViewById(R.id.listingSpecialInstructions);
-        listingPhoto = (ImageView) findViewById(R.id.listingPhoto);
+        saveListingBtn = (Button) findViewById(R.id.editSaveListingBtn);
+        editListingPhotoBtn = (Button) findViewById(R.id.editListingEditPhotoBtn);
 
-        //For making new listing quicker
-        populateDefaultValuesForTesting();
-
-        saveListingBtn = (Button) findViewById(R.id.saveListingBtn);
         saveListingBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                saveNewListing();
+            public void onClick(View v) {
+                editListing();
             }
         });
 
-        editListingPhotoBtn = (Button) findViewById(R.id.listingEditPhotoBtn);
         editListingPhotoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,33 +117,78 @@ public class NewListingActivity extends AppCompatActivity {
             }
         });
 
-        // setting TextView of owner's name
-        databaseReference.child("Users").child(userID).addListenerForSingleValueEvent(
-                new ValueEventListener() {
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        User user = dataSnapshot.getValue(User.class);
-                        if (user == null) {
-                            // User is null, error out
-                            Log.e(TAG, "User " + userID + " is unexpectedly null");
-                            Toast.makeText(NewListingActivity.this,
-                                    "Error: could not fetch user.",
-                                    Toast.LENGTH_SHORT).show();
-                        } else {
-                            owner.setText(user.getName());
-                        }
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
+        Intent intent = getIntent();
+        String ownerStr = intent.getStringExtra("owner");
+        String streetNumStr = intent.getStringExtra("streetAddress");
+        String cityStr = intent.getStringExtra("city");
+        String stateStr = intent.getStringExtra("state");
+        String zipCodeStr = intent.getStringExtra("zipCode");
+        String priceStr = intent.getStringExtra("price");
+        String specialInstructionsStr = intent.getStringExtra("specialInstructions");
+        currentParkingID = intent.getStringExtra("parkingID");
+
+        //Prefilling datas
+        owner.setText(ownerStr);
+        addressStreetNumber.setText(streetNumStr);
+        addressCity.setText(cityStr);
+        addressState.setText(stateStr);
+        addressZipCode.setText(zipCodeStr);
+        price.setText(priceStr);
+        specialInstructions.setText(specialInstructionsStr);
+
+
+        //Retrieve date and time from Firebase and prefill
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.child("Listings").hasChild(currentParkingID)) {
+                    ParkingSpace parking = dataSnapshot.child("Listings").child(currentParkingID).getValue(ParkingSpace.class);
+
+                    String startDateStr = parking.getStartDate();
+                    String endDateStr = parking.getEndDate();
+                    String startTimeStr = parking.getStartTime();
+                    String endTimeStr = parking.getEndTime();
+                    startDate.setText(startDateStr);
+                    endDate.setText(endDateStr);
+                    startTime.setText(startTimeStr);
+                    endTime.setText(endTimeStr);
                 }
-        );
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+
+
+        // Loading the parking photo
+        final ImageView parkingPhoto = (ImageView) findViewById(R.id.editListingPhoto);
+        StorageReference storageReference = FirebaseStorage.getInstance().getReference();
+        storageReference.child("parkingPhotos/" + currentParkingID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                Picasso.with(getApplicationContext()).load(uri.toString()).into(parkingPhoto);
+                Log.i("SET PARKING PHOTO", "Success");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
+                Log.i("SET PARKING PHOTO", "Fail");
+            }
+        });
+
+
 
         //Get the current day, month, and year
         calendar = Calendar.getInstance();
         year = calendar.get(Calendar.YEAR);
         month = calendar.get(Calendar.MONTH);
         day = calendar.get(Calendar.DAY_OF_MONTH);
+
 
         //Set on click listeners for the date and time pickers
         startDate.setOnClickListener(new View.OnClickListener() {
@@ -181,7 +215,6 @@ public class NewListingActivity extends AppCompatActivity {
                 showDialog(TO_TIME);
             }
         });
-
 
     }
 
@@ -232,7 +265,7 @@ public class NewListingActivity extends AppCompatActivity {
     }
 
     private void showPhotoActionDialog() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(NewListingActivity.this);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(EditListingActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
         LinearLayout galleryLL = mView.findViewById(R.id.galleryLL);
         LinearLayout cameraLL = mView.findViewById(R.id.cameraLL);
@@ -264,10 +297,7 @@ public class NewListingActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Take all the user input to create a new listing and update to database
-     */
-    public void saveNewListing() {
+    public void editListing() {
         Intent i = new Intent();
         String streetNumString = addressStreetNumber.getText().toString();
         String cityString = addressCity.getText().toString();
@@ -329,7 +359,6 @@ public class NewListingActivity extends AppCompatActivity {
 
     }
 
-
     @Override
     protected Dialog onCreateDialog(int id) {
         // TODO Auto-generated method stub
@@ -375,7 +404,7 @@ public class NewListingActivity extends AppCompatActivity {
             };
 
     private TimePickerDialog.OnTimeSetListener startTimeListener = new TimePickerDialog.OnTimeSetListener() {
-        public void onTimeSet(TimePicker view,int hourofday,int min){
+        public void onTimeSet(TimePicker view, int hourofday, int min){
             setStartTime(hourofday, min);
         }
     };
@@ -456,7 +485,7 @@ public class NewListingActivity extends AppCompatActivity {
      * @param endTime   end time
      */
     public void addListingToDatabaseNew(String startDate, String endDate, String startTime,
-                                     String endTime, LatLng point) {
+                                        String endTime, LatLng point) {
         String startDateList[] = startDate.split("-");
         String endDateList[] = endDate.split("-");
         int startTimeSystem[] = get24HoursTimeSystem(startTime);
@@ -548,8 +577,8 @@ public class NewListingActivity extends AppCompatActivity {
 
     //This method contains parkingID
     public static ParkingSpace getParkingSpace(String startDate, String endDate, String startTime,
-                                         String endTime, String userID, String ownerName,
-                                         String price, String address, LatLng point, String parkingID) {
+                                               String endTime, String userID, String ownerName,
+                                               String price, String address, LatLng point, String parkingID) {
         if(startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty() ||
                 userID.isEmpty() || price.isEmpty() || address.isEmpty()) {
             return null;
@@ -565,19 +594,6 @@ public class NewListingActivity extends AppCompatActivity {
 
         //return result;
         return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
-    }
-
-    public void populateDefaultValuesForTesting() {
-        addressStreetNumber.setText("1 Washington Square");
-        addressCity.setText("San Jose");
-        addressState.setText("CA");
-        addressZipCode.setText("95112");
-        price.setText("5");
-        startDate.setText("11-19-2017");
-        endDate.setText("11-19-2017");
-        startTime.setText("5:00 PM");
-        endTime.setText("10:00 PM");
-
     }
 
     private void addListingToUser(ParkingSpace ps) {
