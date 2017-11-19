@@ -56,6 +56,7 @@
     <string name="editProfile">Edit Photo</string>
     <string name="chooseFromGallery">Choose From Gallery</string>
     <string name="takeAPhoto">Take A Photo</string>
+    <string name="specialInstructionHint">special instruction if any</string>
 
 
 </resources>

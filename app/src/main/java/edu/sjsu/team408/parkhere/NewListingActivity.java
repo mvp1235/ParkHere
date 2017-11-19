@@ -60,7 +60,7 @@ public class NewListingActivity extends AppCompatActivity {
     private final static int TO_TIME = 3;
 
     private TextView owner;
-    private EditText addressStreetNumber, addressCity, addressState, addressZipCode, price, startDate, endDate, startTime, endTime;
+    private EditText addressStreetNumber, addressCity, addressState, addressZipCode, price, startDate, endDate, startTime, endTime, specialInstructions;
     private Button saveListingBtn, editListingPhotoBtn;
     private ImageView listingPhoto;
 
@@ -90,7 +90,8 @@ public class NewListingActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
         progressDialog = new ProgressDialog(this);
 
-
+        //Get the parking id and use it throughout the activity
+        currentParkingID = databaseReference.child("AvailableParkings").push().getKey();
 
         Intent intent = getIntent();
 
@@ -105,6 +106,7 @@ public class NewListingActivity extends AppCompatActivity {
         endDate = (EditText) findViewById(R.id.listingEndDate);
         startTime = (EditText) findViewById(R.id.listingStartTime);
         endTime = (EditText) findViewById(R.id.listingEndTime);
+        specialInstructions = (EditText) findViewById(R.id.listingSpecialInstructions);
         listingPhoto = (ImageView) findViewById(R.id.listingPhoto);
 
         //For making new listing quicker
@@ -483,12 +485,14 @@ public class NewListingActivity extends AppCompatActivity {
         String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
 
-        //Get the parking id and use it throughout the activity
-        currentParkingID = databaseReference.child("AvailableParkings").push().getKey();
         String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingID; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 //        String parkingSpaceUidKey;
         ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingID);
+
+        //Adding special instruction to parking (if any is provided)
+        String specialIns = specialInstructions.getText().toString();
+        parking.setSpecialInstruction(specialIns);
         String childKey;
 //        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();    // no longer using these, gonna use the member variable currentParkingID
 
@@ -541,7 +545,7 @@ public class NewListingActivity extends AppCompatActivity {
 
 
 
-    //This method containis parkingID
+    //This method contains parkingID
     public static ParkingSpace getParkingSpace(String startDate, String endDate, String startTime,
                                          String endTime, String userID, String ownerName,
                                          String price, String address, LatLng point, String parkingID) {
@@ -567,8 +571,8 @@ public class NewListingActivity extends AppCompatActivity {
         addressCity.setText("San Jose");
         addressState.setText("CA");
         addressZipCode.setText("95112");
-        price.setText("5.0");
-        startDate.setText("11-15-2017");
+        price.setText("5");
+        startDate.setText("11-19-2017");
         endDate.setText("11-15-2017");
         startTime.setText("5:00 PM");
         endTime.setText("10:00 PM");
