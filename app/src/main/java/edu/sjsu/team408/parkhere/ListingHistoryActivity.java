@@ -59,6 +59,14 @@ public class ListingHistoryActivity extends ListActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == VIEW_DETAIL_HISTORY_LISTING && resultCode == RESULT_OK) {
+            finish();
+        }
+    }
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {

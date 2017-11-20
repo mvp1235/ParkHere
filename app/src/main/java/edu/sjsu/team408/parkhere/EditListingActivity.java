@@ -350,7 +350,7 @@ public class EditListingActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
 
-            addListingToDatabaseNew(startDateString, endDateString, startTimeString, endTimeString,
+            editListingOnDatabase(startDateString, endDateString, startTimeString, endTimeString,
                     point);
 
             setResult(RESULT_OK, i);
@@ -484,7 +484,7 @@ public class EditListingActivity extends AppCompatActivity {
      * @param startTime start time
      * @param endTime   end time
      */
-    public void addListingToDatabaseNew(String startDate, String endDate, String startTime,
+    public void editListingOnDatabase(String startDate, String endDate, String startTime,
                                         String endTime, LatLng point) {
         String startDateList[] = startDate.split("-");
         String endDateList[] = endDate.split("-");
@@ -548,7 +548,7 @@ public class EditListingActivity extends AppCompatActivity {
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
         }
-        addListingToUser(parking);
+        editUserListing(parking);
         databaseReference.child("Listings").child(currentParkingID).setValue(parking);
     }
 
@@ -596,20 +596,30 @@ public class EditListingActivity extends AppCompatActivity {
         return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
-    private void addListingToUser(ParkingSpace ps) {
-        final ArrayList<ParkingSpace> newList = new ArrayList<ParkingSpace>();
+    private void editUserListing(ParkingSpace ps) {
+        final ArrayList<ParkingSpace> newList = new ArrayList<>();
         newList.add(ps);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("asd", "asdfa");
                 if(firebaseAuth.getCurrentUser() != null) {
                     String targetID = firebaseAuth.getCurrentUser().getUid();
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             User currentUser = null;
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                            currentUser.addToListingHistory(newList);
+
+                            //To edit, first delete the old listing value, then add the new one in, so there won't be duplicates
+                            //Before this, the user's listing history doesn't remove the old listing, it just adds to the list
+                            ArrayList<ParkingSpace> existingListings = currentUser.getMyListingHistory();
+                            for (ParkingSpace p : existingListings) {
+                                if (p.getParkingID().equalsIgnoreCase(currentParkingID)) {
+                                    existingListings.remove(p);
+                                }
+                            }
+                            existingListings.add(newList.get(0));
+//                            currentUser.addToListingHistory(newList);
+                            currentUser.setMyListingHistory(existingListings);
                             databaseReference.child("Users").child(currentUser.getId()).setValue(currentUser);
                         }
                     }

@@ -143,6 +143,10 @@ public class User implements Parcelable{
 
     public ArrayList<ParkingSpace> getMyListingHistory() {return this.myListingHistory;}
 
+    public void setMyListingHistory(ArrayList<ParkingSpace> myListingHistory) {
+        this.myListingHistory = myListingHistory;
+    }
+
     public String toString () {
         return getName();
     }
