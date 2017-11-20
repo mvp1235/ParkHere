@@ -76,7 +76,7 @@ public class NewListingActivity extends AppCompatActivity {
     private AlertDialog photoActionDialog;
     private ProgressDialog progressDialog;
 
-    private String currentParkingID;
+    private String currentParkingIDRef;
 
 
     @Override
@@ -198,7 +198,7 @@ public class NewListingActivity extends AppCompatActivity {
             String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), parkingBitmap, "Title", null);
             Uri imageUri = Uri.parse(path);
 
-            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
+            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingIDRef);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -216,7 +216,7 @@ public class NewListingActivity extends AppCompatActivity {
             progressDialog.show();
 
             Uri imageUri = data.getData();
-            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
+            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingIDRef);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -484,13 +484,15 @@ public class NewListingActivity extends AppCompatActivity {
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
 
         //Get the parking id and use it throughout the activity
-        currentParkingID = databaseReference.child("AvailableParkings").push().getKey();
-        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingID; //starthour-startminutes-endhour-endminutes-currentParkingID
+        currentParkingIDRef = databaseReference.child("AvailableParkings").push().getKey();
+        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingIDRef; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 //        String parkingSpaceUidKey;
-        ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingID);
+        ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingIDRef);
+        String ownerParkingID = userID;
+        parking.setOwnerParkingID(ownerParkingID);
         String childKey;
-//        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();    // no longer using these, gonna use the member variable currentParkingID
+//        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();    // no longer using these, gonna use the member variable currentParkingIDRef
 
         while(!startDateCalendar.equals(endDateCalendar)) {
             int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
@@ -500,7 +502,7 @@ public class NewListingActivity extends AppCompatActivity {
 
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-            childKey = currentParkingID;
+            childKey = currentParkingIDRef;
             parentKey = currentDate;
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
@@ -509,13 +511,13 @@ public class NewListingActivity extends AppCompatActivity {
             startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
         }
         if(startDateCalendar.equals(endDateCalendar)) {
-            childKey = currentParkingID;
+            childKey = currentParkingIDRef;
             parentKey = endDate;
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
         }
         addListingToUser(parking);
-        databaseReference.child("Listings").child(currentParkingID).setValue(parking);
+        databaseReference.child("Listings").child(currentParkingIDRef).setValue(parking);
     }
 
 

@@ -126,7 +126,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         clickedParking = new ParkingSpace(bundle);
 
-        setParkingPhoto(clickedParking.getParkingID());
+        setParkingPhoto(clickedParking.getParkingIDRef());
 
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
         ownerTV.setText(clickedParking.getOwner().getName());
@@ -204,7 +204,7 @@ public class DetailParkingActivity extends AppCompatActivity {
      * Implement reservation functionality here
      */
     public void makeReservation() {
-        final String parkingID = clickedParking.getParkingID();
+        final String parkingID = clickedParking.getParkingIDRef();
 
         //here add the reserved parking to user's myCurrentReservedParkings lists
 
@@ -251,8 +251,87 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
     public ParkingSpace[] splitParkingSpace(ParkingSpace clickedParking) {
+        String reserveStartDate = reserveFromDate.getText().toString().split(":")[1].trim();
+        String reserveEndDate = reserveToDate.getText().toString().split(":")[1].trim();
+        String reserveStartTime = reserveFromTime.getText().toString().split("-")[1].trim();
+        String reserveEndTime = reserveToTime.getText().toString().split("-")[1].trim();
+
+
+        String clickedParkingStartDate= clickedParking.getStartDate();
+        String clickedParkingEndDate = clickedParking.getEndDate();
+        String clickedParkingStartTime = clickedParking.getStartTime();
+        String clickedParkingEndTime = clickedParking.getEndTime();
+
+        ParkingSpace reserveParking = clickedParking.clone();
+        ParkingSpace splittedParking1 = clickedParking.clone();
+        ParkingSpace splittedParking2 = clickedParking.clone();
+
+
+        if(clickedParkingStartDate.equals(reserveStartDate) && reserveEndDate.equals(clickedParkingEndDate)){
+            //reserving the entire clicked parking.
+                reserveParking = clickedParking;
+
+
+        } else if(clickedParkingStartDate.equals(reserveStartDate) && !clickedParkingEndDate.equals(reserveEndDate)) {
+            //split 2. reserving first half day.
+            reserveParking.setEndDate(reserveEndDate);  //set new end date
+            GregorianCalendar ref = getGregorianCalendarDate(reserveEndDate);
+            ref.add(Calendar.DAY_OF_MONTH, 1);
+            String startDate = getDate(ref);
+            splittedParking1.setStartDate(startDate);   //set new start date.
+
+
+        } else if(!clickedParkingStartDate.equals(reserveStartDate) && clickedParkingEndDate.equals(reserveEndDate)) {
+            //split 2. reserving second half.
+            reserveParking.setStartDate(reserveStartDate);
+
+            GregorianCalendar ref = getGregorianCalendarDate(reserveStartDate);
+            ref.add(Calendar.DAY_OF_MONTH, -1);
+            String endDate = getDate(ref);  //new end date
+            splittedParking1.setEndDate(endDate);
+
+        } else {
+            //split 3. reserving the middle one.
+            reserveParking.setStartDate(reserveStartDate);
+            reserveParking.setEndDate(reserveEndDate);
+
+            GregorianCalendar ref = getGregorianCalendarDate(reserveStartDate);
+            ref.add(Calendar.DAY_OF_MONTH, -1);
+            splittedParking1.setEndDate(getDate(ref));
+
+            GregorianCalendar ref2 = getGregorianCalendarDate(reserveEndDate);
+            ref2.add(Calendar.DAY_OF_MONTH, 1);
+            splittedParking2.setStartDate(getDate(ref2));
+        }
+
+        if(clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)) {
+            //do nothing
+            splittedParking1 = null;
+            splittedParking2 = null;
+        } else if (clickedParkingStartTime.equals(reserveStartTime) && !clickedParkingEndTime.equals(reserveEndTime)) {
+            //split 2. reserving first half hour.
+            reserveParking.setEndTime(reserveEndTime);
+            splittedParking1.setStartTime(reserveEndTime);
+            splittedParking2 = null;
+        } else if (!clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)) {
+            //split 2. reserving second half hour.
+            reserveParking.setStartTime(reserveStartTime);
+            splittedParking1.setEndTime(reserveStartTime);
+            splittedParking2 = null;
+        } else {
+            //split 3. reserving middle hour.
+            reserveParking.setStartTime(reserveStartTime);
+            reserveParking.setEndTime(reserveEndTime);
+
+            splittedParking1.setEndTime(reserveStartTime);
+            splittedParking2.setStartTime(reserveEndTime);
+        }
+
         ParkingSpace[] splitted = new ParkingSpace[3];      //[0] ps to book. [1]&[2] splitted ps
-        splitted[0] = clickedParking;
+        splitted[0] = reserveParking;
+        splitted[1] = splittedParking1;
+        splitted[2] = splittedParking2;
+
 
         //for now just return the retire click parking space. Will implement split later.
 
@@ -260,12 +339,12 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
     public void deleteParkingReference(ParkingSpace clickedParking) {
-        final String parkingID = clickedParking.getParkingID();
+        final String parkingIDRef = clickedParking.getParkingIDRef();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
 
-        final GregorianCalendar startDateRef = getGregorianCalendar(startDate);
-        final GregorianCalendar endDateRef = getGregorianCalendar(endDate);
+        final GregorianCalendar startDateRef = getGregorianCalendarDate(startDate);
+        final GregorianCalendar endDateRef = getGregorianCalendarDate(endDate);
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -274,8 +353,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingID)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingID).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
                         }
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
@@ -283,8 +362,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingID)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingID).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
                         }
                     }
                 }
@@ -318,7 +397,61 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
     public void addSplittedParkingsToDatabase(ParkingSpace p1, ParkingSpace p2) {
+        if(p1 != null) {
+            p1.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
 
+            String p1ChildKey = p1.getParkingIDRef();
+
+            GregorianCalendar start = getGregorianCalendarDate(p1.getStartDate());
+            GregorianCalendar end = getGregorianCalendarDate(p1.getEndDate());
+
+            int startTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p1.getStartTime());
+            int endTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p1.getEndTime());
+            int starthour = startTimeSystem[0];
+            int startMinutes = startTimeSystem[1];
+            int endHour = endTimeSystem[0];
+            int endMinutes = endTimeSystem[1];
+
+            String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p1.getParkingIDRef();
+
+            while(!start.equals(end)) {
+                String p1ParentKey = getDate(start);
+                databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
+                start.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            if(start.equals(end)) {
+                String p1ParentKey = getDate(start);
+                databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
+            }
+            databaseReference.child("Listings").child(p1ChildKey).setValue(p1);
+        }
+        if(p2 != null) {
+            p2.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
+            String p2ChildKey = p2.getParkingIDRef();
+
+            GregorianCalendar start = getGregorianCalendarDate(p2.getStartDate());
+            GregorianCalendar end = getGregorianCalendarDate(p2.getEndDate());
+
+            int startTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p2.getStartTime());
+            int endTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p2.getEndTime());
+            int starthour = startTimeSystem[0];
+            int startMinutes = startTimeSystem[1];
+            int endHour = endTimeSystem[0];
+            int endMinutes = endTimeSystem[1];
+
+            String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p2.getParkingIDRef();
+
+            while(!start.equals(end)) {
+                String p2ParentKey = getDate(start);
+                databaseReference.child("AvailableParkings").child(p2ParentKey).child(p2ChildKey).setValue(dataValue);
+                start.add(Calendar.DAY_OF_MONTH, 1);
+            }
+            if(start.equals(end)) {
+                String p2ParentKey = getDate(start);
+                databaseReference.child("AvailableParkings").child(p2ParentKey).child(p2ChildKey).setValue(dataValue);
+            }
+            databaseReference.child("Listings").child(p2ChildKey).setValue(p2);
+        }
     }
 
     public String getDate(GregorianCalendar g) {
@@ -328,7 +461,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         return month + "-" + day + "-" + year;
     }
 
-    public GregorianCalendar getGregorianCalendar(String date) {
+    public GregorianCalendar getGregorianCalendarDate(String date) {
         String[] tokens = date.split("-");
         int month = Integer.parseInt(tokens[0]);
         int day = Integer.parseInt(tokens[1]);
@@ -336,7 +469,12 @@ public class DetailParkingActivity extends AppCompatActivity {
         return new GregorianCalendar(year, month -1 , day);
     }
 
-
+    public GregorianCalendar getGregorianCalendarTime(String time) {
+        String[] tokens = time.split("-");
+        int hour = Integer.parseInt(tokens[0]);
+        int minute = Integer.parseInt(tokens[1]);
+        return new GregorianCalendar(2018,0,1, hour, minute);
+    }
 
 
 
@@ -414,7 +552,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         minuteString = (minute < 10) ? "0" + Integer.toString(minute) : Integer.toString(minute);
         String completeTime = hourString + ":" + minuteString + " " + ampm;
 
-        reserveFromTime.setText("From Time: " + completeTime);
+        reserveFromTime.setText("From Time- " + completeTime);
     }
 
     public void setReserveToTime(int hour, int minute) {
@@ -434,7 +572,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         minuteString = (minute < 10) ? "0" + Integer.toString(minute) : Integer.toString(minute);
         String completeTime = hourString + ":" + minuteString + " " + ampm;
 
-        reserveToTime.setText("To Time: " + completeTime);
+        reserveToTime.setText("To Time- " + completeTime);
     }
 
     public void setReserveFromDate(int year, int month, int day) {

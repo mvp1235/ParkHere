@@ -56,7 +56,7 @@ public class HistoryParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
 
         //Load URL into image view
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-        storageReference.child("parkingPhotos/" + parking.getParkingID()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageReference.child("parkingPhotos/" + parking.getParkingIDRef()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png'
