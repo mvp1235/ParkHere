@@ -21,7 +21,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
         android:background="@color/background_floating_material_dark"
         android:text="Send"
         android:textColor="@color/background_material_light" />
@@ -31,7 +31,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/msg_type"
-        android:layout_alignParentLeft="false"
+        android:layout_alignParentStart="false"
         android:layout_alignParentTop="false"
         android:layout_below="@+id/meLbl"
         android:layout_marginBottom="20dp"
@@ -45,15 +45,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="start|center_vertical"
-        android:text="User 1"
-        android:textSize="20sp" />
-
-    <TextView
-        android:id="@+id/friendLabel"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:text="User 2"
+        android:text="Chat with"
         android:textSize="20sp" />
 
 </RelativeLayout>

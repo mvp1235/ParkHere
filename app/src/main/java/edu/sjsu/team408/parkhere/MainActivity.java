@@ -44,7 +44,15 @@ public class MainActivity extends AppCompatActivity {
                     selectedFragment = new ProfileFragment();
                     break;
                 case R.id.navigation_messaging:
-                    selectedFragment = new ChatFragment();
+                    if (mAuth.getCurrentUser() != null)
+                        selectedFragment = new ChatFragment();
+                    else {
+                        Toast.makeText(getApplicationContext(),
+                                "Please login first.",
+                                Toast.LENGTH_LONG)
+                                .show();
+                        selectedFragment = new ProfileFragment();
+                    }
                     break;
             }
 

@@ -6,7 +6,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
-        android:background="@drawable/ic_right_chat_bubble"
+        android:background="@drawable/ic_left_chat_bubble"
         android:orientation="vertical"
         android:paddingBottom="10dp">
 

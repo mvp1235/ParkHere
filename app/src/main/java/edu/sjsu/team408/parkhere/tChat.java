@@ -42,8 +42,14 @@ public class tChat extends AppCompatActivity {
         messageArea = (EditText)findViewById(R.id.messageArea);
         scrollView = (ScrollView)findViewById(R.id.scrollView);
 
-        reference1 = FirebaseDatabase.getInstance().getReference().child(tUserDetails.username).child(tUserDetails.chatWith);
-        reference2 = FirebaseDatabase.getInstance().getReference().child(tUserDetails.chatWith).child(tUserDetails.username);
+        reference1 = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(tUserDetails.username)
+                .child(tUserDetails.chatWith);
+        reference2 = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(tUserDetails.chatWith)
+                .child(tUserDetails.username);
 
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -102,15 +108,16 @@ public class tChat extends AppCompatActivity {
         TextView textView = new TextView(tChat.this);
         textView.setText(message);
 
-        LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams lp2 = new LinearLayout.LayoutParams(
+                ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         lp2.weight = 1.0f;
 
         if(type == 1) {
-            lp2.gravity = Gravity.LEFT;
+            lp2.gravity = Gravity.START;
             textView.setBackgroundResource(R.drawable.ic_right_chat_bubble);
         }
         else{
-            lp2.gravity = Gravity.RIGHT;
+            lp2.gravity = Gravity.END;
             textView.setBackgroundResource(R.drawable.ic_left_chat_bubble);
         }
         textView.setLayoutParams(lp2);
