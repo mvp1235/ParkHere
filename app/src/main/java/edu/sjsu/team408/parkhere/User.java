@@ -20,6 +20,7 @@ public class User implements Parcelable{
     private ArrayList<ParkingSpace> myCurrentReservedParkings;
     private ArrayList<ParkingSpace> myListingHistory;
     private ArrayList<ParkingSpace> myReservationList;
+    private ArrayList<Review> myReviews;
 
     public User(){};
 
@@ -33,6 +34,7 @@ public class User implements Parcelable{
         this.myCurrentReservedParkings = new ArrayList<>();     //empty first created
         this.myListingHistory = new ArrayList<>();
         this.myReservationList = new ArrayList<>();
+        this.myReviews = new ArrayList<>();
     }
 
 
@@ -173,6 +175,18 @@ public class User implements Parcelable{
 
     public String toString () {
         return getName();
+    }
+
+    public ArrayList<Review> getMyReviews() {
+        return myReviews;
+    }
+
+    public void setMyReviews(ArrayList<Review> myReviews) {
+        this.myReviews = myReviews;
+    }
+
+    public void addToReviewList(Review review) {
+        myReviews.add(review);
     }
 
 }

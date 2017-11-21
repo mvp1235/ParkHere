@@ -59,6 +59,9 @@
     <string name="specialInstructionHint">special instruction if any</string>
     <string name="editListingPage">Edit Listing Page</string>
     <string name="save">Save</string>
+    <string name="review">Review</string>
+    <string name="reviewHint">give a description about your experience</string>
+    <string name="submit">Submit</string>
 
 
 </resources>
