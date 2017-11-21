@@ -75,8 +75,4 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void searchListing(String location) {
-        Toast.makeText(getApplicationContext(), location, Toast.LENGTH_SHORT).show();
-    }
-
 }

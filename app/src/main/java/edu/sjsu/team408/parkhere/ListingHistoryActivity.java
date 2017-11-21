@@ -82,6 +82,7 @@ public class ListingHistoryActivity extends ListActivity {
         b.putString(SearchResultActivity.END_DATE, parking.getEndDate());
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
         b.putString(SearchResultActivity.OWNER_PARKING_ID, parking.getOwnerParkingID());
+        b.putString(SearchResultActivity.PARKING_ID_REF, parking.getParkingIDRef());
 
         intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_LISTING);

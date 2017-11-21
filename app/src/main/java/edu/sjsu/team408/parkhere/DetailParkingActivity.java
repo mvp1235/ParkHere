@@ -56,8 +56,6 @@ public class DetailParkingActivity extends AppCompatActivity {
     private StorageReference storageReference;
     private ParkingSpace clickedParking;
     private User currentUser;
-    private static String parkingPhotoString = "https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png";
-    private Uri parkingURI = null;
     private TextView reserveToTime, reserveFromDate, reserveToDate, reserveFromTime;
     private Calendar calendar;
     private int year, month, day;
@@ -279,7 +277,6 @@ public class DetailParkingActivity extends AppCompatActivity {
             public void onSuccess(Uri uri) {
                 //Parking photo is set by user
                 Picasso.with(getApplicationContext()).load(uri.toString()).into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Success");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -287,7 +284,6 @@ public class DetailParkingActivity extends AppCompatActivity {
                 //Handle any errors
                 //Parking photo is the default one, user has not set a photo for the listing yet
                 Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Fail");
             }
         });
 
