@@ -218,12 +218,10 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         ParkingSpace[] spaces = splitParkingSpace(clickedParking);  //0.
         final ParkingSpace parkingSpaceToBook = spaces[0];
-        ParkingSpace parkingSpaceSplit1 = spaces[1];    //to be added back to database
-        ParkingSpace parkingSpaceSplit2 = spaces[2];    //to be added back to database
         deleteParkingReference(clickedParking);     //1.
         deleteParkingListing(parkingID);        //2.
 
-        addSplittedParkingsToDatabase(parkingSpaceSplit1, parkingSpaceSplit2);  //6
+        addSplittedParkingsToDatabase(spaces);  //6
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -266,11 +264,33 @@ public class DetailParkingActivity extends AppCompatActivity {
         ParkingSpace splittedParking1 = clickedParking.clone();
         ParkingSpace splittedParking2 = clickedParking.clone();
 
+        ParkingSpace[] splitted = new ParkingSpace[3];      //[0] ps to book. [1]&[2] splitted ps
 
         if(clickedParkingStartDate.equals(reserveStartDate) && reserveEndDate.equals(clickedParkingEndDate)){
             //reserving the entire clicked parking.
                 reserveParking = clickedParking;
+            if(clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)) {
+                //do nothing
+                splittedParking1 = null;
+                splittedParking2 = null;
+            } else if (clickedParkingStartTime.equals(reserveStartTime) && !clickedParkingEndTime.equals(reserveEndTime)) {
+                //split 2. reserving first half hour.
+                reserveParking.setEndTime(reserveEndTime);
+                splittedParking1.setStartTime(reserveEndTime);
+                splittedParking2 = null;
+            } else if (!clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)) {
+                //split 2. reserving second half hour.
+                reserveParking.setStartTime(reserveStartTime);
+                splittedParking1.setEndTime(reserveStartTime);
+                splittedParking2 = null;
+            } else {
+                //split 3. reserving middle hour.
+                reserveParking.setStartTime(reserveStartTime);
+                reserveParking.setEndTime(reserveEndTime);
 
+                splittedParking1.setEndTime(reserveStartTime);
+                splittedParking2.setStartTime(reserveEndTime);
+            }
 
         } else if(clickedParkingStartDate.equals(reserveStartDate) && !clickedParkingEndDate.equals(reserveEndDate)) {
             //split 2. reserving first half day.
@@ -280,6 +300,36 @@ public class DetailParkingActivity extends AppCompatActivity {
             String startDate = getDate(ref);
             splittedParking1.setStartDate(startDate);   //set new start date.
 
+            if(clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)){
+                //same time. do nothing more
+                splittedParking2 = null;
+
+            } else if (clickedParkingStartTime.equals(reserveStartTime) && !clickedParkingEndTime.equals(reserveEndTime)) {
+                //end time is different.
+                reserveParking.setEndTime(reserveEndTime);
+                //change split2 to first half but start different time end same time. same date as reserve parking.
+                splittedParking2 = reserveParking.clone();
+                splittedParking2.setStartTime(reserveEndTime);
+                splittedParking2.setEndTime(clickedParkingEndTime);
+            } else if (!clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)){
+                //start time is different. change split2 to end different time. Same date as reserve parking.
+                reserveParking.setStartTime(reserveStartTime);
+                splittedParking2 = reserveParking.clone();
+                splittedParking2.setStartTime(clickedParkingStartTime);
+                splittedParking2.setEndTime(reserveStartTime);
+            } else {
+                reserveParking.setStartTime(reserveStartTime);
+                reserveParking.setEndTime(reserveEndTime);
+                splittedParking2 = reserveParking.clone();
+                splittedParking2.setStartTime(clickedParkingStartTime);
+                splittedParking2.setEndTime(reserveStartTime);
+                ParkingSpace splittedParking3 = reserveParking.clone();
+                splittedParking3.setStartTime(reserveEndTime);
+                splittedParking3.setEndTime(clickedParkingEndTime);
+                splitted = new ParkingSpace[4];
+                splitted[3] = splittedParking3;
+
+            }
 
         } else if(!clickedParkingStartDate.equals(reserveStartDate) && clickedParkingEndDate.equals(reserveEndDate)) {
             //split 2. reserving second half.
@@ -289,6 +339,35 @@ public class DetailParkingActivity extends AppCompatActivity {
             ref.add(Calendar.DAY_OF_MONTH, -1);
             String endDate = getDate(ref);  //new end date
             splittedParking1.setEndDate(endDate);
+            if(clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)){
+                //same time. do nothing more
+                splittedParking2 = null;
+
+            } else if (clickedParkingStartTime.equals(reserveStartTime) && !clickedParkingEndTime.equals(reserveEndTime)) {
+                //end time is different.
+                reserveParking.setEndTime(reserveEndTime);
+                //change split2 to first half but start different time end same time. same date as reserve parking.
+                splittedParking2 = reserveParking.clone();
+                splittedParking2.setStartTime(reserveEndTime);
+                splittedParking2.setEndTime(clickedParkingEndTime);
+            } else if (!clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)){
+                //start time is different. change split2 to end different time. Same date as reserve parking.
+                reserveParking.setStartTime(reserveStartTime);
+                splittedParking2 = reserveParking.clone();
+                splittedParking2.setStartTime(clickedParkingStartTime);
+                splittedParking2.setEndTime(reserveStartTime);
+            } else {
+                reserveParking.setStartTime(reserveStartTime);
+                reserveParking.setEndTime(reserveEndTime);
+                splittedParking2 = reserveParking.clone();
+                splittedParking2.setStartTime(clickedParkingStartTime);
+                splittedParking2.setEndTime(reserveStartTime);
+                ParkingSpace splittedParking3 = reserveParking.clone();
+                splittedParking3.setStartTime(reserveEndTime);
+                splittedParking3.setEndTime(clickedParkingEndTime);
+                splitted = new ParkingSpace[4];
+                splitted[3] = splittedParking3;
+            }
 
         } else {
             //split 3. reserving the middle one.
@@ -302,32 +381,39 @@ public class DetailParkingActivity extends AppCompatActivity {
             GregorianCalendar ref2 = getGregorianCalendarDate(reserveEndDate);
             ref2.add(Calendar.DAY_OF_MONTH, 1);
             splittedParking2.setStartDate(getDate(ref2));
+
+            if(clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)){
+                //do nothing.
+            } else if (clickedParkingStartTime.equals(reserveStartTime) && !clickedParkingEndTime.equals(reserveEndTime)) {
+                reserveParking.setEndTime(reserveEndTime);
+                ParkingSpace splittedParking3 = reserveParking.clone();
+                splittedParking3.setStartTime(reserveEndTime);
+                splittedParking3.setEndTime(clickedParkingEndTime);
+                splitted = new ParkingSpace[4];
+                splitted[3] = splittedParking3;
+            } else if (!clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)){
+                reserveParking.setStartTime(reserveStartTime);
+                ParkingSpace splittedParking3 = reserveParking.clone();
+                splittedParking3.setStartTime(clickedParkingStartTime);
+                splittedParking3.setEndTime(reserveStartTime);
+                splitted = new ParkingSpace[4];
+                splitted[3] = splittedParking3;
+            } else {
+                reserveParking.setStartTime(reserveStartTime);
+                reserveParking.setEndTime(reserveEndTime);
+
+                ParkingSpace splittedParking3 = reserveParking.clone();
+                ParkingSpace splittedParking4 = reserveParking.clone();
+                splittedParking3.setStartTime(clickedParkingStartTime);
+                splittedParking3.setEndTime(reserveStartTime);
+                splittedParking4.setStartTime(reserveEndTime);
+                splittedParking4.setEndTime(clickedParkingEndTime);
+                splitted = new ParkingSpace[5];
+                splitted[3] = splittedParking3;
+                splitted[4] = splittedParking4;
+            }
         }
 
-        if(clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)) {
-            //do nothing
-            splittedParking1 = null;
-            splittedParking2 = null;
-        } else if (clickedParkingStartTime.equals(reserveStartTime) && !clickedParkingEndTime.equals(reserveEndTime)) {
-            //split 2. reserving first half hour.
-            reserveParking.setEndTime(reserveEndTime);
-            splittedParking1.setStartTime(reserveEndTime);
-            splittedParking2 = null;
-        } else if (!clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)) {
-            //split 2. reserving second half hour.
-            reserveParking.setStartTime(reserveStartTime);
-            splittedParking1.setEndTime(reserveStartTime);
-            splittedParking2 = null;
-        } else {
-            //split 3. reserving middle hour.
-            reserveParking.setStartTime(reserveStartTime);
-            reserveParking.setEndTime(reserveEndTime);
-
-            splittedParking1.setEndTime(reserveStartTime);
-            splittedParking2.setStartTime(reserveEndTime);
-        }
-
-        ParkingSpace[] splitted = new ParkingSpace[3];      //[0] ps to book. [1]&[2] splitted ps
         splitted[0] = reserveParking;
         splitted[1] = splittedParking1;
         splitted[2] = splittedParking2;
@@ -396,62 +482,43 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     }
 
-    public void addSplittedParkingsToDatabase(ParkingSpace p1, ParkingSpace p2) {
-        if(p1 != null) {
-            p1.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
+    public void addSplittedParkingsToDatabase(ParkingSpace[] spaces) {
+        int i = 1;
+        int outOfBounds = spaces.length;
+        ParkingSpace p = spaces[i];
+        while(p != null && (i < outOfBounds)) {
+            p = spaces[i];
+            if (p != null) {
+                p.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
 
-            String p1ChildKey = p1.getParkingIDRef();
+                String p1ChildKey = p.getParkingIDRef();
 
-            GregorianCalendar start = getGregorianCalendarDate(p1.getStartDate());
-            GregorianCalendar end = getGregorianCalendarDate(p1.getEndDate());
+                GregorianCalendar start = getGregorianCalendarDate(p.getStartDate());
+                GregorianCalendar end = getGregorianCalendarDate(p.getEndDate());
 
-            int startTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p1.getStartTime());
-            int endTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p1.getEndTime());
-            int starthour = startTimeSystem[0];
-            int startMinutes = startTimeSystem[1];
-            int endHour = endTimeSystem[0];
-            int endMinutes = endTimeSystem[1];
+                int startTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p.getStartTime());
+                int endTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p.getEndTime());
+                int starthour = startTimeSystem[0];
+                int startMinutes = startTimeSystem[1];
+                int endHour = endTimeSystem[0];
+                int endMinutes = endTimeSystem[1];
 
-            String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p1.getParkingIDRef();
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getParkingIDRef();
 
-            while(!start.equals(end)) {
-                String p1ParentKey = getDate(start);
-                databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
-                start.add(Calendar.DAY_OF_MONTH, 1);
+                while (!start.equals(end)) {
+                    String p1ParentKey = getDate(start);
+                    databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
+                    start.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                if (start.equals(end)) {
+                    String p1ParentKey = getDate(start);
+                    databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
+                }
+                databaseReference.child("Listings").child(p1ChildKey).setValue(p);
             }
-            if(start.equals(end)) {
-                String p1ParentKey = getDate(start);
-                databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
-            }
-            databaseReference.child("Listings").child(p1ChildKey).setValue(p1);
+            i++;
         }
-        if(p2 != null) {
-            p2.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
-            String p2ChildKey = p2.getParkingIDRef();
 
-            GregorianCalendar start = getGregorianCalendarDate(p2.getStartDate());
-            GregorianCalendar end = getGregorianCalendarDate(p2.getEndDate());
-
-            int startTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p2.getStartTime());
-            int endTimeSystem[] = NewListingActivity.get24HoursTimeSystem(p2.getEndTime());
-            int starthour = startTimeSystem[0];
-            int startMinutes = startTimeSystem[1];
-            int endHour = endTimeSystem[0];
-            int endMinutes = endTimeSystem[1];
-
-            String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p2.getParkingIDRef();
-
-            while(!start.equals(end)) {
-                String p2ParentKey = getDate(start);
-                databaseReference.child("AvailableParkings").child(p2ParentKey).child(p2ChildKey).setValue(dataValue);
-                start.add(Calendar.DAY_OF_MONTH, 1);
-            }
-            if(start.equals(end)) {
-                String p2ParentKey = getDate(start);
-                databaseReference.child("AvailableParkings").child(p2ParentKey).child(p2ChildKey).setValue(dataValue);
-            }
-            databaseReference.child("Listings").child(p2ChildKey).setValue(p2);
-        }
     }
 
     public String getDate(GregorianCalendar g) {
