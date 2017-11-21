@@ -3,10 +3,13 @@
     package="edu.sjsu.team408.parkhere">
 
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
@@ -40,7 +43,8 @@
         <activity android:name=".SignUpActivity" />
         <activity android:name=".SignInActivity" />
         <activity android:name=".BookingHistoryActivity" />
-        <activity android:name=".ListingHistoryActivity"></activity>
+        <activity android:name=".ListingHistoryActivity" />
+        <activity android:name=".EditListingActivity"></activity>
     </application>
 
 </manifest>
