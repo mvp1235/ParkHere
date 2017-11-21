@@ -72,6 +72,8 @@ public class BookingHistoryActivity extends ListActivity {
         b.putString(SearchResultActivity.SPECIAL_INSTRUCTION, parking.getSpecialInstruction());
         b.putString(SearchResultActivity.START_DATE, parking.getStartDate());
         b.putString(SearchResultActivity.END_DATE, parking.getEndDate());
+        b.putString(SearchResultActivity.START_TIME, parking.getStartTime());
+        b.putString(SearchResultActivity.END_TIME, parking.getEndTime());
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
         b.putString(SearchResultActivity.OWNER_PARKING_ID, parking.getOwnerParkingID());
 

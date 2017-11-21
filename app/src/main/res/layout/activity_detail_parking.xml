@@ -76,6 +76,13 @@
                     android:layout_gravity="bottom"
                     android:layout_weight="1"
                     android:text="@string/edit" />
+
+                <Button
+                    android:id="@+id/seeWhoBookedMyParkingSpace"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="ReserveList" />
             </LinearLayout>
 
 

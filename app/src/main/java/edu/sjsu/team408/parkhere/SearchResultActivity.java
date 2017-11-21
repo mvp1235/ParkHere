@@ -49,6 +49,7 @@ public class SearchResultActivity extends ListActivity {
     static final String START_TIME = "startTime";
     static final String END_TIME = "endTime";
     static final String OWNER_PARKING_ID = "OwnerParkingID";
+    static final String RESERVE_BY = "reservedBy";
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
     private ArrayList<String> availableParkingSpacesOnDate;
@@ -216,6 +217,7 @@ public class SearchResultActivity extends ListActivity {
         b.putString(PARKING_ID_REF, parking.getParkingIDRef());
         b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
         b.putString(OWNER_PARKING_ID, parking.getOwnerParkingID());
+        b.putParcelable(RESERVE_BY, parking.getReservedBy());
 
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);

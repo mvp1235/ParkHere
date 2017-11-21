@@ -19,6 +19,7 @@ public class User implements Parcelable{
     private String profileURL;
     private ArrayList<ParkingSpace> myCurrentReservedParkings;
     private ArrayList<ParkingSpace> myListingHistory;
+    private ArrayList<ParkingSpace> myReservationList;
 
     public User(){};
 
@@ -31,6 +32,7 @@ public class User implements Parcelable{
         this.profileURL = profileURL;
         this.myCurrentReservedParkings = new ArrayList<>();     //empty first created
         this.myListingHistory = new ArrayList<>();
+        this.myReservationList = new ArrayList<>();
     }
 
 
@@ -145,6 +147,28 @@ public class User implements Parcelable{
 
     public void setMyListingHistory(ArrayList<ParkingSpace> myListingHistory) {
         this.myListingHistory = myListingHistory;
+    }
+
+    public void setMyCurrentReservedParkings(ArrayList<ParkingSpace> myCurrentReservedParkings){
+        this.myCurrentReservedParkings = myCurrentReservedParkings;
+    }
+
+    public ArrayList<ParkingSpace> getMyReservationList(){
+        return this.myReservationList;
+    }
+
+    public void setMyReservationList(ArrayList<ParkingSpace> myReservationList){
+        this.myReservationList = myReservationList;
+    }
+    public void addToMyReservetionList(ParkingSpace p) {
+        if(myReservationList == null) {
+            myReservationList = new ArrayList<ParkingSpace>();
+        }
+        myReservationList.add(p);
+    }
+
+    public User clone(){
+        return new User(id, name, address, phoneNumber, emailAddress,profileURL);
     }
 
     public String toString () {

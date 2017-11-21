@@ -23,6 +23,7 @@ public class ParkingSpace implements Parcelable{
     private double price;
     private String parkingIDRef;
     private String ownerParkingID;
+    private User reservedBy;
 
 
     public ParkingSpace(){}
@@ -53,6 +54,7 @@ public class ParkingSpace implements Parcelable{
         this.price = b.getDouble(SearchResultActivity.PRICE, 0);
         this.parkingIDRef = b.getString(SearchResultActivity.PARKING_ID_REF, "");
         this.ownerParkingID = b.getString(SearchResultActivity.OWNER_PARKING_ID, "");
+        this.reservedBy = b.getParcelable(SearchResultActivity.RESERVE_BY);
     }
 
     protected ParkingSpace(Parcel in) {
@@ -154,6 +156,12 @@ public class ParkingSpace implements Parcelable{
 
     public String getOwnerParkingID() {return this.ownerParkingID;}
 
+    public void setReservedBy(User seeker) {
+        this.reservedBy = seeker;
+    }
+
+    public User getReservedBy(){return this.reservedBy;}
+
     @Override
     public int describeContents() {
         return 0;
@@ -175,6 +183,7 @@ public class ParkingSpace implements Parcelable{
         ParkingSpace p = new ParkingSpace(address, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime,
                 endTime, price, parkingIDRef);
         p.setOwnerParkingID(this.ownerParkingID);
+        p.setReservedBy(this.reservedBy);
         return p;
     }
 

@@ -50,7 +50,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV;
     private ImageView parkingPhoto;
-    private Button reserveBtn, editBtn;
+    private Button reserveBtn, editBtn, reserveListBtn;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
@@ -61,6 +61,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private TextView reserveToTime, reserveFromDate, reserveToDate, reserveFromTime;
     private Calendar calendar;
     private int year, month, day;
+    private ParkingSpace parkingSpaceToBook;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,12 +81,19 @@ public class DetailParkingActivity extends AppCompatActivity {
         parkingPhoto = (ImageView) findViewById(R.id.detailParkingPhoto);
         reserveBtn = (Button) findViewById(R.id.reserveBtn);
         editBtn = (Button) findViewById(R.id.detailEditBtn);
+        reserveListBtn = (Button) findViewById(R.id.seeWhoBookedMyParkingSpace);
 
         //seeker set reservation from date to date, from time to time.
         reserveFromDate = (TextView) findViewById(R.id.reserveFromDateTV);
         reserveToDate = (TextView) findViewById(R.id.reserveToDateTV);
         reserveFromTime = (TextView) findViewById(R.id.reserveFromTimeTV);
         reserveToTime = (TextView) findViewById(R.id.reserveToTimeTV);
+
+
+
+        //**************
+
+
 
         //Get the current day, month, and year
         calendar = Calendar.getInstance();
@@ -129,6 +137,12 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         clickedParking = new ParkingSpace(bundle);
 
+        //This part is for defaul testing only****
+        reserveFromDate.setText("From Date: " +clickedParking.getStartDate());
+        reserveToDate.setText("To Date: " +clickedParking.getEndDate());
+        reserveFromTime.setText("From Time - " +clickedParking.getStartTime());
+        reserveToTime.setText("To Time - " + clickedParking.getEndTime());
+
         setParkingPhoto(clickedParking.getParkingIDRef());
 
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
@@ -155,6 +169,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 @Override
                 public void onClick(View v) {
                     makeReservation();    //Duoc -- i will continue fixing this part tmr.
+                    notifyOwner();
+                    //updateDatabase();
                 }
             });
         }
@@ -164,16 +180,24 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveBtn.setVisibility(View.VISIBLE);
             editBtn.setVisibility(View.GONE);       // only show edit button on listing history
             reserveBtn.setText("Reserve");
+            reserveListBtn.setVisibility(View.GONE);
         } else if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_) {
             reserveBtn.setVisibility(View.GONE);    //book again should be taken out since it depends on the listing owner, i.e. you can't really book again if it's not up for listing
             editBtn.setVisibility(View.GONE);       // only show edit button on listing history
-
+            reserveToDate.setVisibility(View.GONE);
+            reserveFromDate.setVisibility(View.GONE);
+            reserveToTime.setVisibility(View.GONE);
+            reserveFromTime.setVisibility(View.GONE);
+            reserveListBtn.setVisibility(View.GONE);
 //            reserveBtn.setText("Book Again");
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
             reserveBtn.setText("List Again");     //list again will take user to the new listing activity, with all data pre-filled, and allow user to pick another data and time
                                                     //To be implemented later
-
+            reserveToDate.setVisibility(View.GONE);
+            reserveFromDate.setVisibility(View.GONE);
+            reserveToTime.setVisibility(View.GONE);
+            reserveFromTime.setVisibility(View.GONE);
             //An edit button will be shown on this screen as well to allow user to edit the listings he/she posted
             editBtn.setVisibility(View.VISIBLE);
             editBtn.setOnClickListener(new View.OnClickListener() {
@@ -187,6 +211,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         //Hide distance if user is checking history
         LinearLayout ll = findViewById(R.id.detailParkingDistanceLL);
+
         if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_ || request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
             ll.setVisibility(View.GONE);
         } else {
@@ -285,12 +310,10 @@ public class DetailParkingActivity extends AppCompatActivity {
         //6. add the splitted parking space to database if there are remainding ones.
 
         ParkingSpace[] spaces = splitParkingSpace(clickedParking);  //0.
-        final ParkingSpace parkingSpaceToBook = spaces[0];
+        parkingSpaceToBook = spaces[0];
         deleteParkingReference(clickedParking);     //1.
         deleteParkingListing(parkingID);        //2.
-
         addSplittedParkingsToDatabase(spaces);  //6
-
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -302,9 +325,6 @@ public class DetailParkingActivity extends AppCompatActivity {
                             currentUser.addReservedParking(parkingSpaceToBook);     //3.
                             String currentUserID = currentUser.getId();
                             databaseReference.child("Users").child(currentUserID).setValue(currentUser); //4.
-                            notifyOwner(parkingSpaceToBook);  //5.
-
-
                             setResult(RESULT_OK);
                             finish();
                         }
@@ -315,7 +335,44 @@ public class DetailParkingActivity extends AppCompatActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
     }
+
+
+    public void notifyOwner() {
+        final String ownerID = parkingSpaceToBook.getOwnerParkingID();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(currentUser == null){
+                        if(firebaseAuth.getCurrentUser() != null) {
+                            String targetID = firebaseAuth.getCurrentUser().getUid();
+                            if (!targetID.isEmpty()) {
+                                if (dataSnapshot.child("Users").hasChild(targetID)) {
+                                    currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                                }
+                            }
+                        }
+                    }
+                    ParkingSpace p = parkingSpaceToBook.clone();
+                    User currentUserPublicInfo = currentUser.clone();
+                    p.setReservedBy(currentUserPublicInfo);
+                    if (dataSnapshot.child("Users").hasChild(ownerID)) {
+                        User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                        owner.addToMyReservetionList(p);
+                        databaseReference.child("Users").child(ownerID).setValue(owner);
+                    }
+                }
+
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
     public ParkingSpace[] splitParkingSpace(ParkingSpace clickedParking) {
         String reserveStartDate = reserveFromDate.getText().toString().split(":")[1].trim();
         String reserveEndDate = reserveToDate.getText().toString().split(":")[1].trim();
@@ -546,7 +603,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
-    public void notifyOwner(ParkingSpace bookedParkingSpace) {
+
+
+    public void updateDatabase(){
 
     }
 
@@ -710,7 +769,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveToTime.setText("To Time- " + completeTime);
     }
 
-    public void setReserveFromDate(int year, int month, int day) {
+    public void setReserveFromDate(int year, int month, int day){
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
         monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
