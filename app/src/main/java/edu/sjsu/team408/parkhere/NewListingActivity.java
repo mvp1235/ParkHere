@@ -342,10 +342,11 @@ public class NewListingActivity extends AppCompatActivity {
 //                Log.i("TEST", "ERROR MAKING LISTING");
 //            }
 //            addListingToDatabaseNew(startDateString, endDateString, startTimeString, endTimeString, point);
-
             //Till here
             /////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+            //Huy's replacement
             /////////////////////////////////////////////////////////////////////////////////////////////////////
             //FROM HERE
             //Let's use this version to prevent the problem we've been facing, i.e. it only works for certain address entered
@@ -353,7 +354,8 @@ public class NewListingActivity extends AppCompatActivity {
             String addressString = streetNumString + ", " + cityString + ", "
                     + stateString;
             String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
-                    + Uri.encode(addressString) + "&sensor=true&key=AIzaSyBqgv8PrGCSFVa-Nb2ymE3gGnuv-LgfGps";   //using my own API key here
+                    + Uri.encode(addressString) + "&sensor=true&key=AIzaSyBqgv8PrGCSFVa-Nb2ymE3gGnuv-LgfGps";   //using my own API key here, 2,500 free request per day,
+                                                                                                                // which should be fine for development now
             RequestQueue queue = Volley.newRequestQueue(this);
             JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                 @Override
@@ -637,10 +639,10 @@ public class NewListingActivity extends AppCompatActivity {
     }
 
     public void populateDefaultValuesForTesting() {
-        addressStreetNumber.setText("645 Overland Way");
+        addressStreetNumber.setText("1 Washington Square");
         addressCity.setText("San Jose");
         addressState.setText("CA");
-        addressZipCode.setText("95111");
+        addressZipCode.setText("95112");
         price.setText("5");
         startDate.setText("11-22-2017");
         endDate.setText("11-22-2017");

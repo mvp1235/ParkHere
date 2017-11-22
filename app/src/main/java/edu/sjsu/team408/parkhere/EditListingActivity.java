@@ -24,6 +24,12 @@ import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -39,6 +45,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -302,10 +311,10 @@ public class EditListingActivity extends AppCompatActivity {
         String stateString = addressState.getText().toString();
         String zipcodeString = addressZipCode.getText().toString();
         String priceString = price.getText().toString();
-        String startDateString = startDate.getText().toString();
-        String endDateString = endDate.getText().toString();
-        String startTimeString = startTime.getText().toString();
-        String endTimeString = endTime.getText().toString();
+        final String startDateString = startDate.getText().toString();
+        final String endDateString = endDate.getText().toString();
+        final String startTimeString = startTime.getText().toString();
+        final String endTimeString = endTime.getText().toString();
 
         //Making sure all fields are filled by user
         if (streetNumString.isEmpty() || cityString.isEmpty() || stateString.isEmpty() || zipcodeString.isEmpty()) {
@@ -329,27 +338,74 @@ public class EditListingActivity extends AppCompatActivity {
             i.putExtra("startDate", startDateString);
             i.putExtra("endDate", endDateString);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            // Robin's geocoding code
             // Getting latitude and longitude of an address
-            Geocoder geocoder = new Geocoder(this);
-            List<android.location.Address> addressList;
-            LatLng point = null;
-            try {
-                String addressString = streetNumString + ", " + cityString + ", "
-                        + stateString + " " + zipcodeString;
-                addressList = geocoder.getFromLocationName(addressString, 5);
-                if (addressList.size() > 0) {
-                    android.location.Address location = addressList.get(0);
-                    location.getLatitude();
-                    location.getLongitude();
-                    point = new LatLng(location.getLatitude(), location.getLongitude());
-                }
-            } catch (IOException e) {
-                Toast.makeText(getApplicationContext(), R.string.addressInvalid,
-                        Toast.LENGTH_SHORT).show();
-            }
+//            Geocoder geocoder = new Geocoder(this);
+//            List<android.location.Address> addressList;
+//            LatLng point = null;
+//            try {
+//                String addressString = streetNumString + ", " + cityString + ", "
+//                        + stateString + " " + zipcodeString;
+//                addressList = geocoder.getFromLocationName(addressString, 5);
+//                if (addressList.size() > 0) {
+//                    android.location.Address location = addressList.get(0);
+//                    location.getLatitude();
+//                    location.getLongitude();
+//                    point = new LatLng(location.getLatitude(), location.getLongitude());
+//                }
+//            } catch (IOException e) {
+//                Toast.makeText(getApplicationContext(), R.string.addressInvalid,
+//                        Toast.LENGTH_SHORT).show();
+//            }
+//
+//            editListingOnDatabase(startDateString, endDateString, startTimeString, endTimeString,
+//                    point);
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-            editListingOnDatabase(startDateString, endDateString, startTimeString, endTimeString,
-                    point);
+            //Huy's replacement
+            /////////////////////////////////////////////////////////////////////////////////////////////////////
+            //FROM HERE
+            //Let's use this version to prevent the problem we've been facing, i.e. it only works for certain address entered
+            LatLng point = null;
+            String addressString = streetNumString + ", " + cityString + ", "
+                    + stateString;
+            String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
+                    + Uri.encode(addressString) + "&sensor=true&key=AIzaSyBqgv8PrGCSFVa-Nb2ymE3gGnuv-LgfGps";   //using my own API key here, 2,500 free request per day,
+            // which should be fine for development now
+            RequestQueue queue = Volley.newRequestQueue(this);
+            JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                @Override
+                public void onResponse(JSONObject response) {
+                    JSONObject location;
+                    try {
+                        // Get JSON Array called "results" and then get the 0th
+                        // complete object as JSON
+                        Log.i("TEST", response.toString());
+                        location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                        // Get the value of the attribute whose name is
+                        // "formatted_string"
+                        if (location.getDouble("lat") != 0 && location.getDouble("lng") != 0) {
+                            LatLng latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+                            editListingOnDatabase(startDateString, endDateString, startTimeString, endTimeString, latLng);
+                            //Do what you want
+                        }
+                    } catch (JSONException e1) {
+                        e1.printStackTrace();
+
+                    }
+                }
+
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.d("Error.Response", error.toString());
+                }
+            });
+            // add it to the queue
+            queue.add(stateReq);
+            //TILL HERE
+            /////////////////////////////////////////////
 
             setResult(RESULT_OK, i);
             finish();
