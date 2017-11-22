@@ -552,11 +552,10 @@ public class NewListingActivity extends AppCompatActivity {
         String price = this.price.getText().toString();
         String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
-        //Get the parking id and use it throughout the activity
-        currentParkingIDRef = databaseReference.child("AvailableParkings").push().getKey();
+
         String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingIDRef; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
-//        String parkingSpaceUidKey;
+
         ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingIDRef);
         String ownerParkingID = userID;
         parking.setOwnerParkingID(ownerParkingID);

@@ -211,7 +211,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             reviewBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    writeBookingReview();
+                    writeOwnerReview();
                 }
             });
 //            reserveBtn.setText("Book Again");
@@ -262,14 +262,32 @@ public class DetailParkingActivity extends AppCompatActivity {
         }
     }
 
-    private void writeBookingReview() {
-        String reviewer = firebaseAuth.getCurrentUser().getUid();
-        String reviewee = clickedParking.getOwnerParkingID();
+    private void writeOwnerReview() {
+        String reviewerID = firebaseAuth.getCurrentUser().getUid();
+        String revieweeID = clickedParking.getOwnerParkingID();
+        String parkingID = clickedParking.getParkingIDRef();
+
         Intent intent = new Intent(this, BookingReviewActivity.class);
-        intent.putExtra("reviewerID", reviewer);
-        intent.putExtra("revieweeID", reviewee);
+        intent.putExtra("reviewerID", reviewerID);
+        intent.putExtra("revieweeID", revieweeID);
+        intent.putExtra("parkingID", parkingID);
+
         startActivityForResult(intent, WRITE_REVIEW_CODE);
     }
+
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == LISTING_EDIT_CODE && resultCode == RESULT_OK) {      //take input from listing editting page and reflect changes to database here
+            finish();
+        } else if (requestCode == WRITE_REVIEW_CODE && resultCode == RESULT_OK) {
+            finish();
+        }
+
+    }
+
 
     private void editListing() {
         Intent intent = new Intent(DetailParkingActivity.this, EditListingActivity.class);
@@ -287,14 +305,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         startActivityForResult(intent, LISTING_EDIT_CODE);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == LISTING_EDIT_CODE && resultCode == RESULT_OK) {      //take input from listing editting page and reflect changes to database here
-            finish();
-        }
-    }
 
     /**
      * Parse an address into separate fields, such as street number, city, state, zipCode

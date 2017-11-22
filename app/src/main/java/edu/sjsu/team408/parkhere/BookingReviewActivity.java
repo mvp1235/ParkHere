@@ -22,11 +22,13 @@ public class BookingReviewActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
 
-    private String reviewerID, revieweeID;
+    private String reviewerID, revieweeID, parkingID;
     private RatingBar ratingBar;
     private EditText descriptionET;
     private Button submitBtn;
     private TextView starCountsTV;
+
+    private String currentReviewId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,9 +38,13 @@ public class BookingReviewActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
 
+        currentReviewId = databaseReference.child("Reviews").push().getKey();
+
         Intent i = getIntent();
         reviewerID = i.getStringExtra("reviewerID");
         revieweeID = i.getStringExtra("revieweeID");
+        parkingID = i.getStringExtra("parkingID");
+
 
         starCountsTV = (TextView) findViewById(R.id.bookintStarCounts);
         ratingBar = (RatingBar) findViewById(R.id.bookingRatingBar);
@@ -67,6 +73,15 @@ public class BookingReviewActivity extends AppCompatActivity {
     }
 
     private void saveReviewToDatabase() {
+        String description = descriptionET.getText().toString();
+        double star = ratingBar.getRating();
+        Review review = new Review(currentReviewId, star, reviewerID, revieweeID, description, parkingID);
+
+        databaseReference.child("Reviews").child(currentReviewId).setValue(review);
+
+
+        setResult(RESULT_OK);
+        finish();
 
     }
 }

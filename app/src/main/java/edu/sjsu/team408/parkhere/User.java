@@ -3,7 +3,6 @@ package edu.sjsu.team408.parkhere;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 /**
@@ -20,7 +19,7 @@ public class User implements Parcelable{
     private ArrayList<ParkingSpace> myCurrentReservedParkings;
     private ArrayList<ParkingSpace> myListingHistory;
     private ArrayList<ParkingSpace> myReservationList;
-    private ArrayList<Review> myReviews;
+    private ArrayList<String> myReviews;
 
     public User(){};
 
@@ -177,15 +176,15 @@ public class User implements Parcelable{
         return getName();
     }
 
-    public ArrayList<Review> getMyReviews() {
+    public ArrayList<String> getMyReviews() {
         return myReviews;
     }
 
-    public void setMyReviews(ArrayList<Review> myReviews) {
+    public void setMyReviews(ArrayList<String> myReviews) {
         this.myReviews = myReviews;
     }
 
-    public void addToReviewList(Review review) {
+    public void addToReviewList(String review) {
         myReviews.add(review);
     }
 
