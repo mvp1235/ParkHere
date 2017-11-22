@@ -2,7 +2,6 @@ package edu.sjsu.team408.parkhere;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -16,23 +15,32 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class ListingHistoryActivity extends ListActivity {
+/**
+ * Created by DuocNguyen on 11/21/17.
+ */
 
-    public static final int VIEW_DETAIL_HISTORY_LISTING = 2001;
+public class ReservationListActivity extends ListActivity{
 
-    private ArrayList<ParkingSpace> parkingSpaces;
+    public static final int VIEW_DETAIL_RESERVATION = 123456;
+
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
+    private User currentUser;
+    private ArrayList<ParkingSpace> reservationList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_listing_history);
+        setContentView(R.layout.activity_reservation_list);
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
-        parkingSpaces = new ArrayList<>();
 
 
+        reservationList = new ArrayList<>();
+
+        //populateDataForTesting();
+
+        //Populate parking spaces with user's reserved parking spaces
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -40,32 +48,19 @@ public class ListingHistoryActivity extends ListActivity {
                     String targetID = firebaseAuth.getCurrentUser().getUid();
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
-                            User currentUser = null;
-                            currentUser = dataSnapshot.child("Users").child(targetID).
-                                    getValue(User.class);
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
 
-                            parkingSpaces = currentUser.getMyListingHistory();
-
-                            showMyListingHistory();
+                            reservationList = currentUser.getMyReservationList();
+                            showMyReservationList();
                         }
                     }
                 }
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
+            public void onCancelled(DatabaseError databaseError) {}
         });
-    }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == VIEW_DETAIL_HISTORY_LISTING && resultCode == RESULT_OK) {
-            finish();
-        }
     }
 
     @Override
@@ -80,26 +75,29 @@ public class ListingHistoryActivity extends ListActivity {
         b.putString(SearchResultActivity.SPECIAL_INSTRUCTION, parking.getSpecialInstruction());
         b.putString(SearchResultActivity.START_DATE, parking.getStartDate());
         b.putString(SearchResultActivity.END_DATE, parking.getEndDate());
+        b.putString(SearchResultActivity.START_TIME, parking.getStartTime());
+        b.putString(SearchResultActivity.END_TIME, parking.getEndTime());
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
         b.putString(SearchResultActivity.OWNER_PARKING_ID, parking.getOwnerParkingID());
-        b.putString(SearchResultActivity.PARKING_ID_REF, parking.getParkingIDRef());
+        b.putParcelable(SearchResultActivity.RESERVE_BY, parking.getReservedBy());
+
 
         intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
-        intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_LISTING);
-        startActivityForResult(intent, VIEW_DETAIL_HISTORY_LISTING);
+        intent.putExtra("requestCode", VIEW_DETAIL_RESERVATION);
+        startActivityForResult(intent, VIEW_DETAIL_RESERVATION);
 
     }
 
-
-    private void showMyListingHistory() {
-        if(parkingSpaces == null) {
+    public void showMyReservationList(){
+        if(reservationList == null) {
             //empty
             return;
         }
         // Create the adapter to convert the array to views
-        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
+        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, reservationList);
 
         // Attach the adapter to a ListView
         setListAdapter(adapter);
+
     }
 }

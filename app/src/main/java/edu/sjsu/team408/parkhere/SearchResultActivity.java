@@ -45,13 +45,14 @@ public class SearchResultActivity extends ListActivity {
     static final String START_DATE = "startDate";
     static final String END_DATE = "endDate";
     static final String PRICE = "price";
-    static final String PARKING_ID = "parkingID";
+    static final String PARKING_ID_REF = "parkingIDRef";
     static final String START_TIME = "startTime";
     static final String END_TIME = "endTime";
-
+    static final String OWNER_PARKING_ID = "OwnerParkingID";
+    static final String RESERVE_BY = "reservedBy";
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
-    private ArrayList<String> availableParkingSpaces;
+    private ArrayList<String> availableParkingSpacesOnDate;
     private DatabaseReference databaseReference;
     private ArrayList<ParkingSpace> parkingSpaces;
 
@@ -67,7 +68,7 @@ public class SearchResultActivity extends ListActivity {
         Intent intent = getIntent();
         databaseReference = FirebaseDatabase.getInstance().getReference();
 
-        availableParkingSpaces = new ArrayList<String>();
+        availableParkingSpacesOnDate = new ArrayList<String>();
         //get user input for location
         final String dateSearchTerm = intent.getStringExtra("date");
         final String locationSearchTerm = intent.getStringExtra("location");
@@ -88,9 +89,9 @@ public class SearchResultActivity extends ListActivity {
                     for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings")
                             .child(dateSearchTerm).getChildren()) {
                         String p = userIDList.getValue(String.class);
-                        availableParkingSpaces.add(p);
-                        searchResult(searchTimeTerm);
+                        availableParkingSpacesOnDate.add(p);
                     }
+                    searchResult(searchTimeTerm);
                 }
             }
 
@@ -213,8 +214,10 @@ public class SearchResultActivity extends ListActivity {
         b.putString(START_TIME, parking.getStartTime());
         b.putString(END_TIME, parking.getEndTime());
         b.putDouble(PRICE, parking.getPrice());
-        b.putString(PARKING_ID, parking.getParkingID());
+        b.putString(PARKING_ID_REF, parking.getParkingIDRef());
         b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
+        b.putString(OWNER_PARKING_ID, parking.getOwnerParkingID());
+        b.putParcelable(RESERVE_BY, parking.getReservedBy());
 
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);
@@ -233,8 +236,8 @@ public class SearchResultActivity extends ListActivity {
 
     private void searchResult (String searchTimeTerm) {
         parkingSpaces = new ArrayList<>();  // get the parking spaces.
-        if(availableParkingSpaces.size() > 0) {
-            for(String available: availableParkingSpaces) {
+        if(availableParkingSpacesOnDate.size() > 0) {
+            for(String available: availableParkingSpacesOnDate) {
                 String tokens[] = available.split("/"); //[0] contains time, [1] contains parkingID to search database
                 final String parkingID = tokens[1];
                 String availableTime = tokens[0];   //starthour-startminute-endhour-endminute
@@ -273,6 +276,12 @@ public class SearchResultActivity extends ListActivity {
         } else {
             Toast.makeText(this, R.string.addressInvalid, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void showReservationList(ArrayList<ParkingSpace> list){
+
+        ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, list, null);
+        setListAdapter(adapter);
     }
 
     private static boolean isWithinAvailableTime(String searchTime, String availableTime) {

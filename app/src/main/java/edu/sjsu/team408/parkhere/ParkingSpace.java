@@ -21,13 +21,15 @@ public class ParkingSpace implements Parcelable{
     private String startTime;
     private String endTime;
     private double price;
-    private String parkingID;
+    private String parkingIDRef;
+    private String ownerParkingID;
+    private User reservedBy;
 
 
     public ParkingSpace(){}
 
     public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction,
-                        String startDate, String endDate, String startTime, String endTime, double price, String parkingID) {
+                        String startDate, String endDate, String startTime, String endTime, double price, String parkingIDRef) {
         this.address = address;
         this.owner = owner;
         this.parkingImageUrl = parkingImageUrl;
@@ -37,7 +39,7 @@ public class ParkingSpace implements Parcelable{
         this.price = price;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.parkingID = parkingID;
+        this.parkingIDRef = parkingIDRef;
     }
 
     public ParkingSpace(Bundle b) {
@@ -50,7 +52,9 @@ public class ParkingSpace implements Parcelable{
         this.startTime = b.getString(SearchResultActivity.START_TIME, "");
         this.endTime = b.getString(SearchResultActivity.END_TIME, "");
         this.price = b.getDouble(SearchResultActivity.PRICE, 0);
-        this.parkingID = b.getString(SearchResultActivity.PARKING_ID, "");
+        this.parkingIDRef = b.getString(SearchResultActivity.PARKING_ID_REF, "");
+        this.ownerParkingID = b.getString(SearchResultActivity.OWNER_PARKING_ID, "");
+        this.reservedBy = b.getParcelable(SearchResultActivity.RESERVE_BY);
     }
 
     protected ParkingSpace(Parcel in) {
@@ -61,7 +65,7 @@ public class ParkingSpace implements Parcelable{
         startDate = in.readString();
         endDate = in.readString();
         price = in.readDouble();
-        parkingID = in.readString();
+        parkingIDRef = in.readString();
     }
 
     public static final Creator<ParkingSpace> CREATOR = new Creator<ParkingSpace>() {
@@ -76,12 +80,12 @@ public class ParkingSpace implements Parcelable{
         }
     };
 
-    public String getParkingID() {
-        return parkingID;
+    public String getParkingIDRef() {
+        return parkingIDRef;
     }
 
-    public void setParkingID(String parkingID) {
-        this.parkingID = parkingID;
+    public void setParkingIDRef(String parkingIDRef) {
+        this.parkingIDRef = parkingIDRef;
     }
 
     public Address getAddress() {
@@ -148,6 +152,16 @@ public class ParkingSpace implements Parcelable{
 
     public void setEndTime(String endTime) {this.endTime = endTime;}
 
+    public void setOwnerParkingID(String id) {this.ownerParkingID = id;}
+
+    public String getOwnerParkingID() {return this.ownerParkingID;}
+
+    public void setReservedBy(User seeker) {
+        this.reservedBy = seeker;
+    }
+
+    public User getReservedBy(){return this.reservedBy;}
+
     @Override
     public int describeContents() {
         return 0;
@@ -162,7 +176,15 @@ public class ParkingSpace implements Parcelable{
         dest.writeString(startDate);
         dest.writeString(endDate);
         dest.writeDouble(price);
-        dest.writeString(parkingID);
+        dest.writeString(parkingIDRef);
+    }
+
+    public ParkingSpace clone() {
+        ParkingSpace p = new ParkingSpace(address, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime,
+                endTime, price, parkingIDRef);
+        p.setOwnerParkingID(this.ownerParkingID);
+        p.setReservedBy(this.reservedBy);
+        return p;
     }
 
     public String toString() {

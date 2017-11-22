@@ -28,7 +28,7 @@ public class BookingHistoryActivity extends ListActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_booking_history);
+        setContentView(R.layout.activity_reservation_list);
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
 
@@ -72,8 +72,11 @@ public class BookingHistoryActivity extends ListActivity {
         b.putString(SearchResultActivity.SPECIAL_INSTRUCTION, parking.getSpecialInstruction());
         b.putString(SearchResultActivity.START_DATE, parking.getStartDate());
         b.putString(SearchResultActivity.END_DATE, parking.getEndDate());
+        b.putString(SearchResultActivity.START_TIME, parking.getStartTime());
+        b.putString(SearchResultActivity.END_TIME, parking.getEndTime());
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
-        b.putString(SearchResultActivity.PARKING_ID, parking.getParkingID());
+        b.putString(SearchResultActivity.OWNER_PARKING_ID, parking.getOwnerParkingID());
+
 
         intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_BOOKING_);
