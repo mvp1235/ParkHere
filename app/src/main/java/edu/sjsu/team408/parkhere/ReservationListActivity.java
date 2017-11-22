@@ -2,7 +2,6 @@ package edu.sjsu.team408.parkhere;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -16,14 +15,18 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
-public class BookingHistoryActivity extends ListActivity {
+/**
+ * Created by DuocNguyen on 11/21/17.
+ */
 
-    public static final int VIEW_DETAIL_HISTORY_BOOKING_ = 5000;
+public class ReservationListActivity extends ListActivity{
 
-    private ArrayList<ParkingSpace> parkingSpaces;
+    public static final int VIEW_DETAIL_RESERVATION = 123456;
+
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
+    private ArrayList<ParkingSpace> reservationList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +36,7 @@ public class BookingHistoryActivity extends ListActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
 
-        parkingSpaces = new ArrayList<>();
+        reservationList = new ArrayList<>();
 
         //populateDataForTesting();
 
@@ -47,8 +50,8 @@ public class BookingHistoryActivity extends ListActivity {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
 
-                            parkingSpaces = currentUser.getMyCurrentReservedParkings();
-                            showCurrentlyReservedParkings();
+                            reservationList = currentUser.getMyReservationList();
+                            showMyReservationList();
                         }
                     }
                 }
@@ -76,23 +79,25 @@ public class BookingHistoryActivity extends ListActivity {
         b.putString(SearchResultActivity.END_TIME, parking.getEndTime());
         b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
         b.putString(SearchResultActivity.OWNER_PARKING_ID, parking.getOwnerParkingID());
+        b.putParcelable(SearchResultActivity.RESERVE_BY, parking.getReservedBy());
 
 
         intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
-        intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_BOOKING_);
-        startActivityForResult(intent, VIEW_DETAIL_HISTORY_BOOKING_);
+        intent.putExtra("requestCode", VIEW_DETAIL_RESERVATION);
+        startActivityForResult(intent, VIEW_DETAIL_RESERVATION);
 
     }
 
-    private void showCurrentlyReservedParkings() {
-        if(parkingSpaces == null) {
+    public void showMyReservationList(){
+        if(reservationList == null) {
             //empty
             return;
         }
         // Create the adapter to convert the array to views
-        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
+        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, reservationList);
 
         // Attach the adapter to a ListView
         setListAdapter(adapter);
+
     }
 }

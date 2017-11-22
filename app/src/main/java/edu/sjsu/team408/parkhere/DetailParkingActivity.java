@@ -47,8 +47,10 @@ public class DetailParkingActivity extends AppCompatActivity {
     private final static int TO_TIME = 3;
 
     private final static int LISTING_EDIT_CODE = 10;
+    private final static int RESERVATION_LIST_VIEW_CODE = 11;
 
-    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV;
+    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel;
+    private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
     private Button reserveBtn, editBtn, reserveListBtn;
     private DatabaseReference databaseReference;
@@ -73,6 +75,14 @@ public class DetailParkingActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
 
         //Reference to the UI elements
+        seekerLabel = (TextView) findViewById(R.id.detailOwnerLabel);
+        seekerPhoneLabel = (TextView) findViewById(R.id.detailAddressLabel);
+        seekerEmailLabel = (TextView) findViewById(R.id.detailDateLabel);
+        priceLabel = (TextView) findViewById(R.id.detailPriceLabel);
+        distanceLabel = (TextView) findViewById(R.id.detailDistanceLabel);
+        specialInstructionLabel = (TextView) findViewById(R.id.detailSpecialInstructionLabel);
+
+
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
         ownerTV = (TextView) findViewById(R.id.detailParkingOwner);
         specialInstructionTV = (TextView) findViewById(R.id.detailParkingSpecialInstruction);
@@ -82,6 +92,13 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveBtn = (Button) findViewById(R.id.reserveBtn);
         editBtn = (Button) findViewById(R.id.detailEditBtn);
         reserveListBtn = (Button) findViewById(R.id.seeWhoBookedMyParkingSpace);
+        reserveListBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(DetailParkingActivity.this, ReservationListActivity.class);
+                startActivityForResult(intent, RESERVATION_LIST_VIEW_CODE);
+            }
+        });
 
         //seeker set reservation from date to date, from time to time.
         reserveFromDate = (TextView) findViewById(R.id.reserveFromDateTV);
@@ -207,6 +224,23 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
             });
 
+        }
+        if(request == ReservationListActivity.VIEW_DETAIL_RESERVATION) {
+            reserveListBtn.setVisibility(View.GONE);
+            editBtn.setVisibility(View.GONE);
+            reserveBtn.setVisibility(View.GONE);
+            seekerLabel.setText("Seeker: ");
+            seekerPhoneLabel.setText("Seeker Phone:");
+            seekerEmailLabel.setText("Seeker Email: ");
+            priceLabel.setVisibility(View.GONE);
+            priceTV.setText("");
+            distanceLabel.setVisibility(View.GONE);
+            specialInstructionLabel.setVisibility(View.GONE);
+            specialInstructionTV.setText("");
+
+            ownerTV.setText(clickedParking.getReservedBy().getName());
+            addressTV.setText(clickedParking.getReservedBy().getPhoneNumber());
+            dateTV.setText(clickedParking.getReservedBy().getEmailAddress());
         }
 
         //Hide distance if user is checking history

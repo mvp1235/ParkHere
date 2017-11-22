@@ -278,6 +278,12 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
+    public void showReservationList(ArrayList<ParkingSpace> list){
+
+        ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, list, null);
+        setListAdapter(adapter);
+    }
+
     private static boolean isWithinAvailableTime(String searchTime, String availableTime) {
         String availableTimeTokens[] = availableTime.split(":");
         int startHour = Integer.parseInt(availableTimeTokens[0]);
