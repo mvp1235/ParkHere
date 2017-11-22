@@ -302,22 +302,25 @@ public class DetailParkingActivity extends AppCompatActivity {
      * @return An arraylist containing all the fields. [0] for street number, [1] for city, [2] for state, and [3] for zip code
      */
     private ArrayList<String> parseAddress(String fullAddress) {
-        ArrayList<String> result = new ArrayList<>();
-        String streetNumber, city, state, zipCode;
-        String[] splits = fullAddress.split(",");
+        if (!fullAddress.isEmpty()) {
+            ArrayList<String> result = new ArrayList<>();
+            String streetNumber, city, state, zipCode;
+            String[] splits = fullAddress.split(",");
 
-        streetNumber = splits[0].trim();
-        city = splits[1].trim();
+            streetNumber = splits[0].trim();
+            city = splits[1].trim();
 
-        String stateZipCode = splits[2].trim(); // get rid of preceding and proceding spaces first
-        state = stateZipCode.split(" ")[0];
-        zipCode = stateZipCode.split(" ")[1];
+            String stateZipCode = splits[2].trim(); // get rid of preceding and proceding spaces first
+            state = stateZipCode.split(" ")[0];
+            zipCode = stateZipCode.split(" ")[1];
 
-        result.add(streetNumber);
-        result.add(city);
-        result.add(state);
-        result.add(zipCode);
-        return result;
+            result.add(streetNumber);
+            result.add(city);
+            result.add(state);
+            result.add(zipCode);
+            return result;
+        }
+        return null;
     }
 
     /**

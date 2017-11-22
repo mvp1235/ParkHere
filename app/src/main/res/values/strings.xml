@@ -63,6 +63,7 @@
     <string name="review">Review</string>
     <string name="reviewHint">give a description about your experience</string>
     <string name="submit">Submit</string>
+    <string name="reservations">Reservations</string>
 
 
 </resources>
