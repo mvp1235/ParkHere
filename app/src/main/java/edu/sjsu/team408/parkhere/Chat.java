@@ -31,8 +31,8 @@ public class Chat {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("chatWithName", chatWithName);
-        result.put("chatWithUid", chatWithUid);
+//        result.put("chatWithName", chatWithName);
+//        result.put("chatWithUid", chatWithUid);
         result.put("lastMessage", lastMessage);
         result.put("timestamp", timestamp);
 

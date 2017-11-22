@@ -25,7 +25,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by robg on 11/17/17.
@@ -130,19 +132,28 @@ public class ChatFragment extends Fragment {
 
                         chatsReference.setValue(
                                 new Chat(chatWithName, chatWithUid, "", new Date()));
-                        userReference
-                                .child("chats")
-                                .push()
-                                .setValue(chatKeyString);
+                        Map<String, Object> childUpdates = new HashMap<>();
+                        // push to sender
+                        childUpdates.put("/Users/"+ user.getUid() + "/chats/", chatKeyString);
+                        membersOfChatsReference.setValue(true);
+                        // push to receiver
+                        childUpdates.put("/Users/"+ chatWithUid + "/chats/", chatKeyString);
+                        mDatabase.child("membersOfChats")
+                                .child(chatKeyString)
+                                .child(chatWithName)
+                                .setValue(true);
+                        mDatabase.updateChildren(childUpdates);
+
                         if (toAutoCompleteTextView.getVisibility() == View.VISIBLE) {
                             toAutoCompleteTextView.setEnabled(false);
                             toAutoCompleteTextView.setVisibility(View.INVISIBLE);
                         }
                         friendLabel.setVisibility(View.VISIBLE);
-                        friendLabel.setText(chatWithUid + " " + chatWithName);
+                        friendLabel.setText(chatWithName);
                         //add message to list
                         String messageContent = editText.getText().toString();
-                        writeNewMessageToFirebase(user.getUid(), author, messageContent);
+                        writeNewMessageToFirebase(
+                                user.getUid(), author, messageContent, chatWithName);
                         addMessageToList(messageContent, true);
                         editText.setText("");
 //                    getMyMessage = !getMyMessage;
@@ -201,7 +212,8 @@ public class ChatFragment extends Fragment {
 
     private void writeNewMessageToFirebase(String userId,
                                            String author,
-                                           String messageContent) {
+                                           String messageContent,
+                                           String receiver) {
         Date timestamp = new Date();
         String messageKey =
                 mDatabase.child("messages")
@@ -209,8 +221,6 @@ public class ChatFragment extends Fragment {
                         .push()
                         .getKey();
         String messageKeyString = "msg " + messageKey;
-
-        membersOfChatsReference.setValue(true);
 
         chatsReference.child("lastMessage").setValue(messageContent);
         chatsReference.child("timestamp").setValue(timestamp);
