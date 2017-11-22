@@ -20,7 +20,7 @@
 //    private ListView listView;
 //    private View btnSend;
 //    private EditText editText;
-//    boolean myMessage = true;
+//    boolean getMyMessage = true;
 //    private List<ChatBubble> ChatBubbles;
 //    private ArrayAdapter<ChatBubble> adapter;
 //
@@ -50,14 +50,14 @@
 //                } else {
 //                    //add message to list
 //                    ChatBubble ChatBubble = new ChatBubble(
-//                            editText.getText().toString(), myMessage);
+//                            editText.getText().toString(), getMyMessage);
 //                    ChatBubbles.add(ChatBubble);
 //                    adapter.notifyDataSetChanged();
 //                    editText.setText("");
-//                    if (myMessage) {
-//                        myMessage = false;
+//                    if (getMyMessage) {
+//                        getMyMessage = false;
 //                    } else {
-//                        myMessage = true;
+//                        getMyMessage = true;
 //                    }
 //                }
 //            }

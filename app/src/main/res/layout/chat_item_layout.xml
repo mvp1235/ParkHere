@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/profile_item_padding"
+    android:paddingRight="@dimen/profile_item_padding"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/chatWithLabel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:gravity="center_vertical"
+        android:text="Chat with"
+        android:textStyle="bold" />
+    <TextView
+        android:id="@+id/lastMessageLabel"
+        android:layout_width="match_parent"
+        android:layout_weight="3"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:text="last message content" />
+</LinearLayout>
+

@@ -2,12 +2,15 @@ package edu.sjsu.team408.parkhere;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -17,6 +20,8 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -29,8 +34,12 @@ import java.util.List;
 public class ChatFragment extends Fragment {
 
     private ListView listView;
-    private View btnSend;
+    private View sendButton;
     private EditText editText;
+    private TextView friendLabel;
+    private AutoCompleteTextView toAutoCompleteTextView;
+    private ArrayList<User> userList;
+
     boolean myMessage = true;
     private List<ChatBubble> chatBubbleList;
     private ArrayAdapter<ChatBubble> adapter;
@@ -43,13 +52,14 @@ public class ChatFragment extends Fragment {
     private DatabaseReference membersOfChatsReference;
     private DatabaseReference chatsReference;
     private DatabaseReference messagesReference;
-
+    private DatabaseReference userReference;
+    private DatabaseReference userListReference;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.activity_messaging, container, false);
+        View view = inflater.inflate(R.layout.fragment_messaging, container, false);
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
         user = FirebaseAuth.getInstance().getCurrentUser();
@@ -59,33 +69,84 @@ public class ChatFragment extends Fragment {
         setupChildReference(author);
 
         chatBubbleList = new ArrayList<>();
+        userList = new ArrayList<>();
 
-        listView = (ListView) view.findViewById(R.id.list_msg);
-        btnSend = view.findViewById(R.id.btn_chat_send);
-        editText = (EditText) view.findViewById(R.id.msg_type);
+        listView = view.findViewById(R.id.chat_listView);
+        sendButton = view.findViewById(R.id.new_message_button);
+        editText = view.findViewById(R.id.input_message_editText);
+        friendLabel = view.findViewById(R.id.friendLabel);
+        toAutoCompleteTextView = view.findViewById(R.id.toAutoCompleteTextView);
 
         //set ListView adapter first
         adapter = new MessageAdapter(getActivity(), R.layout.right_chat_bubble, chatBubbleList);
         listView.setAdapter(adapter);
 
+        // setting up the autocomplete text field
+        final ArrayAdapter<String> autoComplete =
+                new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1);
+        userListReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                userList.clear();
+                autoComplete.clear();
+                for (DataSnapshot user : dataSnapshot.getChildren()) {
+                    autoComplete.add(user.child("name").getValue(String.class));
+                    userList.add(user.getValue(User.class));
+//                autocompleteAdapter.notifyDataSetChanged();
+                }
+            }
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        toAutoCompleteTextView.setAdapter(autoComplete);
+
+        toAutoCompleteTextView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {
+                    if (toAutoCompleteTextFieldIsValid()) {
+                        sendButton.setEnabled(true);
+                    } else {
+                        sendButton.setEnabled(false);
+                    }
+                }
+            }
+        });
+
         //event for button SEND
-        btnSend.setOnClickListener(new View.OnClickListener() {
+        sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (editText.getText().toString().trim().equals("")) {
                     Toast.makeText(getActivity(),
-                            "Please input some text...",
+                            "Please enter some text...",
                             Toast.LENGTH_SHORT).show();
                 } else {
-                    //add message to list
-                    String messageContent = editText.getText().toString();
-                    writeNewMessageToFirebase(
-                            user.getUid(),
-                            author,
-                            messageContent);
-                    addMessageToList(messageContent, true);
-                    editText.setText("");
-//                    myMessage = !myMessage;
+                    if (toAutoCompleteTextFieldIsValid()) {
+                        String chatWithName = toAutoCompleteTextView.getText().toString();
+                        String chatWithUid = findUidByName(userList, chatWithName);
+
+                        chatsReference.setValue(
+                                new Chat(chatWithName, chatWithUid, "", new Date()));
+                        userReference
+                                .child("chats")
+                                .push()
+                                .setValue(chatKeyString);
+                        if (toAutoCompleteTextView.getVisibility() == View.VISIBLE) {
+                            toAutoCompleteTextView.setEnabled(false);
+                            toAutoCompleteTextView.setVisibility(View.INVISIBLE);
+                        }
+                        friendLabel.setVisibility(View.VISIBLE);
+                        friendLabel.setText(chatWithUid + " " + chatWithName);
+                        //add message to list
+                        String messageContent = editText.getText().toString();
+                        writeNewMessageToFirebase(user.getUid(), author, messageContent);
+                        addMessageToList(messageContent, true);
+                        editText.setText("");
+//                    getMyMessage = !getMyMessage;
+                    }
                 }
             }
         });
@@ -94,7 +155,7 @@ public class ChatFragment extends Fragment {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Message newMessage = dataSnapshot.getValue(Message.class);
-                if (newMessage.getUserId() != user.getUid())
+                if (!newMessage.getUserId().equals(user.getUid()))
                     addMessageToList(newMessage.getContent(), false);
             }
 
@@ -123,6 +184,21 @@ public class ChatFragment extends Fragment {
         return view;
     }
 
+    private String findUidByName(ArrayList<User> userList, String chatWithName) {
+        for (User user : userList) {
+            if (chatWithName.equals(user.getName()))
+                return user.getId();
+        }
+        return "";
+    }
+
+    private boolean toAutoCompleteTextFieldIsValid() {
+        boolean validity = false;
+        if (!toAutoCompleteTextView.getText().toString().trim().equals(""))
+            validity = true;
+        return validity;
+    }
+
     private void writeNewMessageToFirebase(String userId,
                                            String author,
                                            String messageContent) {
@@ -133,8 +209,12 @@ public class ChatFragment extends Fragment {
                         .push()
                         .getKey();
         String messageKeyString = "msg " + messageKey;
+
         membersOfChatsReference.setValue(true);
-        chatsReference.setValue(new Chat(messageContent, timestamp));
+
+        chatsReference.child("lastMessage").setValue(messageContent);
+        chatsReference.child("timestamp").setValue(timestamp);
+
         messagesReference
                 .child(messageKeyString)
                 .setValue(
@@ -142,10 +222,14 @@ public class ChatFragment extends Fragment {
                                 author,
                                 messageContent,
                                 timestamp));
-
     }
     private void setupChildReference(String author) {
         chatKeyString = "chat " + chatKey;
+
+        userListReference = mDatabase.child("Users");
+
+        userReference = mDatabase.child("Users")
+                .child(user.getUid());
 
         membersOfChatsReference =
                 mDatabase.child("membersOfChats")

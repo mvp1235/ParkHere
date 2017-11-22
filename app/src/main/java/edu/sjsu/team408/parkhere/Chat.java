@@ -13,13 +13,17 @@ import java.util.Map;
 
 @IgnoreExtraProperties
 public class Chat {
+    private String chatWithName;
+    private String chatWithUid;
     private String lastMessage;
     private Date timestamp;
 
     public Chat() {
     }
 
-    public Chat(String lastMessage, Date timestamp) {
+    public Chat(String chatWithName, String chatWithUid, String lastMessage, Date timestamp) {
+        this.chatWithName = chatWithName;
+        this.chatWithUid = chatWithUid;
         this.lastMessage = lastMessage;
         this.timestamp = timestamp;
     }
@@ -27,6 +31,8 @@ public class Chat {
     @Exclude
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
+        result.put("chatWithName", chatWithName);
+        result.put("chatWithUid", chatWithUid);
         result.put("lastMessage", lastMessage);
         result.put("timestamp", timestamp);
 
@@ -47,5 +53,21 @@ public class Chat {
 
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
+    }
+
+    public String getChatWithName() {
+        return chatWithName;
+    }
+
+    public void setChatWithName(String chatWithName) {
+        this.chatWithName = chatWithName;
+    }
+
+    public String getChatWithUid() {
+        return chatWithUid;
+    }
+
+    public void setChatWithUid(String chatWithUid) {
+        this.chatWithUid = chatWithUid;
     }
 }

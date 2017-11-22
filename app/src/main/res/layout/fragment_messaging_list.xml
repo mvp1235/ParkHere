@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="20dp">
+
+    <Button
+        android:id="@+id/new_message_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/background_floating_material_dark"
+        android:text="+"
+        android:textSize="30sp"
+        android:textColor="@color/background_material_light" />
+
+    <!--<ListView-->
+        <!--android:id="@+id/chat_listView"-->
+        <!--android:layout_width="match_parent"-->
+        <!--android:layout_height="match_parent"-->
+        <!--android:layout_alignParentStart="true"-->
+        <!--android:layout_below="@+id/message_list_label"-->
+        <!--android:layout_marginTop="12dp"-->
+        <!--android:divider="@null"-->
+        <!--android:listSelector="@android:color/transparent"-->
+        <!--android:transcriptMode="alwaysScroll" />-->
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/chat_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentStart="true"
+        android:layout_below="@+id/message_list_label"
+        android:layout_marginTop="12dp"
+        android:divider="@null"/>
+
+    <TextView
+        android:id="@+id/message_list_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start|center_vertical"
+        android:text="@string/Messaging"
+        android:textSize="20sp" />
+
+</RelativeLayout>
+

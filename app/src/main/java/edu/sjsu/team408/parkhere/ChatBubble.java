@@ -17,7 +17,7 @@ public class ChatBubble {
         return content;
     }
 
-    public boolean myMessage() {
+    public boolean getMyMessage() {
         return myMessage;
     }
 }

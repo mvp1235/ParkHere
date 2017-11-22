@@ -27,15 +27,15 @@ public class ChatFragmentTest {
     public void typeMessageClickSend() {
         onView(withId(R.id.navigation_messaging))
                 .perform(click());
-        onView(withId(R.id.msg_type))
+        onView(withId(R.id.input_message_editText))
                 .perform(typeText("Hello"));
         closeSoftKeyboard();
-        onView(withId(R.id.btn_chat_send))
+        onView(withId(R.id.new_message_button))
                 .perform(click());
-        onView(withId(R.id.msg_type))
+        onView(withId(R.id.input_message_editText))
                 .perform(typeText("I am good."));
         closeSoftKeyboard();
-        onView(withId(R.id.btn_chat_send))
+        onView(withId(R.id.new_message_button))
                 .perform(click());
         slowDown2Secs();
     }

@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
                     break;
                 case R.id.navigation_messaging:
                     if (mAuth.getCurrentUser() != null)
-                        selectedFragment = new ChatFragment();
+                        selectedFragment = new ChatListFragment();
                     else {
                         Toast.makeText(getApplicationContext(),
                                 "Please login first.",
