@@ -259,45 +259,7 @@ public class EditProfileActivity extends AppCompatActivity {
                                 currentUser.setProfileURL(parkingPhotoEncoded);
                             else
                                 currentUser.setProfileURL("http://www.havoca.org/wp-content/uploads/2016/03/icon-user-default-300x300.png");   // default parking photo if user didn't set a photo for parking
-
-
-                            String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
-                                    + Uri.encode(address) + "&sensor=true&key=AIzaSyBqgv8PrGCSFVa-Nb2ymE3gGnuv-LgfGps";   //using my own API key here, 2,500 free request per day,
-                            // which should be fine for development now
-                            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
-                            JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
-                                @Override
-                                public void onResponse(JSONObject response) {
-                                    JSONObject location;
-                                    try {
-                                        // Get JSON Array called "results" and then get the 0th
-                                        // complete object as JSON
-                                        location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
-                                        // Get the value of the attribute whose name is
-                                        // "formatted_string"
-                                        if (location.getDouble("lat") != 0 && location.getDouble("lng") != 0) {
-                                            LatLng latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
-
-                                            //Do what you want
-                                            currentUser.setAddress(new Address(address, latLng));
-
-                                            databaseReference.child("Users").child(targetID).setValue(currentUser);
-
-                                        }
-                                    } catch (JSONException e1) {
-                                        e1.printStackTrace();
-
-                                    }
-                                }
-
-                            }, new Response.ErrorListener() {
-                                @Override
-                                public void onErrorResponse(VolleyError error) {
-                                    Log.d("Error.Response", error.toString());
-                                }
-                            });
-                            // add it to the queue
-                            queue.add(stateReq);
+                            editProfileDatabase(address, targetID);
 
                         }
                     }
@@ -310,6 +272,47 @@ public class EditProfileActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    public void editProfileDatabase(final String address, final String targetID) {
+        String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
+                + Uri.encode(address) + "&sensor=true&key=AIzaSyBqgv8PrGCSFVa-Nb2ymE3gGnuv-LgfGps";   //using my own API key here, 2,500 free request per day,
+        // which should be fine for development now
+        RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+        JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+            @Override
+            public void onResponse(JSONObject response) {
+                JSONObject location;
+                try {
+                    // Get JSON Array called "results" and then get the 0th
+                    // complete object as JSON
+                    location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                    // Get the value of the attribute whose name is
+                    // "formatted_string"
+                    if (location.getDouble("lat") != 0 && location.getDouble("lng") != 0) {
+                        LatLng latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+
+                        //Do what you want
+                        currentUser.setAddress(new Address(address, latLng));
+
+                        databaseReference.child("Users").child(targetID).setValue(currentUser);
+
+                    } else {
+                        //Invalid address. Handle here. For now, let's assume users need to enter a valid address
+                    }
+                } catch (JSONException e1) {
+                    e1.printStackTrace();
+                }
+            }
+
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                Log.d("Error.Response", error.toString());
+            }
+        });
+        // add it to the queue
+        queue.add(stateReq);
     }
 
     public Address getAddress(String address) {
