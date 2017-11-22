@@ -136,7 +136,6 @@ public class EditListingActivity extends AppCompatActivity {
         price.setText(priceStr);
         specialInstructions.setText(specialInstructionsStr);
 
-
         //Retrieve date and time from Firebase and prefill
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -152,6 +151,7 @@ public class EditListingActivity extends AppCompatActivity {
                     endDate.setText(endDateStr);
                     startTime.setText(startTimeStr);
                     endTime.setText(endTimeStr);
+
                 }
 
             }
@@ -170,14 +170,12 @@ public class EditListingActivity extends AppCompatActivity {
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png'
                 Picasso.with(getApplicationContext()).load(uri.toString()).into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Success");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
                 Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Fail");
             }
         });
 

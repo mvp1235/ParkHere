@@ -48,18 +48,17 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     private final static int LISTING_EDIT_CODE = 10;
     private final static int RESERVATION_LIST_VIEW_CODE = 11;
+    private static final int WRITE_REVIEW_CODE = 11;
 
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel;
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
-    private Button reserveBtn, editBtn, reserveListBtn;
+    private Button reserveBtn, editBtn, reserveListBtn, reviewBtn;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
     private ParkingSpace clickedParking;
     private User currentUser;
-    private static String parkingPhotoString = "https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png";
-    private Uri parkingURI = null;
     private TextView reserveToTime, reserveFromDate, reserveToDate, reserveFromTime;
     private Calendar calendar;
     private int year, month, day;
@@ -99,6 +98,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                 startActivityForResult(intent, RESERVATION_LIST_VIEW_CODE);
             }
         });
+        reviewBtn = (Button) findViewById(R.id.bookingReviewBtn);
 
         //seeker set reservation from date to date, from time to time.
         reserveFromDate = (TextView) findViewById(R.id.reserveFromDateTV);
@@ -154,10 +154,10 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         clickedParking = new ParkingSpace(bundle);
 
-        //This part is for defaul testing only****
-        reserveFromDate.setText("From Date: " +clickedParking.getStartDate());
-        reserveToDate.setText("To Date: " +clickedParking.getEndDate());
-        reserveFromTime.setText("From Time - " +clickedParking.getStartTime());
+        //This part is for default testing only****
+        reserveFromDate.setText("From Date: " + clickedParking.getStartDate());
+        reserveToDate.setText("To Date: " + clickedParking.getEndDate());
+        reserveFromTime.setText("From Time - " + clickedParking.getStartTime());
         reserveToTime.setText("To Time - " + clickedParking.getEndTime());
 
         setParkingPhoto(clickedParking.getParkingIDRef());
@@ -198,6 +198,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             editBtn.setVisibility(View.GONE);       // only show edit button on listing history
             reserveBtn.setText("Reserve");
             reserveListBtn.setVisibility(View.GONE);
+            reviewBtn.setVisibility(View.GONE);
         } else if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_) {
             reserveBtn.setVisibility(View.GONE);    //book again should be taken out since it depends on the listing owner, i.e. you can't really book again if it's not up for listing
             editBtn.setVisibility(View.GONE);       // only show edit button on listing history
@@ -206,6 +207,13 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveToTime.setVisibility(View.GONE);
             reserveFromTime.setVisibility(View.GONE);
             reserveListBtn.setVisibility(View.GONE);
+            reviewBtn.setVisibility(View.VISIBLE);
+            reviewBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    writeBookingReview();
+                }
+            });
 //            reserveBtn.setText("Book Again");
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
@@ -215,6 +223,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveFromDate.setVisibility(View.GONE);
             reserveToTime.setVisibility(View.GONE);
             reserveFromTime.setVisibility(View.GONE);
+            reviewBtn.setVisibility(View.GONE);
             //An edit button will be shown on this screen as well to allow user to edit the listings he/she posted
             editBtn.setVisibility(View.VISIBLE);
             editBtn.setOnClickListener(new View.OnClickListener() {
@@ -237,7 +246,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             distanceLabel.setVisibility(View.GONE);
             specialInstructionLabel.setVisibility(View.GONE);
             specialInstructionTV.setText("");
-
+            reviewBtn.setVisibility(View.GONE);
             ownerTV.setText(clickedParking.getReservedBy().getName());
             addressTV.setText(clickedParking.getReservedBy().getPhoneNumber());
             dateTV.setText(clickedParking.getReservedBy().getEmailAddress());
@@ -251,6 +260,15 @@ public class DetailParkingActivity extends AppCompatActivity {
         } else {
             ll.setVisibility(View.VISIBLE);
         }
+    }
+
+    private void writeBookingReview() {
+        String reviewer = firebaseAuth.getCurrentUser().getUid();
+        String reviewee = clickedParking.getOwnerParkingID();
+        Intent intent = new Intent(this, BookingReviewActivity.class);
+        intent.putExtra("reviewerID", reviewer);
+        intent.putExtra("revieweeID", reviewee);
+        startActivityForResult(intent, WRITE_REVIEW_CODE);
     }
 
     private void editListing() {
@@ -313,7 +331,6 @@ public class DetailParkingActivity extends AppCompatActivity {
             public void onSuccess(Uri uri) {
                 //Parking photo is set by user
                 Picasso.with(getApplicationContext()).load(uri.toString()).into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Success");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
@@ -321,7 +338,6 @@ public class DetailParkingActivity extends AppCompatActivity {
                 //Handle any errors
                 //Parking photo is the default one, user has not set a photo for the listing yet
                 Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Fail");
             }
         });
 

@@ -589,7 +589,6 @@ public class NewListingActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Log.d("asd", "asdfa");
                 if(firebaseAuth.getCurrentUser() != null) {
                     String targetID = firebaseAuth.getCurrentUser().getUid();
                     if(!targetID.isEmpty()) {
