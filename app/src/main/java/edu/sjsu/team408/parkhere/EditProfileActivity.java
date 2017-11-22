@@ -13,13 +13,21 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Base64;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -28,6 +36,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -40,12 +51,11 @@ public class EditProfileActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
-    private EditText nameET, emailET, phoneET, addressET;
+    private EditText nameET, emailET, phoneET, streetNumET, cityET, stateET, zipCodeET;
     private ImageView profileIV;
     private Button saveButton, editProfilePictureBtn;
     private AlertDialog photoActionDialog;
     private Bitmap profileBitmap = null;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +73,11 @@ public class EditProfileActivity extends AppCompatActivity {
         nameET = (EditText) findViewById(R.id.editUserFullName);
         emailET = (EditText) findViewById(R.id.editUserEmail);
         phoneET = (EditText) findViewById(R.id.editUserPhone);
-        addressET = (EditText) findViewById(R.id.editUserAddress);
+        streetNumET = (EditText) findViewById(R.id.editUserStreetNumber);
+        cityET = (EditText) findViewById(R.id.editUserCity);
+        stateET = (EditText) findViewById(R.id.editUserState);
+        zipCodeET = (EditText) findViewById(R.id.editUserZipCode);
+
         profileIV = (ImageView) findViewById(R.id.editProfilePicture);
         saveButton = (Button) findViewById(R.id.saveButton);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -85,7 +99,22 @@ public class EditProfileActivity extends AppCompatActivity {
         nameET.setText(name);
         emailET.setText(email);
         phoneET.setText(phone);
-        addressET.setText(address);
+
+        if (!address.isEmpty()) {
+            String addressToken[] = address.split(",");
+            String stateAndZipCode[] = addressToken[2].trim().split(" ");
+
+            String streetAddress = addressToken[0].trim();
+            String city = addressToken[1].trim();
+            String state = stateAndZipCode[0].trim();
+            String zipcode = stateAndZipCode[1].trim();
+
+            streetNumET.setText(streetAddress);
+            cityET.setText(city);
+            stateET.setText(state);
+            zipCodeET.setText(zipcode);
+        }
+
 
         //load profile URL into profile ImageView
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -211,7 +240,7 @@ public class EditProfileActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(firebaseAuth.getCurrentUser() != null) {
-                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    final String targetID = firebaseAuth.getCurrentUser().getUid();
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
@@ -219,19 +248,57 @@ public class EditProfileActivity extends AppCompatActivity {
                             String fullName = nameET.getText().toString();
                             String email = emailET.getText().toString();
                             String phone = phoneET.getText().toString();
-                            String address = addressET.getText().toString();
-                            String parkingPhotoEncoded = encodeBitmap(profileBitmap);
+                            final String address = streetNumET.getText().toString() + ", " + cityET.getText().toString() + ", " + stateET.getText().toString() + " " + zipCodeET.getText().toString();
+                            final String parkingPhotoEncoded = encodeBitmap(profileBitmap);
 
                             currentUser.setName(fullName);
                             currentUser.setEmailAddress(email);
                             currentUser.setPhoneNumber(phone);
-                            currentUser.setAddress(getAddress(address));
+
                             if (parkingPhotoEncoded != null)
                                 currentUser.setProfileURL(parkingPhotoEncoded);
                             else
                                 currentUser.setProfileURL("http://www.havoca.org/wp-content/uploads/2016/03/icon-user-default-300x300.png");   // default parking photo if user didn't set a photo for parking
 
-                            databaseReference.child("Users").child(targetID).setValue(currentUser);
+
+                            String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
+                                    + Uri.encode(address) + "&sensor=true&key=AIzaSyBqgv8PrGCSFVa-Nb2ymE3gGnuv-LgfGps";   //using my own API key here, 2,500 free request per day,
+                            // which should be fine for development now
+                            RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                            JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    JSONObject location;
+                                    try {
+                                        // Get JSON Array called "results" and then get the 0th
+                                        // complete object as JSON
+                                        location = response.getJSONArray("results").getJSONObject(0).getJSONObject("geometry").getJSONObject("location");
+                                        // Get the value of the attribute whose name is
+                                        // "formatted_string"
+                                        if (location.getDouble("lat") != 0 && location.getDouble("lng") != 0) {
+                                            LatLng latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+
+                                            //Do what you want
+                                            currentUser.setAddress(new Address(address, latLng));
+
+                                            databaseReference.child("Users").child(targetID).setValue(currentUser);
+
+                                        }
+                                    } catch (JSONException e1) {
+                                        e1.printStackTrace();
+
+                                    }
+                                }
+
+                            }, new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Log.d("Error.Response", error.toString());
+                                }
+                            });
+                            // add it to the queue
+                            queue.add(stateReq);
+
                         }
                     }
                 }

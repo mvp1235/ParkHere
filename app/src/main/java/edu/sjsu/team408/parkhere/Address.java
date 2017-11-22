@@ -185,6 +185,7 @@ public class Address implements Parcelable {
         setZipCode(zipcode);
         setLatitude(point.latitude);
         setLongitude(point.longitude);
+
     }
 
 
