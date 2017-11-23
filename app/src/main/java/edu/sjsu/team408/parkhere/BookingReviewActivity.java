@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.Iterator;
+
 public class BookingReviewActivity extends AppCompatActivity {
 
     private DatabaseReference databaseReference;
@@ -67,17 +69,58 @@ public class BookingReviewActivity extends AppCompatActivity {
             }
         });
 
-
-
-
     }
 
     private void saveReviewToDatabase() {
-        String description = descriptionET.getText().toString();
-        double star = ratingBar.getRating();
-        Review review = new Review(currentReviewId, star, reviewerID, revieweeID, description, parkingID);
+        final String description = descriptionET.getText().toString();
+        final double star = ratingBar.getRating();
 
-        databaseReference.child("Reviews").child(currentReviewId).setValue(review);
+
+        String currentUserId = firebaseAuth.getCurrentUser().getUid();
+
+
+
+
+
+        databaseReference.child("Reviews").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                Iterator<DataSnapshot> reviews = dataSnapshot.getChildren().iterator();
+                boolean reviewAdded = false;
+                while (reviews.hasNext()) {
+                    DataSnapshot ds = reviews.next();
+                    Review r = ds.getValue(Review.class);
+                    Log.i("Success", "iteration");
+
+                    String park, reviewer, reviewee;
+                    park = r.getParkingID();
+                    reviewer = r.getReviewerID();
+                    reviewee = r.getRevieweeID();
+
+                    //User has already left a review before, so edit existing one instead of creating new review
+                    if (park.equalsIgnoreCase(parkingID) && reviewer.equalsIgnoreCase(reviewerID) && reviewee.equalsIgnoreCase(revieweeID)) {
+                        Review review = new Review(currentReviewId, star, reviewerID, revieweeID, description, parkingID);
+                        databaseReference.child("Reviews").child(r.getId()).setValue(review);
+                        Log.i("Success", "here");
+                        reviewAdded = true;
+                        break;
+                    }
+                }
+                // user leaves the review for the first time
+                if (!reviewAdded) {
+                    Review review = new Review(currentReviewId, star, reviewerID, revieweeID, description, parkingID);
+                    databaseReference.child("Reviews").child(currentReviewId).setValue(review);
+                }
+                databaseReference.child("Reviews").removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
 
 
         setResult(RESULT_OK);

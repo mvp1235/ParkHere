@@ -61,14 +61,12 @@ public class HistoryParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
             public void onSuccess(Uri uri) {
                 // Got the download URL for 'users/me/profile.png'
                 Picasso.with(getContext()).load(uri.toString()).into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Success");
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception exception) {
                 // Handle any errors
                 Picasso.with(getContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingPhoto);
-                Log.i("SET PARKING PHOTO", "Fail");
             }
         });
 

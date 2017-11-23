@@ -365,7 +365,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         //here add the reserved parking to user's myCurrentReservedParkings lists
 
-        //0. Split the parking space depending on seeker's booking rage.
+        //0. Split the parking space depending on seeker's booking range.
         //1. Delete reference from AvailableParkings
         //2. Delete parking from Listings then split it.
         //3. Take seeker's desire booking range and reserve the space.
