@@ -643,8 +643,8 @@ public class NewListingActivity extends AppCompatActivity {
         addressState.setText("CA");
         addressZipCode.setText("95112");
         price.setText("5");
-        startDate.setText("11-22-2017");
-        endDate.setText("11-22-2017");
+        startDate.setText("11-23-2017");
+        endDate.setText("11-23-2017");
         startTime.setText("5:00 PM");
         endTime.setText("10:00 PM");
 

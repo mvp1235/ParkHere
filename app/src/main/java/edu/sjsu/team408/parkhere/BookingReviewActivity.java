@@ -17,6 +17,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 
 public class BookingReviewActivity extends AppCompatActivity {
@@ -50,7 +51,6 @@ public class BookingReviewActivity extends AppCompatActivity {
 
         starCountsTV = (TextView) findViewById(R.id.bookintStarCounts);
         ratingBar = (RatingBar) findViewById(R.id.bookingRatingBar);
-        ratingBar.setStepSize(1);   //number of stars can only be integer (1-5)
 
         ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
             @Override
@@ -75,13 +75,7 @@ public class BookingReviewActivity extends AppCompatActivity {
         final String description = descriptionET.getText().toString();
         final double star = ratingBar.getRating();
 
-
-        String currentUserId = firebaseAuth.getCurrentUser().getUid();
-
-
-
-
-
+        //Iterate through the existing review database, check first to see if the reviewer has already left a review for the reviewee for that same listing
         databaseReference.child("Reviews").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -90,7 +84,6 @@ public class BookingReviewActivity extends AppCompatActivity {
                 while (reviews.hasNext()) {
                     DataSnapshot ds = reviews.next();
                     Review r = ds.getValue(Review.class);
-                    Log.i("Success", "iteration");
 
                     String park, reviewer, reviewee;
                     park = r.getParkingID();
@@ -99,17 +92,18 @@ public class BookingReviewActivity extends AppCompatActivity {
 
                     //User has already left a review before, so edit existing one instead of creating new review
                     if (park.equalsIgnoreCase(parkingID) && reviewer.equalsIgnoreCase(reviewerID) && reviewee.equalsIgnoreCase(revieweeID)) {
-                        Review review = new Review(currentReviewId, star, reviewerID, revieweeID, description, parkingID);
+                        Review review = new Review(r.getId(), star, reviewerID, revieweeID, description, parkingID);
                         databaseReference.child("Reviews").child(r.getId()).setValue(review);
-                        Log.i("Success", "here");
                         reviewAdded = true;
-                        break;
+                        addReviewIdToUser(review);
+                        break;  //stop traversing once an existing review has been found
                     }
                 }
                 // user leaves the review for the first time
                 if (!reviewAdded) {
                     Review review = new Review(currentReviewId, star, reviewerID, revieweeID, description, parkingID);
                     databaseReference.child("Reviews").child(currentReviewId).setValue(review);
+                    addReviewIdToUser(review);
                 }
                 databaseReference.child("Reviews").removeEventListener(this);
             }
@@ -120,11 +114,50 @@ public class BookingReviewActivity extends AppCompatActivity {
             }
         });
 
-
-
-
         setResult(RESULT_OK);
         finish();
+    }
+
+    private void addReviewIdToUser(final Review r) {
+        final String reviewerID = r.getReviewerID();
+        final String revieweeID = r.getRevieweeID();
+        final String reviewID = r.getId();
+
+        final ArrayList<String> newList = new ArrayList<>();
+        newList.add(r.getId());
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    //Add review ref ID to reviewer
+                    if(!reviewerID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(reviewerID)) {
+                            User currentUser = null;
+                            currentUser = dataSnapshot.child("Users").child(reviewerID).getValue(User.class);
+                            currentUser.addToReviewList(reviewID);
+                            databaseReference.child("Users").child(reviewerID).setValue(currentUser);
+                            Log.i("TEST", currentUser.getId());
+                        }
+                    }
+
+                    //Add review ref ID to reviewee
+                    if(!revieweeID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(revieweeID)) {
+                            User currentUser = null;
+                            currentUser = dataSnapshot.child("Users").child(revieweeID).getValue(User.class);
+                            currentUser.addToFeedbackList(reviewID);
+                            databaseReference.child("Users").child(revieweeID).setValue(currentUser);
+
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
     }
 }

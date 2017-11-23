@@ -19,7 +19,8 @@ public class User implements Parcelable{
     private ArrayList<ParkingSpace> myCurrentReservedParkings;
     private ArrayList<ParkingSpace> myListingHistory;
     private ArrayList<ParkingSpace> myReservationList;
-    private ArrayList<String> myReviews;
+    private ArrayList<String> myFeedbacks;        // feedback reviews received from others who rented my parking space
+    private ArrayList<String> myReviews;          // reviews left on other listing owners
 
     public User(){};
 
@@ -34,6 +35,7 @@ public class User implements Parcelable{
         this.myListingHistory = new ArrayList<>();
         this.myReservationList = new ArrayList<>();
         this.myReviews = new ArrayList<>();
+        this.myFeedbacks = new ArrayList<>();
     }
 
 
@@ -184,8 +186,30 @@ public class User implements Parcelable{
         this.myReviews = myReviews;
     }
 
-    public void addToReviewList(String review) {
-        myReviews.add(review);
+    public void addToReviewList(String reviewID) {
+        if (myReviews == null)
+            myReviews = new ArrayList<>();
+
+        //only add review id if it doesn't exist
+        if (!myReviews.contains(reviewID))
+            myReviews.add(reviewID);
+    }
+
+    public ArrayList<String> getMyFeedbacks() {
+        return myFeedbacks;
+    }
+
+    public void setMyFeedbacks(ArrayList<String> myFeedbacks) {
+        this.myFeedbacks = myFeedbacks;
+    }
+
+    public void addToFeedbackList(String reviewID) {
+        if (myFeedbacks == null)
+            myFeedbacks = new ArrayList<>();
+
+        //only add review id if it doesn't exist
+        if (!myFeedbacks.contains(reviewID))
+            myFeedbacks.add(reviewID);
     }
 
 }

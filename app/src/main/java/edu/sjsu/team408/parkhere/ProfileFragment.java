@@ -190,9 +190,11 @@ public class ProfileFragment extends Fragment {
             }
         } else {
             // This block of code should already exist, we're just moving it to the 'else' statement:
-            Picasso.with(getContext())
-                    .load(encodedPhoto)
-                    .into(profileIV);
+            if (getContext() != null) {
+                Picasso.with(getContext())
+                        .load(encodedPhoto)
+                        .into(profileIV);
+            }
         }
     }
 
