@@ -674,4 +674,20 @@ public class NewListingActivity extends AppCompatActivity {
             }
         });
     }
+
+    public static ParkingSpace getValue(String startDate, String endDate, String startTime,
+                                        String endTime, String userID, String ownerName, String price,
+                                        String address, LatLng point, String parkingID) {
+        ParkingSpace p = new ParkingSpace();
+
+        p.setStartDate(startDate);
+        p.setEndDate(endDate);
+        p.setStartDate(startTime);
+        p.setEndTime(endTime);
+        p.setPrice(Double.parseDouble(price));
+        p.setAddress(new Address(address, point));
+        p.setParkingIDRef(parkingID);
+
+        return p;
+    }
 }
