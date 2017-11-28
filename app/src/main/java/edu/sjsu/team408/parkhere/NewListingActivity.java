@@ -7,13 +7,11 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.*;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -26,12 +24,9 @@ import android.widget.TimePicker;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Locale;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -41,8 +36,6 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -56,8 +49,6 @@ import com.google.firebase.storage.UploadTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 
 public class NewListingActivity extends AppCompatActivity {
     private static final String TAG = NewListingActivity.class.getSimpleName();
@@ -556,7 +547,7 @@ public class NewListingActivity extends AppCompatActivity {
         String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingIDRef; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 
-        ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingIDRef);
+        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingIDRef);
         String ownerParkingID = userID;
         parking.setOwnerParkingID(ownerParkingID);
         //Adding special instruction to parking (if any is provided)
@@ -617,9 +608,9 @@ public class NewListingActivity extends AppCompatActivity {
 
 
     //This method contains parkingID
-    public static ParkingSpace getParkingSpace(String startDate, String endDate, String startTime,
-                                         String endTime, String userID, String ownerName,
-                                         String price, String address, LatLng point, String parkingID) {
+    public static Listing getParkingSpace(String startDate, String endDate, String startTime,
+                                          String endTime, String userID, String ownerName,
+                                          String price, String address, LatLng point, String parkingID) {
         if(startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty() ||
                 userID.isEmpty() || price.isEmpty() || address.isEmpty()) {
             return null;
@@ -634,7 +625,7 @@ public class NewListingActivity extends AppCompatActivity {
 
 
         //return result;
-        return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
+        return new Listing(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
     public void populateDefaultValuesForTesting() {
@@ -650,8 +641,8 @@ public class NewListingActivity extends AppCompatActivity {
 
     }
 
-    private void addListingToUser(ParkingSpace ps) {
-        final ArrayList<ParkingSpace> newList = new ArrayList<ParkingSpace>();
+    private void addListingToUser(Listing ps) {
+        final ArrayList<Listing> newList = new ArrayList<Listing>();
         newList.add(ps);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -675,10 +666,10 @@ public class NewListingActivity extends AppCompatActivity {
         });
     }
 
-    public static ParkingSpace getValue(String startDate, String endDate, String startTime,
-                                        String endTime, String userID, String ownerName, String price,
-                                        String address, LatLng point, String parkingID) {
-        ParkingSpace p = new ParkingSpace();
+    public static Listing getValue(String startDate, String endDate, String startTime,
+                                   String endTime, String userID, String ownerName, String price,
+                                   String address, LatLng point, String parkingID) {
+        Listing p = new Listing();
 
         p.setStartDate(startDate);
         p.setEndDate(endDate);

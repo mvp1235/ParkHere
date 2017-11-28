@@ -7,7 +7,6 @@ import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.location.*;
 import android.net.Uri;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -50,11 +49,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
-import java.util.List;
 
 public class EditListingActivity extends AppCompatActivity {
 
@@ -150,7 +147,7 @@ public class EditListingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.child("Listings").hasChild(currentParkingID)) {
-                    ParkingSpace parking = dataSnapshot.child("Listings").child(currentParkingID).getValue(ParkingSpace.class);
+                    Listing parking = dataSnapshot.child("Listings").child(currentParkingID).getValue(Listing.class);
 
                     String startDateStr = parking.getStartDate();
                     String endDateStr = parking.getEndDate();
@@ -571,7 +568,7 @@ public class EditListingActivity extends AppCompatActivity {
         String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingID; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 //        String parkingSpaceUidKey;
-        ParkingSpace parking = getParkingSpace(startDate, endDate, startTime, endTime, userID, owner, price, address, point, currentParkingID);
+        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime, userID, owner, price, address, point, currentParkingID);
 
         //Adding special instruction to parking (if any is provided)
         String specialIns = specialInstructions.getText().toString();
@@ -630,9 +627,9 @@ public class EditListingActivity extends AppCompatActivity {
 
 
     //This method contains parkingID
-    public static ParkingSpace getParkingSpace(String startDate, String endDate, String startTime,
-                                               String endTime, String userID, String ownerName,
-                                               String price, String address, LatLng point, String parkingID) {
+    public static Listing getParkingSpace(String startDate, String endDate, String startTime,
+                                          String endTime, String userID, String ownerName,
+                                          String price, String address, LatLng point, String parkingID) {
         if(startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty() ||
                 userID.isEmpty() || price.isEmpty() || address.isEmpty()) {
             return null;
@@ -647,11 +644,11 @@ public class EditListingActivity extends AppCompatActivity {
 
 
         //return result;
-        return new ParkingSpace(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
+        return new Listing(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
-    private void editUserListing(ParkingSpace ps) {
-        final ArrayList<ParkingSpace> newList = new ArrayList<>();
+    private void editUserListing(Listing ps) {
+        final ArrayList<Listing> newList = new ArrayList<>();
         newList.add(ps);
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -665,8 +662,8 @@ public class EditListingActivity extends AppCompatActivity {
 
                             //To edit, first delete the old listing value, then add the new one in, so there won't be duplicates
                             //Before this, the user's listing history doesn't remove the old listing, it just adds to the list
-                            ArrayList<ParkingSpace> existingListings = currentUser.getMyListingHistory();
-                            for (ParkingSpace p : existingListings) {
+                            ArrayList<Listing> existingListings = currentUser.getMyListingHistory();
+                            for (Listing p : existingListings) {
                                 if (p.getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
                                     existingListings.remove(p);
                                 }

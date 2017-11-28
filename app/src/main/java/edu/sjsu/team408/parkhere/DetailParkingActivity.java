@@ -4,17 +4,13 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -32,9 +28,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -57,12 +50,12 @@ public class DetailParkingActivity extends AppCompatActivity {
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
-    private ParkingSpace clickedParking;
+    private Listing clickedParking;
     private User currentUser;
     private TextView reserveToTime, reserveFromDate, reserveToDate, reserveFromTime;
     private Calendar calendar;
     private int year, month, day;
-    private ParkingSpace parkingSpaceToBook;
+    private Listing listingToBook;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +145,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
 
-        clickedParking = new ParkingSpace(bundle);
+        clickedParking = new Listing(bundle);
 
         //This part is for default testing only****
         reserveFromDate.setText("From Date: " + clickedParking.getStartDate());
@@ -373,8 +366,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         //5. Update owner that they have reserved which portion of the available time.
         //6. add the splitted parking space to database if there are remainding ones.
 
-        ParkingSpace[] spaces = splitParkingSpace(clickedParking);  //0.
-        parkingSpaceToBook = spaces[0];
+        Listing[] spaces = splitParkingSpace(clickedParking);  //0.
+        listingToBook = spaces[0];
         deleteParkingReference(clickedParking);     //1.
         deleteParkingListing(parkingID);        //2.
         addSplittedParkingsToDatabase(spaces);  //6
@@ -386,7 +379,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                            currentUser.addReservedParking(parkingSpaceToBook);     //3.
+                            currentUser.addReservedParking(listingToBook);     //3.
                             String currentUserID = currentUser.getId();
                             databaseReference.child("Users").child(currentUserID).setValue(currentUser); //4.
                             setResult(RESULT_OK);
@@ -404,7 +397,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
 
     public void notifyOwner() {
-        final String ownerID = parkingSpaceToBook.getOwnerParkingID();
+        final String ownerID = listingToBook.getOwnerParkingID();
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -418,7 +411,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                             }
                         }
                     }
-                    ParkingSpace p = parkingSpaceToBook.clone();
+                    Listing p = listingToBook.clone();
                     User currentUserPublicInfo = currentUser.clone();
                     p.setReservedBy(currentUserPublicInfo);
                     if (dataSnapshot.child("Users").hasChild(ownerID)) {
@@ -437,7 +430,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
 
-    public ParkingSpace[] splitParkingSpace(ParkingSpace clickedParking) {
+    public Listing[] splitParkingSpace(Listing clickedParking) {
         String reserveStartDate = reserveFromDate.getText().toString().split(":")[1].trim();
         String reserveEndDate = reserveToDate.getText().toString().split(":")[1].trim();
         String reserveStartTime = reserveFromTime.getText().toString().split("-")[1].trim();
@@ -449,11 +442,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         String clickedParkingStartTime = clickedParking.getStartTime();
         String clickedParkingEndTime = clickedParking.getEndTime();
 
-        ParkingSpace reserveParking = clickedParking.clone();
-        ParkingSpace splittedParking1 = clickedParking.clone();
-        ParkingSpace splittedParking2 = clickedParking.clone();
+        Listing reserveParking = clickedParking.clone();
+        Listing splittedParking1 = clickedParking.clone();
+        Listing splittedParking2 = clickedParking.clone();
 
-        ParkingSpace[] splitted = new ParkingSpace[3];      //[0] ps to book. [1]&[2] splitted ps
+        Listing[] splitted = new Listing[3];      //[0] ps to book. [1]&[2] splitted ps
 
         if(clickedParkingStartDate.equals(reserveStartDate) && reserveEndDate.equals(clickedParkingEndDate)){
             //reserving the entire clicked parking.
@@ -512,10 +505,10 @@ public class DetailParkingActivity extends AppCompatActivity {
                 splittedParking2 = reserveParking.clone();
                 splittedParking2.setStartTime(clickedParkingStartTime);
                 splittedParking2.setEndTime(reserveStartTime);
-                ParkingSpace splittedParking3 = reserveParking.clone();
+                Listing splittedParking3 = reserveParking.clone();
                 splittedParking3.setStartTime(reserveEndTime);
                 splittedParking3.setEndTime(clickedParkingEndTime);
-                splitted = new ParkingSpace[4];
+                splitted = new Listing[4];
                 splitted[3] = splittedParking3;
 
             }
@@ -551,10 +544,10 @@ public class DetailParkingActivity extends AppCompatActivity {
                 splittedParking2 = reserveParking.clone();
                 splittedParking2.setStartTime(clickedParkingStartTime);
                 splittedParking2.setEndTime(reserveStartTime);
-                ParkingSpace splittedParking3 = reserveParking.clone();
+                Listing splittedParking3 = reserveParking.clone();
                 splittedParking3.setStartTime(reserveEndTime);
                 splittedParking3.setEndTime(clickedParkingEndTime);
-                splitted = new ParkingSpace[4];
+                splitted = new Listing[4];
                 splitted[3] = splittedParking3;
             }
 
@@ -575,29 +568,29 @@ public class DetailParkingActivity extends AppCompatActivity {
                 //do nothing.
             } else if (clickedParkingStartTime.equals(reserveStartTime) && !clickedParkingEndTime.equals(reserveEndTime)) {
                 reserveParking.setEndTime(reserveEndTime);
-                ParkingSpace splittedParking3 = reserveParking.clone();
+                Listing splittedParking3 = reserveParking.clone();
                 splittedParking3.setStartTime(reserveEndTime);
                 splittedParking3.setEndTime(clickedParkingEndTime);
-                splitted = new ParkingSpace[4];
+                splitted = new Listing[4];
                 splitted[3] = splittedParking3;
             } else if (!clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)){
                 reserveParking.setStartTime(reserveStartTime);
-                ParkingSpace splittedParking3 = reserveParking.clone();
+                Listing splittedParking3 = reserveParking.clone();
                 splittedParking3.setStartTime(clickedParkingStartTime);
                 splittedParking3.setEndTime(reserveStartTime);
-                splitted = new ParkingSpace[4];
+                splitted = new Listing[4];
                 splitted[3] = splittedParking3;
             } else {
                 reserveParking.setStartTime(reserveStartTime);
                 reserveParking.setEndTime(reserveEndTime);
 
-                ParkingSpace splittedParking3 = reserveParking.clone();
-                ParkingSpace splittedParking4 = reserveParking.clone();
+                Listing splittedParking3 = reserveParking.clone();
+                Listing splittedParking4 = reserveParking.clone();
                 splittedParking3.setStartTime(clickedParkingStartTime);
                 splittedParking3.setEndTime(reserveStartTime);
                 splittedParking4.setStartTime(reserveEndTime);
                 splittedParking4.setEndTime(clickedParkingEndTime);
-                splitted = new ParkingSpace[5];
+                splitted = new Listing[5];
                 splitted[3] = splittedParking3;
                 splitted[4] = splittedParking4;
             }
@@ -613,7 +606,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         return splitted;
     }
 
-    public void deleteParkingReference(ParkingSpace clickedParking) {
+    public void deleteParkingReference(Listing clickedParking) {
         final String parkingIDRef = clickedParking.getParkingIDRef();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
@@ -673,10 +666,10 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     }
 
-    public void addSplittedParkingsToDatabase(ParkingSpace[] spaces) {
+    public void addSplittedParkingsToDatabase(Listing[] spaces) {
         int i = 1;
         int outOfBounds = spaces.length;
-        ParkingSpace p = spaces[i];
+        Listing p = spaces[i];
         while(p != null && (i < outOfBounds)) {
             p = spaces[i];
             if (p != null) {

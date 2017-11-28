@@ -16,9 +16,9 @@ public class User implements Parcelable{
     private String phoneNumber;
     private String emailAddress;
     private String profileURL;
-    private ArrayList<ParkingSpace> myCurrentReservedParkings;
-    private ArrayList<ParkingSpace> myListingHistory;
-    private ArrayList<ParkingSpace> myReservationList;
+    private ArrayList<Listing> myCurrentReservedParkings;
+    private ArrayList<Listing> myListingHistory;
+    private ArrayList<Listing> myReservationList;
     private ArrayList<String> myFeedbacks;        // feedback reviews received from others who rented my parking space
     private ArrayList<String> myReviews;          // reviews left on other listing owners
 
@@ -123,49 +123,49 @@ public class User implements Parcelable{
         this.profileURL = profileURL;
     }
 
-    public void addReservedParking(ParkingSpace p) {
+    public void addReservedParking(Listing p) {
         if(myCurrentReservedParkings == null) {
-            myCurrentReservedParkings = new ArrayList<ParkingSpace>();
+            myCurrentReservedParkings = new ArrayList<Listing>();
         }
         myCurrentReservedParkings.add(p);
     }
 
-    public ArrayList<ParkingSpace> getMyCurrentReservedParkings() {
+    public ArrayList<Listing> getMyCurrentReservedParkings() {
         return myCurrentReservedParkings;
     }
 
-    public void addToListingHistory(ArrayList<ParkingSpace> newList) {
+    public void addToListingHistory(ArrayList<Listing> newList) {
         if(myListingHistory == null) {
             this.myListingHistory = newList;
         } else {
-            ArrayList<ParkingSpace> newListHistory = newList;
-            for (ParkingSpace ps : myListingHistory) {
+            ArrayList<Listing> newListHistory = newList;
+            for (Listing ps : myListingHistory) {
                 newList.add(ps);
             }
             this.myListingHistory = newListHistory;
         }
     }
 
-    public ArrayList<ParkingSpace> getMyListingHistory() {return this.myListingHistory;}
+    public ArrayList<Listing> getMyListingHistory() {return this.myListingHistory;}
 
-    public void setMyListingHistory(ArrayList<ParkingSpace> myListingHistory) {
+    public void setMyListingHistory(ArrayList<Listing> myListingHistory) {
         this.myListingHistory = myListingHistory;
     }
 
-    public void setMyCurrentReservedParkings(ArrayList<ParkingSpace> myCurrentReservedParkings){
+    public void setMyCurrentReservedParkings(ArrayList<Listing> myCurrentReservedParkings){
         this.myCurrentReservedParkings = myCurrentReservedParkings;
     }
 
-    public ArrayList<ParkingSpace> getMyReservationList(){
+    public ArrayList<Listing> getMyReservationList(){
         return this.myReservationList;
     }
 
-    public void setMyReservationList(ArrayList<ParkingSpace> myReservationList){
+    public void setMyReservationList(ArrayList<Listing> myReservationList){
         this.myReservationList = myReservationList;
     }
-    public void addToMyReservetionList(ParkingSpace p) {
+    public void addToMyReservetionList(Listing p) {
         if(myReservationList == null) {
-            myReservationList = new ArrayList<ParkingSpace>();
+            myReservationList = new ArrayList<Listing>();
         }
         myReservationList.add(p);
     }

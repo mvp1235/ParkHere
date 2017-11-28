@@ -4,13 +4,11 @@ import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.security.acl.Owner;
-
 /**
  * Created by MVP on 10/31/17.
  */
 
-public class ParkingSpace implements Parcelable{
+public class Listing implements Parcelable{
 
     private Address address;
     private User owner;
@@ -26,10 +24,10 @@ public class ParkingSpace implements Parcelable{
     private User reservedBy;
 
 
-    public ParkingSpace(){}
+    public Listing(){}
 
-    public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction,
-                        String startDate, String endDate, String startTime, String endTime, double price, String parkingIDRef) {
+    public Listing(Address address, User owner, String parkingImageUrl, String specialInstruction,
+                   String startDate, String endDate, String startTime, String endTime, double price, String parkingIDRef) {
         this.address = address;
         this.owner = owner;
         this.parkingImageUrl = parkingImageUrl;
@@ -42,7 +40,7 @@ public class ParkingSpace implements Parcelable{
         this.parkingIDRef = parkingIDRef;
     }
 
-    public ParkingSpace(Bundle b) {
+    public Listing(Bundle b) {
         this.address = b.getParcelable(SearchResultActivity.ADDRESS);
         this.owner = b.getParcelable(SearchResultActivity.OWNER);
         this.parkingImageUrl = b.getString(SearchResultActivity.PARKING_IMAGE_URL, "");
@@ -57,7 +55,7 @@ public class ParkingSpace implements Parcelable{
         this.reservedBy = b.getParcelable(SearchResultActivity.RESERVE_BY);
     }
 
-    protected ParkingSpace(Parcel in) {
+    protected Listing(Parcel in) {
         address = in.readParcelable(Address.class.getClassLoader());
         owner = in.readParcelable(User.class.getClassLoader());
         parkingImageUrl = in.readString();
@@ -68,15 +66,15 @@ public class ParkingSpace implements Parcelable{
         parkingIDRef = in.readString();
     }
 
-    public static final Creator<ParkingSpace> CREATOR = new Creator<ParkingSpace>() {
+    public static final Creator<Listing> CREATOR = new Creator<Listing>() {
         @Override
-        public ParkingSpace createFromParcel(Parcel in) {
-            return new ParkingSpace(in);
+        public Listing createFromParcel(Parcel in) {
+            return new Listing(in);
         }
 
         @Override
-        public ParkingSpace[] newArray(int size) {
-            return new ParkingSpace[size];
+        public Listing[] newArray(int size) {
+            return new Listing[size];
         }
     };
 
@@ -179,8 +177,8 @@ public class ParkingSpace implements Parcelable{
         dest.writeString(parkingIDRef);
     }
 
-    public ParkingSpace clone() {
-        ParkingSpace p = new ParkingSpace(address, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime,
+    public Listing clone() {
+        Listing p = new Listing(address, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime,
                 endTime, price, parkingIDRef);
         p.setOwnerParkingID(this.ownerParkingID);
         p.setReservedBy(this.reservedBy);

@@ -1,12 +1,10 @@
 package edu.sjsu.team408.parkhere;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +18,6 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Locale;
 
@@ -28,13 +25,13 @@ import java.util.Locale;
  * Created by MVP on 11/1/2017.
  */
 
-public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
+public class ParkingSpaceAdapter extends ArrayAdapter<Listing> {
     private Context mContext;
     private Location desiredLocation;
 
-    public ParkingSpaceAdapter(@NonNull Context context, ArrayList<ParkingSpace> parkingSpaces,
+    public ParkingSpaceAdapter(@NonNull Context context, ArrayList<Listing> listings,
                                Location desiredLocation) {
-        super(context, 0, parkingSpaces);
+        super(context, 0, listings);
         mContext = context;
         this.desiredLocation = desiredLocation;
     }
@@ -43,7 +40,7 @@ public class ParkingSpaceAdapter extends ArrayAdapter<ParkingSpace> {
     @Override
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         //Get the data item for this position
-        ParkingSpace parking = getItem(position);
+        Listing parking = getItem(position);
 
         // Check if an existing view is being reused, otherwise inflate the view
         if (convertView == null) {

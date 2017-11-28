@@ -54,7 +54,7 @@ public class SearchResultActivity extends ListActivity {
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
     private ArrayList<String> availableParkingSpacesOnDate;
     private DatabaseReference databaseReference;
-    private ArrayList<ParkingSpace> parkingSpaces;
+    private ArrayList<Listing> listings;
 
     private FusedLocationProviderClient mFusedLocationClient;
     private Location mLocation;
@@ -202,7 +202,7 @@ public class SearchResultActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ParkingSpace parking = (ParkingSpace)getListAdapter().getItem(position);
+        Listing parking = (Listing)getListAdapter().getItem(position);
         Intent intent = new Intent(this, DetailParkingActivity.class);
 
         Bundle b = new Bundle();
@@ -235,7 +235,7 @@ public class SearchResultActivity extends ListActivity {
     }
 
     private void searchResult (String searchTimeTerm) {
-        parkingSpaces = new ArrayList<>();  // get the parking spaces.
+        listings = new ArrayList<>();  // get the parking spaces.
         if(availableParkingSpacesOnDate.size() > 0) {
             for(String available: availableParkingSpacesOnDate) {
                 String tokens[] = available.split("/"); //[0] contains time, [1] contains parkingID to search database
@@ -247,8 +247,8 @@ public class SearchResultActivity extends ListActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if(withinAvailableTime) {
                                 if (dataSnapshot.child("Listings").hasChild(parkingID)) {
-                                    ParkingSpace p = dataSnapshot.child("Listings").child(parkingID).getValue(ParkingSpace.class);
-                                    parkingSpaces.add(p);
+                                    Listing p = dataSnapshot.child("Listings").child(parkingID).getValue(Listing.class);
+                                    listings.add(p);
                                     showResult();
                                 }
                             }
@@ -268,7 +268,7 @@ public class SearchResultActivity extends ListActivity {
         // if a location is specified
         if (mLocation != null) {
             // Create the adapter to convert the array to views
-            ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces,
+            ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, listings,
                     mLocation);
 
             // Attach the adapter to a ListView
@@ -278,7 +278,7 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    public void showReservationList(ArrayList<ParkingSpace> list){
+    public void showReservationList(ArrayList<Listing> list){
 
         ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, list, null);
         setListAdapter(adapter);
