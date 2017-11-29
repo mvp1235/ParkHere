@@ -79,9 +79,6 @@ public class SearchResultActivity extends ListActivity {
         else
             userHasDesiredLocation = true;
 
-
-
-
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -268,7 +265,7 @@ public class SearchResultActivity extends ListActivity {
         // if a location is specified
         if (mLocation != null) {
             // Create the adapter to convert the array to views
-            ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, listings,
+            ListingAdapter adapter = new ListingAdapter(this, listings,
                     mLocation);
 
             // Attach the adapter to a ListView
@@ -278,11 +275,6 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    public void showReservationList(ArrayList<Listing> list){
-
-        ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, list, null);
-        setListAdapter(adapter);
-    }
 
     private static boolean isWithinAvailableTime(String searchTime, String availableTime) {
         String availableTimeTokens[] = availableTime.split(":");

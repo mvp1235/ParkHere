@@ -66,6 +66,12 @@
     <string name="reservations">Reservations</string>
     <string name="addParkingSpace">Add Parking Space</string>
     <string name="pickParkingSpace">Pick A Parking Space</string>
+    <string name="postListing">Post A New Listing</string>
+    <string name="viewParkingSpaces">View Parking Spaces</string>
+    <string name="myParkingSpaces">My Parking Spaces</string>
+    <string name="parkingID">Parking ID</string>
+    <string name="delete">Delete</string>
+    <string name="title_activity_detail_parking_space">DetailParkingSpaceActivity</string>
 
 
 </resources>

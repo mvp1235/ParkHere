@@ -46,7 +46,9 @@
         <activity android:name=".ReservationListActivity" />
         <activity android:name=".EditListingActivity" />
         <activity android:name=".BookingReviewActivity" />
-        <activity android:name=".NewParkingSpaceActivity"></activity>
+        <activity android:name=".NewParkingSpaceActivity" />
+        <activity android:name=".ViewParkingSpacesActivity" />
+        <activity android:name=".ManageParkingSpaceActivity"></activity>
     </application>
 
 </manifest>

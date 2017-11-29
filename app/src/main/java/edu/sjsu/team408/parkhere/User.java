@@ -210,6 +210,15 @@ public class User implements Parcelable{
             myParkingSpaces.add(pID);
     }
 
+    public void deleteFromParkingSpaces(String pID) {
+        if (myParkingSpaces == null)
+            myParkingSpaces = new ArrayList<>();
+        //only add parkingSpace id if it doesn't exist
+        if (myParkingSpaces.contains(pID)) {
+            myParkingSpaces.remove(pID);
+        }
+    }
+
     public ArrayList<String> getMyFeedbacks() {
         return myFeedbacks;
     }
@@ -226,6 +235,8 @@ public class User implements Parcelable{
     }
 
     public ArrayList<String> getMyParkingSpaces() {
+        if (myParkingSpaces == null)
+            myParkingSpaces = new ArrayList<>();
         return myParkingSpaces;
     }
 

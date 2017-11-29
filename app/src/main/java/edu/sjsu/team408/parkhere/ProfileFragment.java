@@ -51,10 +51,11 @@ public class ProfileFragment extends Fragment {
     private static final int SIGN_UP_CODE = 10003;
     private static final int SIGN_IN_CODE = 10004;
     private static final int NEW_PARKING_SPACE = 10005;
+    private static final int VIEW_PARKING_SPACES = 10006;
 
     private TextView name, email, phone, address;
     private ImageView profileIV;
-    private Button signUpBtn, signInBtn, logOutBtn, newParkingSpaceBtn;
+    private Button signUpBtn, signInBtn, logOutBtn, newParkingSpaceBtn, viewParkingSpacesBtn;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
@@ -80,7 +81,7 @@ public class ProfileFragment extends Fragment {
         signInBtn = (Button) view.findViewById(R.id.profileSignInBtn);
         logOutBtn = (Button) view.findViewById(R.id.profileLogoutBtn);
         newParkingSpaceBtn = (Button) view.findViewById(R.id.newParkingSpaceBtn);
-
+        viewParkingSpacesBtn = (Button) view.findViewById(R.id.viewParkingSpacesBtn);
 
 
         databaseReference.addValueEventListener(new ValueEventListener() {
@@ -136,6 +137,14 @@ public class ProfileFragment extends Fragment {
             }
         });
 
+        viewParkingSpacesBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), ViewParkingSpacesActivity.class);
+                startActivityForResult(intent, VIEW_PARKING_SPACES);
+            }
+        });
+
         signUpBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -166,6 +175,8 @@ public class ProfileFragment extends Fragment {
             signUpBtn.setVisibility(View.GONE);
             signInBtn.setVisibility(View.GONE);
             logOutBtn.setVisibility(View.VISIBLE);
+            newParkingSpaceBtn.setVisibility(View.VISIBLE);
+            viewParkingSpacesBtn.setVisibility(View.VISIBLE);
             view.findViewById(R.id.profileLL).setVisibility(View.VISIBLE);
             view.findViewById(R.id.profileNameLL).setVisibility(View.VISIBLE);
             view.findViewById(R.id.profileEmailLL).setVisibility(View.VISIBLE);
@@ -181,10 +192,10 @@ public class ProfileFragment extends Fragment {
             logOutBtn.setVisibility(View.GONE);
             signUpBtn.setVisibility(View.VISIBLE);
             signInBtn.setVisibility(View.VISIBLE);
+            newParkingSpaceBtn.setVisibility(View.GONE);
+            viewParkingSpacesBtn.setVisibility(View.GONE);
         }
 
-
-        
         return view;
     }
 

@@ -206,7 +206,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
         final String specialInstructionString = specialInstructions.getText().toString();
 
         //Making sure all fields are filled by user
-        if (streetNumString.isEmpty() || cityString.isEmpty() || stateString.isEmpty() || zipcodeString.isEmpty()) {
+        if (streetNumString.isEmpty()) {
             Toast.makeText(getApplicationContext(), "Street Number cannot be blank...", Toast.LENGTH_SHORT).show();
         } else if (cityString.isEmpty()) {
             Toast.makeText(getApplicationContext(), "City cannot be blank...", Toast.LENGTH_SHORT).show();
