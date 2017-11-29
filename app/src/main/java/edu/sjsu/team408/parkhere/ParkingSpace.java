@@ -116,4 +116,10 @@ public class ParkingSpace implements Parcelable {
         dest.writeString(specialInstruction);
         dest.writeString(parkingID);
     }
+
+    //Use for displaying parking space names in new listing activity
+    @Override
+    public String toString() {
+        return parkingID;
+    }
 }

@@ -65,6 +65,7 @@
     <string name="submit">Submit</string>
     <string name="reservations">Reservations</string>
     <string name="addParkingSpace">Add Parking Space</string>
+    <string name="pickParkingSpace">Pick A Parking Space</string>
 
 
 </resources>

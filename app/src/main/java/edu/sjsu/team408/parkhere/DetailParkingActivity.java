@@ -137,10 +137,6 @@ public class DetailParkingActivity extends AppCompatActivity {
             }
         });
 
-
-
-
-
         Intent intent = getIntent();
 
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
