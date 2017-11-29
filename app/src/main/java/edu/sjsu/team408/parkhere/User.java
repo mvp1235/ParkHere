@@ -2,6 +2,7 @@ package edu.sjsu.team408.parkhere;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -21,6 +22,7 @@ public class User implements Parcelable{
     private ArrayList<Listing> myReservationList;
     private ArrayList<String> myFeedbacks;        // feedback reviews received from others who rented my parking space
     private ArrayList<String> myReviews;          // reviews left on other listing owners
+    private ArrayList<String> myParkingSpaces;
 
     public User(){};
 
@@ -36,6 +38,7 @@ public class User implements Parcelable{
         this.myReservationList = new ArrayList<>();
         this.myReviews = new ArrayList<>();
         this.myFeedbacks = new ArrayList<>();
+        this.myParkingSpaces = new ArrayList<>();
     }
 
 
@@ -212,4 +215,20 @@ public class User implements Parcelable{
             myFeedbacks.add(reviewID);
     }
 
+    public void addToParkingSpacesList(String pID) {
+        if (myParkingSpaces == null)
+            myParkingSpaces = new ArrayList<>();
+
+        //only add parkingSpace id if it doesn't exist
+        if (!myParkingSpaces.contains(pID))
+            myParkingSpaces.add(pID);
+    }
+
+    public ArrayList<String> getMyParkingSpaces() {
+        return myParkingSpaces;
+    }
+
+    public void setMyParkingSpaces(ArrayList<String> myParkingSpaces) {
+        this.myParkingSpaces = myParkingSpaces;
+    }
 }

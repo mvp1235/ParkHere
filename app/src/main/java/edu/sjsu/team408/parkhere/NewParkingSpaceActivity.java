@@ -316,8 +316,30 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
 
     }
 
-    private void addParkingToDatabase(ParkingSpace p) {
-        databaseReference.child("ParkingSpaces").child(p.getParkingID()).setValue(p); //add listing to database
+    private void addParkingToDatabase(final ParkingSpace p) {
+        databaseReference.child("ParkingSpaces").child(p.getParkingID()).setValue(p); //add listing to ParkingSpaces database
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            User currentUser = null;
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                            currentUser.addToParkingSpacesList(p.getParkingID());
+                            databaseReference.child("Users").child(currentUser.getId()).setValue(currentUser);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
     }
 
 

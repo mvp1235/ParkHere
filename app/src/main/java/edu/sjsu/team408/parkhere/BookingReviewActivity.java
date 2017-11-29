@@ -137,7 +137,6 @@ public class BookingReviewActivity extends AppCompatActivity {
                             currentUser = dataSnapshot.child("Users").child(reviewerID).getValue(User.class);
                             currentUser.addToReviewList(reviewID);
                             databaseReference.child("Users").child(reviewerID).setValue(currentUser);
-                            Log.i("TEST", currentUser.getId());
                         }
                     }
 
@@ -148,7 +147,6 @@ public class BookingReviewActivity extends AppCompatActivity {
                             currentUser = dataSnapshot.child("Users").child(revieweeID).getValue(User.class);
                             currentUser.addToFeedbackList(reviewID);
                             databaseReference.child("Users").child(revieweeID).setValue(currentUser);
-
                         }
                     }
                 }
