@@ -38,6 +38,7 @@ public class SearchResultActivity extends ListActivity {
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
     static final String PARKING_BUNDLE = "parkingBundle";
+    static final String PARKING_SPACE = "parkingSpace";
     static final String ADDRESS = "address";
     static final String OWNER = "owner";
     static final String PARKING_IMAGE_URL = "parkingImageUrl";

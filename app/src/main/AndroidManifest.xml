@@ -45,7 +45,8 @@
         <activity android:name=".ListingHistoryActivity" />
         <activity android:name=".ReservationListActivity" />
         <activity android:name=".EditListingActivity" />
-        <activity android:name=".BookingReviewActivity"></activity>
+        <activity android:name=".BookingReviewActivity" />
+        <activity android:name=".NewParkingSpaceActivity"></activity>
     </application>
 
 </manifest>
