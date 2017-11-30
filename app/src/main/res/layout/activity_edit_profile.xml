@@ -46,6 +46,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:background="@android:color/holo_orange_light"
+                android:textColor="@color/common_google_signin_btn_text_dark_default"
                 android:text="@string/editProfile" />
 
 

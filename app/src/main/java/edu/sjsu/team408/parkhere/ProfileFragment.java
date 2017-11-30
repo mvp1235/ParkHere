@@ -55,7 +55,7 @@ public class ProfileFragment extends Fragment {
 
     private TextView name, email, phone, address;
     private ImageView profileIV;
-    private Button signUpBtn, signInBtn, logOutBtn, newParkingSpaceBtn, viewParkingSpacesBtn;
+    private Button signUpBtn, signInBtn, logOutBtn, newParkingSpaceBtn, viewParkingSpacesBtn, editBtn, listBtn;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
@@ -112,7 +112,7 @@ public class ProfileFragment extends Fragment {
 
 
         //Setting up editing profile button
-        Button editBtn = (Button) view.findViewById(R.id.editProfileBtn);
+        editBtn = (Button) view.findViewById(R.id.editProfileBtn);
         editBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -121,7 +121,7 @@ public class ProfileFragment extends Fragment {
         });
 
         //Setting up listing button
-        Button listBtn = (Button) view.findViewById(R.id.newListingBtn);
+        listBtn = (Button) view.findViewById(R.id.newListingBtn);
         listBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -172,6 +172,7 @@ public class ProfileFragment extends Fragment {
         //Hiding/Showing elements based on whether user is logged in or not
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser != null) {
+            listBtn.setVisibility(View.VISIBLE);
             signUpBtn.setVisibility(View.GONE);
             signInBtn.setVisibility(View.GONE);
             logOutBtn.setVisibility(View.VISIBLE);
@@ -194,6 +195,7 @@ public class ProfileFragment extends Fragment {
             signInBtn.setVisibility(View.VISIBLE);
             newParkingSpaceBtn.setVisibility(View.GONE);
             viewParkingSpacesBtn.setVisibility(View.GONE);
+            listBtn.setVisibility(View.GONE);
         }
 
         return view;
