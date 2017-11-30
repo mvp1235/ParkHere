@@ -10,6 +10,7 @@ import android.os.Parcelable;
 
 public class Listing implements Parcelable{
 
+    private String id;
     private Address address;
     private User owner;
     private String parkingImageUrl;
@@ -26,8 +27,9 @@ public class Listing implements Parcelable{
 
     public Listing(){}
 
-    public Listing(Address address, User owner, String parkingImageUrl, String specialInstruction,
+    public Listing(String id, Address address, User owner, String parkingImageUrl, String specialInstruction,
                    String startDate, String endDate, String startTime, String endTime, double price, String parkingIDRef) {
+        this.id = id;
         this.address = address;
         this.owner = owner;
         this.parkingImageUrl = parkingImageUrl;
@@ -41,6 +43,7 @@ public class Listing implements Parcelable{
     }
 
     public Listing(Bundle b) {
+        this.id = b.getString(SearchResultActivity.LISTING_ID, "");
         this.address = b.getParcelable(SearchResultActivity.ADDRESS);
         this.owner = b.getParcelable(SearchResultActivity.OWNER);
         this.parkingImageUrl = b.getString(SearchResultActivity.PARKING_IMAGE_URL, "");
@@ -56,6 +59,7 @@ public class Listing implements Parcelable{
     }
 
     protected Listing(Parcel in) {
+        id = in.readString();
         address = in.readParcelable(Address.class.getClassLoader());
         owner = in.readParcelable(User.class.getClassLoader());
         parkingImageUrl = in.readString();
@@ -77,6 +81,14 @@ public class Listing implements Parcelable{
             return new Listing[size];
         }
     };
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     public String getParkingIDRef() {
         return parkingIDRef;
@@ -167,6 +179,7 @@ public class Listing implements Parcelable{
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(id);
         dest.writeParcelable(address, flags);
         dest.writeParcelable(owner, flags);
         dest.writeString(parkingImageUrl);
@@ -178,7 +191,7 @@ public class Listing implements Parcelable{
     }
 
     public Listing clone() {
-        Listing p = new Listing(address, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime,
+        Listing p = new Listing(id, address, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime,
                 endTime, price, parkingIDRef);
         p.setOwnerParkingID(this.ownerParkingID);
         p.setReservedBy(this.reservedBy);

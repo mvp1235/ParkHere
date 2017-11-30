@@ -37,6 +37,7 @@ public class SearchResultActivity extends ListActivity {
     private static final String TAG = SearchResultActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
+    static final String LISTING_ID = "listingID";
     static final String PARKING_BUNDLE = "parkingBundle";
     static final String ADDRESS = "address";
     static final String OWNER = "owner";
@@ -215,6 +216,7 @@ public class SearchResultActivity extends ListActivity {
         b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
         b.putString(OWNER_PARKING_ID, parking.getOwnerParkingID());
         b.putParcelable(RESERVE_BY, parking.getReservedBy());
+        b.putString(LISTING_ID, parking.getId());
 
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);

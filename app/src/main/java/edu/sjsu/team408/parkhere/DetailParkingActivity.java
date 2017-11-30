@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -295,6 +296,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         intent.putExtra("specialInstructions", specialInstructionTV.getText().toString());
         intent.putExtra("parkingID", clickedParking.getParkingIDRef());
 
+        Intent i = getIntent();
+        intent.putExtra("listingID", i.getStringExtra(SearchResultActivity.LISTING_ID));
         startActivityForResult(intent, LISTING_EDIT_CODE);
     }
 
@@ -607,12 +610,13 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
     public void deleteParkingReference(Listing clickedParking) {
-        final String parkingIDRef = clickedParking.getParkingIDRef();
+        final String listingID = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
 
         final GregorianCalendar startDateRef = getGregorianCalendarDate(startDate);
         final GregorianCalendar endDateRef = getGregorianCalendarDate(endDate);
+
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -621,8 +625,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
                         }
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
@@ -630,8 +634,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
                         }
                     }
                 }

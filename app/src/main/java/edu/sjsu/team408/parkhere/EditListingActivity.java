@@ -80,6 +80,7 @@ public class EditListingActivity extends AppCompatActivity {
     private ProgressDialog progressDialog;
 
     private String currentParkingID;
+    private static String currentListingID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +133,7 @@ public class EditListingActivity extends AppCompatActivity {
         String priceStr = intent.getStringExtra("price");
         String specialInstructionsStr = intent.getStringExtra("specialInstructions");
         currentParkingID = intent.getStringExtra("parkingID");
+        currentListingID = intent.getStringExtra("listingID");
 
         //Prefilling datas
         owner.setText(ownerStr);
@@ -644,7 +646,7 @@ public class EditListingActivity extends AppCompatActivity {
 
 
         //return result;
-        return new Listing(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
+        return new Listing(currentListingID, addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
     private void editUserListing(Listing ps) {
