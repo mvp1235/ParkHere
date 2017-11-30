@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;

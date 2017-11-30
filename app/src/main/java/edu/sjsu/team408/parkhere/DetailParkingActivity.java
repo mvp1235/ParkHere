@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -48,6 +49,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
     private Button reserveBtn, editBtn, reserveListBtn, reviewBtn;
+    private RatingBar ratingBar;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
@@ -74,7 +76,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         priceLabel = (TextView) findViewById(R.id.detailPriceLabel);
         distanceLabel = (TextView) findViewById(R.id.detailDistanceLabel);
         specialInstructionLabel = (TextView) findViewById(R.id.detailSpecialInstructionLabel);
-
+        ratingBar = (RatingBar) findViewById(R.id.detailParkingRatingBar);
 
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
         ownerTV = (TextView) findViewById(R.id.detailParkingOwner);
@@ -254,6 +256,29 @@ public class DetailParkingActivity extends AppCompatActivity {
         } else {
             ll.setVisibility(View.VISIBLE);
         }
+
+        //Setting up rating bar
+        ratingBar.setIsIndicator(true); //disable editing
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = clickedParking.getParkingIDRef();
+                    if (dataSnapshot.child("ParkingSpaces").hasChild(targetID)) {
+                        ParkingSpace p = dataSnapshot.child("ParkingSpaces").child(targetID).getValue(ParkingSpace.class);
+                        double avgRating = p.getAverageRating();
+                        ratingBar.setRating((float)avgRating);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+        
+
     }
 
     private void writeOwnerReview() {
@@ -295,7 +320,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         intent.putExtra("price", priceTV.getText().toString().substring(1)); //get rid of substring before sending over intent to edit listing activity
         intent.putExtra("specialInstructions", specialInstructionTV.getText().toString());
         intent.putExtra("parkingID", clickedParking.getParkingIDRef());
-
         Intent i = getIntent();
         intent.putExtra("listingID", i.getStringExtra(SearchResultActivity.LISTING_ID));
         startActivityForResult(intent, LISTING_EDIT_CODE);
