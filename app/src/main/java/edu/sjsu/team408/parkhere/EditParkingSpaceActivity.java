@@ -108,7 +108,7 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
                 showPhotoActionDialog();
             }
         });
-        storageReference = FirebaseStorage.getInstance().getReference();
+
         storageReference.child("parkingPhotos/" + currentParkingID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {

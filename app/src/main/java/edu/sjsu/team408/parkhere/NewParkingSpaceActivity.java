@@ -83,8 +83,6 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
         //Get the parking id and use it throughout the activity
         currentParkingIDRef = databaseReference.child("AvailableParkings").push().getKey();
 
-        Intent intent = getIntent();
-
         //Referencing to the UI elements
         addressStreetNumber = (EditText) findViewById(R.id.parkingSpaceAddressStreetNumber);
         addressCity = (EditText) findViewById(R.id.parkingSpaceAddressCity);

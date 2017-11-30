@@ -1,12 +1,14 @@
 package edu.sjsu.team408.parkhere;
 
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.provider.MediaStore;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Base64;
@@ -26,12 +28,19 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
@@ -47,19 +56,30 @@ public class EditProfileActivity extends AppCompatActivity {
 
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
+    private StorageReference storageReference;
     private User currentUser;
     private EditText nameET, emailET, phoneET, streetNumET, cityET, stateET, zipCodeET;
     private ImageView profileIV;
     private Button saveButton, editProfilePictureBtn;
+
+
     private AlertDialog photoActionDialog;
-    private Bitmap profileBitmap = null;
+    private ProgressDialog progressDialog;
+
+    private String currentUserId;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
+        progressDialog = new ProgressDialog(this);
+
+        currentUserId = firebaseAuth.getCurrentUser().getUid();
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");
@@ -112,30 +132,21 @@ public class EditProfileActivity extends AppCompatActivity {
             zipCodeET.setText(zipcode);
         }
 
-
-        //load profile URL into profile ImageView
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        //Load image to profile ImageView
+        storageReference.child("userProfilePhotos/" + currentUserId).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if(firebaseAuth.getCurrentUser() != null) {
-                    String targetID = firebaseAuth.getCurrentUser().getUid();
-                    if(!targetID.isEmpty()) {
-                        if (dataSnapshot.child("Users").hasChild(targetID)) {
-                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                            if (currentUser != null)    //If the user has set an image
-                                loadUserProfilePhoto(currentUser.getProfileURL());
-                            else    // if the user never set an image, use default one
-                                profileIV.setImageResource(R.mipmap.default_profile_photo);
-                        }
-                    }
-                }
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                Picasso.with(getApplicationContext()).load(uri.toString()).into(profileIV);
             }
-
+        }).addOnFailureListener(new OnFailureListener() {
             @Override
-            public void onCancelled(DatabaseError databaseError) {
-
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(profileIV);
             }
         });
+
 
 
     }
@@ -176,59 +187,46 @@ public class EditProfileActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            progressDialog.setMessage("Uploading the photo...");
+            progressDialog.show();
+
             Bundle extras = data.getExtras();
-            profileBitmap = (Bitmap) extras.get("data");
-            profileIV.setImageBitmap(profileBitmap);
+            Bitmap parkingBitmap = (Bitmap) extras.get("data");
+
+            ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+            parkingBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+            String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), parkingBitmap, "Title", null);
+            Uri imageUri = Uri.parse(path);
+
+            StorageReference filepath = storageReference.child("userProfilePhotos").child(currentUserId);
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+
+                    Toast.makeText(getApplicationContext(), "Photo uploaded.", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
+                }
+            });
+
+            profileIV.setImageBitmap(parkingBitmap);
             photoActionDialog.dismiss();
 
         } else if (requestCode == REQUEST_GALLERY_PHOTO && resultCode == RESULT_OK) {
+            progressDialog.setMessage("Uploading the photo...");
+            progressDialog.show();
+
             Uri imageUri = data.getData();
-            try {
-                profileBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), imageUri);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            if (profileBitmap != null) {
-                profileIV.setImageBitmap(profileBitmap);
-                photoActionDialog.dismiss();
-            }
-        }
-    }
-
-    private String encodeBitmap(Bitmap bitmap) {
-        if (bitmap == null)
-            return null;
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
-        String imageEncoded = Base64.encodeToString(baos.toByteArray(), Base64.DEFAULT);
-
-        return imageEncoded;
-    }
-
-    private void loadUserProfilePhoto(String encodedPhoto) {
-
-        if (encodedPhoto != null) {
-            if (!encodedPhoto.contains("http")) {
-                try {
-                    profileBitmap = decodeFromFirebaseBase64(encodedPhoto);
-                    profileIV.setImageBitmap(profileBitmap);
-                } catch (IOException e) {
-                    e.printStackTrace();
+            StorageReference filepath = storageReference.child("userProfilePhotos").child(currentUserId);
+            filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
+                    Toast.makeText(getApplicationContext(), "Photo uploaded.", Toast.LENGTH_SHORT).show();
+                    progressDialog.dismiss();
                 }
-            } else {
-                // This block of code should already exist, we're just moving it to the 'else' statement:
-                profileIV.setImageResource(R.mipmap.default_profile_photo);
-            }
-        } else {
-            profileIV.setImageResource(R.mipmap.default_profile_photo);
+            });
+            profileIV.setImageURI(imageUri);
+            photoActionDialog.dismiss();
         }
-
-    }
-
-    public static Bitmap decodeFromFirebaseBase64(String image) throws IOException {
-        byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
     }
 
     public void updateProfile() {
@@ -245,16 +243,11 @@ public class EditProfileActivity extends AppCompatActivity {
                             String email = emailET.getText().toString();
                             String phone = phoneET.getText().toString();
                             final String address = streetNumET.getText().toString() + ", " + cityET.getText().toString() + ", " + stateET.getText().toString() + " " + zipCodeET.getText().toString();
-                            final String parkingPhotoEncoded = encodeBitmap(profileBitmap);
 
                             currentUser.setName(fullName);
                             currentUser.setEmailAddress(email);
                             currentUser.setPhoneNumber(phone);
 
-                            if (parkingPhotoEncoded != null)
-                                currentUser.setProfileURL(parkingPhotoEncoded);
-                            else
-                                currentUser.setProfileURL("http://www.havoca.org/wp-content/uploads/2016/03/icon-user-default-300x300.png");   // default parking photo if user didn't set a photo for parking
                             editProfileDatabase(address, targetID);
 
                         }
