@@ -96,6 +96,10 @@ public class BookingReviewActivity extends AppCompatActivity {
                         databaseReference.child("Reviews").child(r.getId()).setValue(review);
                         reviewAdded = true;
                         addReviewIdToUser(review);
+
+                        //add review ID to the particular parking space
+                        //include the old rating to properly update average rating
+                        addReviewIdToParkingSpace(review, r.getStars());
                         break;  //stop traversing once an existing review has been found
                     }
                 }
@@ -104,6 +108,7 @@ public class BookingReviewActivity extends AppCompatActivity {
                     Review review = new Review(currentReviewId, star, reviewerID, revieweeID, description, parkingID);
                     databaseReference.child("Reviews").child(currentReviewId).setValue(review);
                     addReviewIdToUser(review);
+                    addReviewIdToParkingSpace(review, 0);
                 }
                 databaseReference.child("Reviews").removeEventListener(this);
             }
@@ -122,9 +127,6 @@ public class BookingReviewActivity extends AppCompatActivity {
         final String reviewerID = r.getReviewerID();
         final String revieweeID = r.getRevieweeID();
         final String reviewID = r.getId();
-
-        final ArrayList<String> newList = new ArrayList<>();
-        newList.add(r.getId());
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -149,6 +151,36 @@ public class BookingReviewActivity extends AppCompatActivity {
                             databaseReference.child("Users").child(revieweeID).setValue(currentUser);
                         }
                     }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
+    }
+
+    private void addReviewIdToParkingSpace(final Review r, final double oldRating) {
+        final String parkingID = r.getParkingID();
+        final String reviewID = r.getId();
+        final double star = r.getStars();
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    //Add review ref ID to reviewer
+                    if(!parkingID.isEmpty() && !reviewID.isEmpty()) {
+                        if (dataSnapshot.child("ParkingSpaces").hasChild(parkingID)) {
+                            ParkingSpace parking = null;
+                            parking = dataSnapshot.child("ParkingSpaces").child(parkingID).getValue(ParkingSpace.class);
+                            if (parking != null) {
+                                parking.addToReviewList(reviewID, star, oldRating);
+                            }
+                            databaseReference.child("ParkingSpaces").child(parkingID).setValue(parking);
+                        }
+                    }
+
                 }
             }
 
