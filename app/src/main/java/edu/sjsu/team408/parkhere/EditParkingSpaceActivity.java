@@ -1,10 +1,7 @@
 package edu.sjsu.team408.parkhere;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -15,12 +12,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -31,6 +25,8 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -41,23 +37,21 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
-public class NewParkingSpaceActivity extends AppCompatActivity {
+public class EditParkingSpaceActivity extends AppCompatActivity {
 
     private final static int REQUEST_GALLERY_PHOTO = 9000;
     private final static int REQUEST_IMAGE_CAPTURE = 9001;
 
-    private EditText addressStreetNumber, addressCity, addressState, addressZipCode, specialInstructions;
-    private Button saveParkingSpaceBtn, editParkingSpacePhotoBtn;
+    private Button saveParkingSpaceBtn, parkingSpaceEditPhotoBtn;
     private ImageView parkingSpacePhoto;
+    private EditText streetNumberET, cityET, stateET, zipCodeET, instructionET;
 
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
@@ -66,13 +60,12 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
     private AlertDialog photoActionDialog;
     private ProgressDialog progressDialog;
 
-    private String currentParkingIDRef;
-
+    private String currentParkingID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_parking_space);
+        setContentView(R.layout.activity_edit_parking_space);
 
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
         firebaseAuth = FirebaseAuth.getInstance();
@@ -80,38 +73,55 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
         storageReference = FirebaseStorage.getInstance().getReference();
         progressDialog = new ProgressDialog(this);
 
-        //Get the parking id and use it throughout the activity
-        currentParkingIDRef = databaseReference.child("AvailableParkings").push().getKey();
-
         Intent intent = getIntent();
+        String streetNumStr = intent.getStringExtra("streetAddress");
+        String cityStr = intent.getStringExtra("city");
+        String stateStr = intent.getStringExtra("state");
+        String zipCodeStr = intent.getStringExtra("zipCode");
+        String specialInstructionsStr = intent.getStringExtra("specialInstructions");
+        currentParkingID = intent.getStringExtra("parkingID");
 
-        //Referencing to the UI elements
-        addressStreetNumber = (EditText) findViewById(R.id.parkingSpaceAddressStreetNumber);
-        addressCity = (EditText) findViewById(R.id.parkingSpaceAddressCity);
-        addressState = (EditText) findViewById(R.id.parkingSpaceAddressState);
-        addressZipCode = (EditText) findViewById(R.id.parkingSpaceAddressZipCode);
-        specialInstructions = (EditText) findViewById(R.id.parkingSpaceSpecialInstructions);
-        parkingSpacePhoto = (ImageView) findViewById(R.id.parkingSpacePhoto);
+        saveParkingSpaceBtn = findViewById(R.id.saveParkingSpaceBtn);
+        parkingSpaceEditPhotoBtn = findViewById(R.id.parkingSpaceEditPhotoBtn);
+        parkingSpacePhoto = findViewById(R.id.parkingSpacePhoto);
+        streetNumberET = findViewById(R.id.parkingSpaceAddressStreetNumber);
+        cityET = findViewById(R.id.parkingSpaceAddressCity);
+        stateET = findViewById(R.id.parkingSpaceAddressState);
+        zipCodeET = findViewById(R.id.parkingSpaceAddressZipCode);
+        instructionET = findViewById(R.id.parkingSpaceSpecialInstructions);
 
-        //For making new listing quicker
-        //populateDefaultValuesForTesting();
+        streetNumberET.setText(streetNumStr);
+        cityET.setText(cityStr);
+        stateET.setText(stateStr);
+        zipCodeET.setText(zipCodeStr);
+        instructionET.setText(specialInstructionsStr);
 
-        saveParkingSpaceBtn = (Button) findViewById(R.id.saveParkingSpaceBtn);
         saveParkingSpaceBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
-                saveNewParkingSpace();
+            public void onClick(View v) {
+                editParkingSpace();
             }
         });
-
-        editParkingSpacePhotoBtn = (Button) findViewById(R.id.parkingSpaceEditPhotoBtn);
-        editParkingSpacePhotoBtn.setOnClickListener(new View.OnClickListener() {
+        parkingSpaceEditPhotoBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 showPhotoActionDialog();
             }
         });
-
+        storageReference = FirebaseStorage.getInstance().getReference();
+        storageReference.child("parkingPhotos/" + currentParkingID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+            @Override
+            public void onSuccess(Uri uri) {
+                // Got the download URL for 'users/me/profile.png'
+                Picasso.with(getApplicationContext()).load(uri.toString()).into(parkingSpacePhoto);
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception exception) {
+                // Handle any errors
+                Picasso.with(getApplicationContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(parkingSpacePhoto);
+            }
+        });
     }
 
     @Override
@@ -128,7 +138,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), parkingBitmap, "Title", null);
             Uri imageUri = Uri.parse(path);
 
-            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingIDRef);
+            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -146,7 +156,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             progressDialog.show();
 
             Uri imageUri = data.getData();
-            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingIDRef);
+            StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
@@ -160,7 +170,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
     }
 
     private void showPhotoActionDialog() {
-        AlertDialog.Builder mBuilder = new AlertDialog.Builder(NewParkingSpaceActivity.this);
+        AlertDialog.Builder mBuilder = new AlertDialog.Builder(EditParkingSpaceActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
         LinearLayout galleryLL = mView.findViewById(R.id.galleryLL);
         LinearLayout cameraLL = mView.findViewById(R.id.cameraLL);
@@ -192,16 +202,13 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * Take all the user input to create a new listing and update to database
-     */
-    public void saveNewParkingSpace() {
+    public void editParkingSpace() {
         Intent i = new Intent();
-        final String streetNumString = addressStreetNumber.getText().toString();
-        final String cityString = addressCity.getText().toString();
-        final String stateString = addressState.getText().toString();
-        final String zipcodeString = addressZipCode.getText().toString();
-        final String specialInstructionString = specialInstructions.getText().toString();
+        final String streetNumString = streetNumberET.getText().toString();
+        final String cityString = cityET.getText().toString();
+        final String stateString = stateET.getText().toString();
+        final String zipcodeString = zipCodeET.getText().toString();
+        final String specialInstructionString = instructionET.getText().toString();
 
         //Making sure all fields are filled by user
         if (streetNumString.isEmpty()) {
@@ -218,41 +225,6 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             i.putExtra("state", stateString);
             i.putExtra("zipcode", zipcodeString);
             i.putExtra("specialInstruction", specialInstructionString);
-
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Robin's geocoding code
-            // for some reason, it doesn't work properly for all addresses when using on emulator, but is perfect on my Samsung S8
-            // I went ahead and used the Google Geocoding API instead, which works fine for all devices
-            // for better development since you guys don't own an android device, let's disable this and use my part for now.
-            // Getting latitude and longitude of an address
-
-            //From here
-//            Geocoder geocoder = new Geocoder(this,  Locale.getDefault());
-//            List<android.location.Address> addressList;
-//            LatLng point = null;
-//
-//            try {
-//                String addressString = streetNumString + ", " + cityString + ", "
-//                        + stateString;
-//                Log.i("TEST", addressString);
-//                addressList = geocoder.getFromLocationName(addressString, 1);
-//                if (addressList.size() > 0) {
-//                    android.location.Address location = addressList.get(0);
-//                    location.getLatitude();
-//                    location.getLongitude();
-//                    point = new LatLng(location.getLatitude(), location.getLongitude());
-//                    Log.i("TEST", location.toString() + " dsddsdsd");
-//                }
-//            } catch (IOException e) {
-//                Toast.makeText(getApplicationContext(), R.string.addressInvalid,
-//                        Toast.LENGTH_SHORT).show();
-//                Log.i("TEST", "ERROR MAKING LISTING");
-//            }
-//            addListingToDatabaseNew(startDateString, endDateString, startTimeString, endTimeString, point);
-            //Till here
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
             //Huy's replacement
             /////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -283,10 +255,10 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
                             p.setAddress(address);
                             p.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
                             p.setSpecialInstruction(specialInstructionString);
-                            p.setParkingID(currentParkingIDRef);
+                            p.setParkingID(currentParkingID);
                             p.setOwner(owner);
 
-                            addParkingToDatabase(p);
+                            editParkingDatabase(p);
                             //Do what you want
                         }
                     } catch (JSONException e1) {
@@ -313,8 +285,8 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
 
     }
 
-    private void addParkingToDatabase(final ParkingSpace p) {
-        databaseReference.child("ParkingSpaces").child(p.getParkingID()).setValue(p); //add listing to ParkingSpaces database
+    private void editParkingDatabase(final ParkingSpace p) {
+        databaseReference.child("ParkingSpaces").child(p.getParkingID()).setValue(p);
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -325,8 +297,12 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             User currentUser = null;
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                            currentUser.addToParkingSpacesList(p.getParkingID());
+                            if (currentUser != null) {
+                                currentUser.addToParkingSpacesList(p.getParkingID());
+                            }
                             databaseReference.child("Users").child(currentUser.getId()).setValue(currentUser);
+                            setResult(RESULT_OK);
+                            finish();
                         }
                     }
                 }
@@ -338,6 +314,5 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             }
         });
     }
-
 
 }
