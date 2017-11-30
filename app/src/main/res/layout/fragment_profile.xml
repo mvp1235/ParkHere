@@ -35,8 +35,7 @@
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="2"
-                android:contentDescription="@string/userProfilePictureDescription"
-                android:src="@mipmap/default_profile_photo" />
+                android:contentDescription="@string/userProfilePictureDescription" />
 
             <Button
                 android:id="@+id/editProfileBtn"

@@ -206,8 +206,6 @@ public class DetailParkingActivity extends AppCompatActivity {
 //            reserveBtn.setText("Book Again");
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
-            reserveBtn.setText("List Again");     //list again will take user to the new listing activity, with all data pre-filled, and allow user to pick another data and time
-                                                    //To be implemented later
             reserveToDate.setVisibility(View.GONE);
             reserveFromDate.setVisibility(View.GONE);
             reserveToTime.setVisibility(View.GONE);
@@ -239,6 +237,12 @@ public class DetailParkingActivity extends AppCompatActivity {
             ownerTV.setText(clickedParking.getReservedBy().getName());
             addressTV.setText(clickedParking.getReservedBy().getPhoneNumber());
             dateTV.setText(clickedParking.getReservedBy().getEmailAddress());
+
+            //remove listener for date views when viewing from history
+            reserveFromDate.setOnClickListener(null);
+            reserveToDate.setOnClickListener(null);
+            reserveFromTime.setOnClickListener(null);
+            reserveToTime.setOnClickListener(null);
         }
 
         //Hide distance if user is checking history

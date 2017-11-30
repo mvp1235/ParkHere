@@ -210,7 +210,6 @@ public class EditProfileActivity extends AppCompatActivity {
 
             profileIV.setImageBitmap(parkingBitmap);
             photoActionDialog.dismiss();
-
         } else if (requestCode == REQUEST_GALLERY_PHOTO && resultCode == RESULT_OK) {
             progressDialog.setMessage("Uploading the photo...");
             progressDialog.show();
