@@ -15,6 +15,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -174,8 +175,16 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    makeReservation();    //Duoc -- i will continue fixing this part tmr.
-                    notifyOwner();
+                    if(reserveFromDate.getText().length() == 0 || reserveToDate.getText().length() == 0 || reserveFromTime.getText().length() == 0 ||
+                            reserveToTime.getText().length() == 0) {
+                        Toast.makeText(getApplicationContext(), "Cannot Leave Reservation Time Blank...", Toast.LENGTH_SHORT).show();
+                    } else if (checkReservingYourOwnParking()){
+                        //remind owner they cannot reserve their own parking.
+                        Toast.makeText(getApplicationContext(), "Cannot Book Your Own Parking Space...", Toast.LENGTH_SHORT).show();
+                    } else {
+                        makeReservation();    //Duoc -- i will continue fixing this part tmr.
+                        notifyOwner();
+                    }
                     //updateDatabase();
                 }
             });
@@ -249,6 +258,12 @@ public class DetailParkingActivity extends AppCompatActivity {
         } else {
             ll.setVisibility(View.VISIBLE);
         }
+    }
+
+    public boolean checkReservingYourOwnParking() {
+        String ownerParkingID = clickedParking.getOwnerParkingID();
+        String ownerID = firebaseAuth.getCurrentUser().getUid();
+        return ownerParkingID.equals(ownerID);
     }
 
     private void writeOwnerReview() {
