@@ -46,30 +46,20 @@
                 android:layout_weight="1"
                 android:background="@android:color/holo_orange_light"
                 android:text="@string/edit"
+                android:layout_marginRight="5dp"
+                android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+            <Button
+                android:id="@+id/profileLogoutBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/holo_red_light"
+                android:text="@string/logOut"
+                android:layout_gravity="center_vertical"
+                android:layout_marginRight="5dp"
                 android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
         </LinearLayout>
-
-        <Button
-            android:id="@+id/newListingBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/postListing" />
-
-        <Button
-            android:id="@+id/newParkingSpaceBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/addParkingSpace" />
-
-        <Button
-            android:id="@+id/viewParkingSpacesBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
-            android:text="@string/viewParkingSpaces" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -84,6 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/name"
+                android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <TextView
@@ -107,6 +98,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/email"
+                android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <TextView
@@ -130,6 +122,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/phone"
+                android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <TextView
@@ -153,6 +146,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="@string/address"
+                android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <TextView
@@ -164,23 +158,42 @@
         </LinearLayout>
 
         <Button
+            android:id="@+id/newListingBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/postListing" />
+
+        <Button
+            android:id="@+id/newParkingSpaceBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/addParkingSpace" />
+
+        <Button
+            android:id="@+id/viewParkingSpacesBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:text="@string/viewParkingSpaces" />
+
+
+        <Button
             android:id="@+id/profileSignUpBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/signUp" />
+            android:background="@android:color/holo_green_light"
+            android:text="@string/signUp"
+            android:layout_marginBottom="5dp"
+            android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
         <Button
             android:id="@+id/profileSignInBtn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/signIn" />
-
-        <Button
-            android:id="@+id/profileLogoutBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@android:color/holo_red_light"
-            android:text="@string/logOut"
+            android:background="@android:color/holo_blue_bright"
+            android:text="@string/signIn"
             android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
     </LinearLayout>
