@@ -74,6 +74,7 @@
     <string name="title_activity_detail_parking_space">DetailParkingSpaceActivity</string>
     <string name="createParkingSpace">Create A New Parking Space</string>
     <string name="editParkingSpace">Edit Parking Space</string>
+    <string name="numReviewsSample">(10 reviews)</string>
 
 
 </resources>

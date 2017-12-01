@@ -45,7 +45,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private final static int RESERVATION_LIST_VIEW_CODE = 11;
     private static final int WRITE_REVIEW_CODE = 11;
 
-    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel;
+    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
     private Button reserveBtn, editBtn, reserveListBtn, reviewBtn;
@@ -77,7 +77,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         distanceLabel = (TextView) findViewById(R.id.detailDistanceLabel);
         specialInstructionLabel = (TextView) findViewById(R.id.detailSpecialInstructionLabel);
         ratingBar = (RatingBar) findViewById(R.id.detailParkingRatingBar);
-
+        reviewCount = (TextView) findViewById(R.id.detailParkingTotalReviews);
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
         ownerTV = (TextView) findViewById(R.id.detailParkingOwner);
         specialInstructionTV = (TextView) findViewById(R.id.detailParkingSpecialInstruction);
@@ -266,8 +266,14 @@ public class DetailParkingActivity extends AppCompatActivity {
                     String targetID = clickedParking.getParkingIDRef();
                     if (dataSnapshot.child("ParkingSpaces").hasChild(targetID)) {
                         ParkingSpace p = dataSnapshot.child("ParkingSpaces").child(targetID).getValue(ParkingSpace.class);
-                        double avgRating = p.getAverageRating();
+                        double avgRating = 0;
+                        int numReviews = 0;
+                        if (p != null) {
+                            avgRating = p.getAverageRating();
+                            numReviews = p.getReviews().size();
+                        }
                         ratingBar.setRating((float)avgRating);
+                        reviewCount.setText("(" + String.valueOf(numReviews) + " reviews)");
                     }
                 }
             }
@@ -277,7 +283,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
             }
         });
-        
+
 
     }
 

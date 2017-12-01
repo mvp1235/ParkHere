@@ -32,6 +32,8 @@ public class BookingReviewActivity extends AppCompatActivity {
     private TextView starCountsTV;
 
     private String currentReviewId;
+    private String currentUserId;
+    private ArrayList<String> currentUserReviews;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +42,10 @@ public class BookingReviewActivity extends AppCompatActivity {
 
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+        currentUserId = firebaseAuth.getCurrentUser().getUid();
 
         currentReviewId = databaseReference.child("Reviews").push().getKey();
+        currentUserReviews = new ArrayList<>();
 
         Intent i = getIntent();
         reviewerID = i.getStringExtra("reviewerID");
@@ -66,6 +70,51 @@ public class BookingReviewActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 saveReviewToDatabase();
+            }
+        });
+
+        //Get the list of all reviews left by current user, and store in currentUserReviews
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (firebaseAuth.getCurrentUser() != null) {
+                    if (dataSnapshot.child("Users").hasChild(currentUserId)) {
+                        User user = dataSnapshot.child("Users").child(currentUserId).getValue(User.class);
+                        currentUserReviews = user.getMyReviews();
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+        //If the user has already left a review for the same parking spot before, it will be prefilled
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (firebaseAuth.getCurrentUser() != null) {
+                    for (int i=0; i<currentUserReviews.size(); i++) {   //traverse through the reviews left by the user
+                        if (dataSnapshot.child("Reviews").hasChild(currentUserReviews.get(i))) {
+                            Review review = dataSnapshot.child("Reviews").child(currentUserReviews.get(i)).getValue(Review.class);
+                            if (review != null && review.getParkingID().equalsIgnoreCase(parkingID)) {
+                                ratingBar.setRating((float)review.getStars());
+                                descriptionET.setText(review.getDescription());
+                                starCountsTV.setText(String.valueOf(review.getStars()));
+
+                                break;
+                            }
+                        }
+                    }
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 
