@@ -51,6 +51,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private ImageView parkingPhoto;
     private Button reserveBtn, editBtn, reserveListBtn, reviewBtn;
     private RatingBar ratingBar;
+    private LinearLayout ratingLL;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
@@ -103,9 +104,14 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveFromTime = (TextView) findViewById(R.id.reserveFromTimeTV);
         reserveToTime = (TextView) findViewById(R.id.reserveToTimeTV);
 
-
-
         //**************
+        ratingLL = (LinearLayout) findViewById(R.id.detailParkingRatingLL);
+        ratingLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRatings();
+            }
+        });
 
 
 
@@ -295,6 +301,12 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
 
         
+    }
+
+    private void showRatings() {
+        Intent intent = new Intent(DetailParkingActivity.this, ViewRatingsActivity.class);
+        intent.putExtra(SearchResultActivity.PARKING_ID_REF, clickedParking.getParkingIDRef());
+        startActivity(intent);
     }
 
     public boolean checkReservingYourOwnParking() {
@@ -678,12 +690,9 @@ public class DetailParkingActivity extends AppCompatActivity {
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
                 }
                 if(startDateRef.equals(endDateRef)) {
-                    Log.i("TEST1", listingID);
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        Log.i("TEST2", listingID);
                         if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
-                            Log.i("TEST3", listingID);
                             databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
                         }
                     }
