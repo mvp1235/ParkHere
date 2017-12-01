@@ -72,7 +72,7 @@ public class NewListingActivity extends AppCompatActivity{
     private StorageReference storageReference;
     private String userID;
 
-    private String currentListingIDRef;
+    private static String currentListingIDRef;
 
 
     @Override
@@ -116,7 +116,7 @@ public class NewListingActivity extends AppCompatActivity{
                             User currentUser = null;
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
                             ArrayList<String> parkingSpaceIDs = currentUser.getMyParkingSpaces();
-                            if (parkingSpaceIDs == null) {
+                            if (parkingSpaceIDs == null || parkingSpaceIDs.size() == 0) {
                                 parkingSpaceIDs = new ArrayList<>();
                                 TextView error = findViewById(R.id.pickParkingSpacePrompt);
                                 error.setText("No existing parking spaces are found. Please navigate back to profile screen and add a new parking space.");
@@ -621,7 +621,7 @@ public class NewListingActivity extends AppCompatActivity{
 
 
         //return result;
-        return new Listing(addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
+        return new Listing(currentListingIDRef, addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
     public void populateDefaultValuesForTesting() {

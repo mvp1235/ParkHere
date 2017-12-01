@@ -3,6 +3,8 @@ package edu.sjsu.team408.parkhere;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.ArrayList;
+
 /**
  * Created by MVP on 11/28/2017.
  */
@@ -14,6 +16,10 @@ public class ParkingSpace implements Parcelable {
     private String parkingImageUrl;
     private String specialInstruction;
     private String parkingID;
+    private ArrayList<String> reviews;
+    private double totalRating;
+    private double averageRating;
+
 
 
     protected ParkingSpace(Parcel in) {
@@ -32,6 +38,54 @@ public class ParkingSpace implements Parcelable {
         this.parkingImageUrl = parkingImageUrl;
         this.specialInstruction = specialInstruction;
         this.parkingID = parkingID;
+        reviews = new ArrayList<>();
+        totalRating = 0;
+        averageRating = 0;
+    }
+
+    public void addRatingAndCalculate(double newRating) {
+        totalRating += newRating;
+        averageRating = totalRating/reviews.size();
+    }
+
+    public double getTotalRating() {
+        return totalRating;
+    }
+
+    public void setTotalRating(double totalRating) {
+        this.totalRating = totalRating;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public void addToReviewList(String reviewID, double newRating, double oldRating) {
+        if (reviews == null)
+            reviews = new ArrayList<>();
+
+        //only add review id if it doesn't exist
+        if (!reviews.contains(reviewID)) {  //adding a brand new review
+            reviews.add(reviewID);
+            totalRating += newRating;
+            averageRating = totalRating/reviews.size();
+        } else {    //updating an existing review
+            totalRating -= oldRating;    //subtract old rating first
+            totalRating += newRating;   //add new rating to total
+            averageRating = totalRating/reviews.size(); //calculate new average value
+        }
+    }
+
+    public ArrayList<String> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(ArrayList<String> reviews) {
+        this.reviews = reviews;
     }
 
     public Address getAddress() {

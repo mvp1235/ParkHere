@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_margin="20dp"
     tools:context="edu.sjsu.team408.parkhere.BookingReviewActivity">
 
 
@@ -44,6 +45,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end"
-        android:text="@string/submit" />
+        android:background="@android:color/holo_blue_bright"
+        android:text="@string/submit"
+        android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
 </LinearLayout>

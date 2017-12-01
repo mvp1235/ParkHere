@@ -8,11 +8,13 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -44,10 +46,11 @@ public class DetailParkingActivity extends AppCompatActivity {
     private final static int RESERVATION_LIST_VIEW_CODE = 11;
     private static final int WRITE_REVIEW_CODE = 11;
 
-    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel;
+    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
     private Button reserveBtn, editBtn, reserveListBtn, reviewBtn;
+    private RatingBar ratingBar;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
@@ -74,8 +77,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         priceLabel = (TextView) findViewById(R.id.detailPriceLabel);
         distanceLabel = (TextView) findViewById(R.id.detailDistanceLabel);
         specialInstructionLabel = (TextView) findViewById(R.id.detailSpecialInstructionLabel);
-
-
+        ratingBar = (RatingBar) findViewById(R.id.detailParkingRatingBar);
+        reviewCount = (TextView) findViewById(R.id.detailParkingTotalReviews);
         addressTV = (TextView) findViewById(R.id.detailParkingAddress);
         ownerTV = (TextView) findViewById(R.id.detailParkingOwner);
         specialInstructionTV = (TextView) findViewById(R.id.detailParkingSpecialInstruction);
@@ -215,8 +218,6 @@ public class DetailParkingActivity extends AppCompatActivity {
 //            reserveBtn.setText("Book Again");
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
-            reserveBtn.setText("List Again");     //list again will take user to the new listing activity, with all data pre-filled, and allow user to pick another data and time
-                                                    //To be implemented later
             reserveToDate.setVisibility(View.GONE);
             reserveFromDate.setVisibility(View.GONE);
             reserveToTime.setVisibility(View.GONE);
@@ -248,6 +249,12 @@ public class DetailParkingActivity extends AppCompatActivity {
             ownerTV.setText(clickedParking.getReservedBy().getName());
             addressTV.setText(clickedParking.getReservedBy().getPhoneNumber());
             dateTV.setText(clickedParking.getReservedBy().getEmailAddress());
+
+            //remove listener for date views when viewing from history
+            reserveFromDate.setOnClickListener(null);
+            reserveToDate.setOnClickListener(null);
+            reserveFromTime.setOnClickListener(null);
+            reserveToTime.setOnClickListener(null);
         }
 
         //Hide distance if user is checking history
@@ -258,6 +265,35 @@ public class DetailParkingActivity extends AppCompatActivity {
         } else {
             ll.setVisibility(View.VISIBLE);
         }
+
+        //Setting up rating bar
+        ratingBar.setIsIndicator(true); //disable editing
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = clickedParking.getParkingIDRef();
+                    if (dataSnapshot.child("ParkingSpaces").hasChild(targetID)) {
+                        ParkingSpace p = dataSnapshot.child("ParkingSpaces").child(targetID).getValue(ParkingSpace.class);
+                        double avgRating = 0;
+                        int numReviews = 0;
+                        if (p != null) {
+                            avgRating = p.getAverageRating();
+                            numReviews = p.getReviews().size();
+                        }
+                        ratingBar.setRating((float)avgRating);
+                        reviewCount.setText("(" + String.valueOf(numReviews) + " reviews)");
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+
     }
 
     public boolean checkReservingYourOwnParking() {
@@ -305,7 +341,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         intent.putExtra("price", priceTV.getText().toString().substring(1)); //get rid of substring before sending over intent to edit listing activity
         intent.putExtra("specialInstructions", specialInstructionTV.getText().toString());
         intent.putExtra("parkingID", clickedParking.getParkingIDRef());
-
+        Intent i = getIntent();
+        intent.putExtra("listingID", i.getStringExtra(SearchResultActivity.LISTING_ID));
         startActivityForResult(intent, LISTING_EDIT_CODE);
     }
 
@@ -618,12 +655,13 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
     public void deleteParkingReference(Listing clickedParking) {
-        final String parkingIDRef = clickedParking.getParkingIDRef();
+        final String listingID = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
 
         final GregorianCalendar startDateRef = getGregorianCalendarDate(startDate);
         final GregorianCalendar endDateRef = getGregorianCalendarDate(endDate);
+
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -632,8 +670,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
                         }
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
@@ -641,8 +679,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
                         }
                     }
                 }

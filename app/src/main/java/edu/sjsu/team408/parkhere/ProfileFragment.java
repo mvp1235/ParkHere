@@ -1,9 +1,12 @@
 package edu.sjsu.team408.parkhere;
 
 
+import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -21,6 +24,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,6 +35,8 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 import java.io.IOException;
@@ -59,6 +66,14 @@ public class ProfileFragment extends Fragment {
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
+
+    private String currentUserID;
+
+    private StorageReference storageReference;
+    private String userID;
+    private AlertDialog photoActionDialog;
+    private ProgressDialog progressDialog;
+
     public ProfileFragment() {
         // Required empty public constructor
     }
@@ -69,6 +84,9 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
+        storageReference = FirebaseStorage.getInstance().getReference();
+        progressDialog = new ProgressDialog(getContext());
+
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
 
@@ -95,10 +113,6 @@ public class ProfileFragment extends Fragment {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
                             setCurrentUserProfile(currentUser);
 
-                            if (currentUser != null && currentUser.getProfileURL() != null)
-                                loadUserProfilePhoto(currentUser.getProfileURL());
-                            else
-                                profileIV.setImageResource(R.mipmap.default_profile_photo);
                         }
                     }
                 }
@@ -169,8 +183,13 @@ public class ProfileFragment extends Fragment {
         });
 
 
-        //Hiding/Showing elements based on whether user is logged in or not
         FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser != null)
+            currentUserID = firebaseAuth.getCurrentUser().getUid();
+        else
+            currentUserID = null;
+
+        //Hiding/Showing elements based on whether user is logged in or not
         if (currentUser != null) {
             listBtn.setVisibility(View.VISIBLE);
             signUpBtn.setVisibility(View.GONE);
@@ -198,33 +217,26 @@ public class ProfileFragment extends Fragment {
             listBtn.setVisibility(View.GONE);
         }
 
+        //Load image to profile ImageView
+        if (currentUserID != null) {
+            storageReference.child("userProfilePhotos/" + currentUserID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                @Override
+                public void onSuccess(Uri uri) {
+                    // Got the download URL for 'users/me/profile.png'
+                    Picasso.with(getContext()).load(uri.toString()).into(profileIV);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Handle any errors
+                    Picasso.with(getContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(profileIV);
+                }
+            });
+        }
+
         return view;
     }
 
-
-    private void loadUserProfilePhoto(String encodedPhoto) {
-
-        if (!encodedPhoto.contains("http")) {
-            try {
-                Bitmap imageBitmap = decodeFromFirebaseBase64(encodedPhoto);
-                profileIV.setImageBitmap(imageBitmap);
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-            // This block of code should already exist, we're just moving it to the 'else' statement:
-            if (getContext() != null) {
-                Picasso.with(getContext())
-                        .load(encodedPhoto)
-                        .into(profileIV);
-            }
-        }
-    }
-
-    private static Bitmap decodeFromFirebaseBase64(String image) throws IOException {
-        byte[] decodedByteArray = android.util.Base64.decode(image, Base64.DEFAULT);
-        return BitmapFactory.decodeByteArray(decodedByteArray, 0, decodedByteArray.length);
-    }
 
     //Applying changes on the edit screen to the actual data
     //2 cases, editing profile or making new listing (different request codes)
@@ -235,9 +247,23 @@ public class ProfileFragment extends Fragment {
 
         //Handling result from profile editing activity
         if (requestCode == EDIT_PROFILE_CODE) {
-            if (resultCode == RESULT_OK) {
-
+            //load new profile picture to imageview
+            if (currentUserID != null) {
+                storageReference.child("userProfilePhotos/" + currentUserID).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                    @Override
+                    public void onSuccess(Uri uri) {
+                        // Got the download URL for 'users/me/profile.png'
+                        Picasso.with(getContext()).load(uri.toString()).into(profileIV);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Handle any errors
+                        Picasso.with(getContext()).load("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png").into(profileIV);
+                    }
+                });
             }
+
         } else if (requestCode == MAKE_NEW_LISTING_CODE) {  // handling result from making new listing activity
             if (resultCode == RESULT_OK) {
 
