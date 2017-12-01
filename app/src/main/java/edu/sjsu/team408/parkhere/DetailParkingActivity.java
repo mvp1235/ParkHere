@@ -279,7 +279,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                         int numReviews = 0;
                         if (p != null) {
                             avgRating = p.getAverageRating();
-                            numReviews = p.getReviews().size();
+                            if (p.getReviews() != null)
+                                numReviews = p.getReviews().size();
                         }
                         ratingBar.setRating((float)avgRating);
                         reviewCount.setText("(" + String.valueOf(numReviews) + " reviews)");
@@ -677,9 +678,12 @@ public class DetailParkingActivity extends AppCompatActivity {
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
                 }
                 if(startDateRef.equals(endDateRef)) {
+                    Log.i("TEST1", listingID);
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
+                        Log.i("TEST2", listingID);
                         if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
+                            Log.i("TEST3", listingID);
                             databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
                         }
                     }
@@ -758,7 +762,12 @@ public class DetailParkingActivity extends AppCompatActivity {
         int month = g.get(Calendar.MONTH) + 1;
         int day = g.get(Calendar.DAY_OF_MONTH);
         int year = g.get(Calendar.YEAR);
-        return month + "-" + day + "-" + year;
+
+        //before, whenever the day is less than 10, the AvailableParking won't be deleted due to unmatched date string
+        if (day < 10)
+            return month + "-0" + day + "-" + year;
+        else
+            return month + "-" + day + "-" + year;
     }
 
     public GregorianCalendar getGregorianCalendarDate(String date) {
