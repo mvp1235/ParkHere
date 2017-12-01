@@ -293,7 +293,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             }
         });
 
-
+        
     }
 
     public boolean checkReservingYourOwnParking() {
