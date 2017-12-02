@@ -443,9 +443,12 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Listing[] spaces = splitParkingSpace(clickedParking);  //0.
         listingToBook = spaces[0];
-        deleteParkingReference(clickedParking);     //1.
-        deleteParkingListing(parkingID);        //2.
-        addSplittedParkingsToDatabase(spaces);  //6
+        deleteParkingReference(clickedParking, spaces);     //1.
+
+        //combined 2 and 6 inside 1 to prevent concurrency problem (too many listener for data change at once) - Huy
+//        deleteParkingListing(parkingID);        //2.
+//        addSplittedParkingsToDatabase(spaces);  //6
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -457,16 +460,20 @@ public class DetailParkingActivity extends AppCompatActivity {
                             currentUser.addReservedParking(listingToBook);     //3.
                             String currentUserID = currentUser.getId();
                             databaseReference.child("Users").child(currentUserID).setValue(currentUser); //4.
+
                             setResult(RESULT_OK);
                             finish();
                         }
                     }
                 }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+
 
     }
 
@@ -681,7 +688,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         return splitted;
     }
 
-    public void deleteParkingReference(Listing clickedParking) {
+    public void deleteParkingReference(final Listing clickedParking, final Listing[] spaces) {
         final String listingID = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
@@ -711,6 +718,11 @@ public class DetailParkingActivity extends AppCompatActivity {
                         }
                     }
                 }
+
+                if(dataSnapshot.child("Listings").hasChild(clickedParking.getId())) {
+                    databaseReference.child("Listings").child(clickedParking.getId()).removeValue();
+                }
+                addSplittedParkingsToDatabase(spaces);
             }
 
             @Override
@@ -743,9 +755,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         while(p != null && (i < outOfBounds)) {
             p = spaces[i];
             if (p != null) {
-                p.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
+                p.setId(clickedParking.getId());
 
-                String p1ChildKey = p.getParkingIDRef();
+                String p1ChildKey = p.getId();
 
                 GregorianCalendar start = getGregorianCalendarDate(p.getStartDate());
                 GregorianCalendar end = getGregorianCalendarDate(p.getEndDate());
@@ -757,7 +769,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                 int endHour = endTimeSystem[0];
                 int endMinutes = endTimeSystem[1];
 
-                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getParkingIDRef();
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getId();
 
                 while (!start.equals(end)) {
                     String p1ParentKey = getDate(start);
