@@ -20,6 +20,7 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -52,11 +53,15 @@ public class SearchResultActivity extends ListActivity {
     static final String END_TIME = "endTime";
     static final String OWNER_PARKING_ID = "OwnerParkingID";
     static final String RESERVE_BY = "reservedBy";
+    static final String SEEKER = "seeker";
+    static final String SEEKER_BUNDLE = "seekerBundle";
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
     private ArrayList<String> availableParkingSpacesOnDate;
     private DatabaseReference databaseReference;
+    private FirebaseAuth firebaseAuth;
     private ArrayList<Listing> listings;
+    private User currentUser;
 
     private FusedLocationProviderClient mFusedLocationClient;
     private Location mLocation;
@@ -69,7 +74,7 @@ public class SearchResultActivity extends ListActivity {
 
         Intent intent = getIntent();
         databaseReference = FirebaseDatabase.getInstance().getReference();
-
+        firebaseAuth = FirebaseAuth.getInstance();
         availableParkingSpacesOnDate = new ArrayList<String>();
         //get user input for location
         final String dateSearchTerm = intent.getStringExtra("date");
@@ -97,6 +102,24 @@ public class SearchResultActivity extends ListActivity {
             @Override
             public void onCancelled(DatabaseError databaseError) {
                 //not supported
+            }
+        });
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
             }
         });
 
@@ -219,8 +242,13 @@ public class SearchResultActivity extends ListActivity {
         b.putParcelable(RESERVE_BY, parking.getReservedBy());
         b.putString(LISTING_ID, parking.getId());
 
+
+
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);
+        Bundle seeker = new Bundle();
+        seeker.putParcelable(SEEKER, currentUser);
+        intent.putExtra(SEEKER_BUNDLE, seeker);
         startActivityForResult(intent, VIEW_DETAIL_PARKING_FROM_RESULT);
     }
 

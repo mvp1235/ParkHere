@@ -50,6 +50,8 @@
         <activity android:name=".ViewParkingSpacesActivity" />
         <activity android:name=".ManageParkingSpaceActivity" />
         <activity android:name=".EditParkingSpaceActivity" />
+        <activity android:name=".PaymentActivity" />
+
     </application>
 
 </manifest>

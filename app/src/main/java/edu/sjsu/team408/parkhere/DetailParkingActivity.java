@@ -144,6 +144,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         Intent intent = getIntent();
 
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
+        Bundle seekerBundle = intent.getBundleExtra(SearchResultActivity.SEEKER_BUNDLE);
+        currentUser = (User) seekerBundle.get(SearchResultActivity.SEEKER);
 
         clickedParking = new Listing(bundle);
 
@@ -187,6 +189,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     } else {
                         makeReservation();    //Duoc -- i will continue fixing this part tmr.
                         notifyOwner();
+                        startPaymentActivity();
                     }
                     //updateDatabase();
                 }
@@ -294,6 +297,15 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
 
         
+    }
+
+    public void startPaymentActivity(){
+        Intent intent = new Intent();
+        String ownerName = clickedParking.getOwner().getName();
+        String ownerEmail = clickedParking.getOwner().getEmailAddress();
+
+
+
     }
 
     public boolean checkReservingYourOwnParking() {
