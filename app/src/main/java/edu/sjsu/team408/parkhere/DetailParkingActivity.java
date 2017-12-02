@@ -324,7 +324,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
     public boolean startPaymentActivity() {
-        Intent intent = new Intent(DetailParkingActivity.this, PaymentActivity.class);
+        Intent intent = new Intent(DetailParkingActivity.this, BookingPaymentActivity.class);
         String ownerName = clickedParking.getOwner().getName();
         String ownerEmail = clickedParking.getOwner().getEmailAddress();
         String seekerName = currentUser.getName();
@@ -338,7 +338,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         startActivityForResult(intent, MAKE_PAYMENT_CODE);
 
-        return true;
+        return false;
     }
 
 
