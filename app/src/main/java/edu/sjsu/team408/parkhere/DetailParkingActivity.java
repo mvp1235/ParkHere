@@ -735,12 +735,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
-
-
-    public void updateDatabase(){
-
-    }
-
     public void addSplittedParkingsToDatabase(Listing[] spaces) {
         int i = 1;
         int outOfBounds = spaces.length;
@@ -785,11 +779,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         int day = g.get(Calendar.DAY_OF_MONTH);
         int year = g.get(Calendar.YEAR);
 
-        //before, whenever the day is less than 10, the AvailableParking won't be deleted due to unmatched date string
-        if (day < 10)
-            return month + "-0" + day + "-" + year;
-        else
-            return month + "-" + day + "-" + year;
+        return month + "-" + day + "-" + year;
     }
 
     public GregorianCalendar getGregorianCalendarDate(String date) {
@@ -806,10 +796,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         int minute = Integer.parseInt(tokens[1]);
         return new GregorianCalendar(2018,0,1, hour, minute);
     }
-
-
-
-
+    
     @Override
     protected Dialog onCreateDialog(int id) {
         // TODO Auto-generated method stub
