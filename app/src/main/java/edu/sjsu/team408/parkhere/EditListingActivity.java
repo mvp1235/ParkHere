@@ -626,7 +626,6 @@ public class EditListingActivity extends AppCompatActivity {
         });
 
         editUserListing(parking);
-
     }
 
 
@@ -690,11 +689,21 @@ public class EditListingActivity extends AppCompatActivity {
                             //To edit, first delete the old listing value, then add the new one in, so there won't be duplicates
                             //Before this, the user's listing history doesn't remove the old listing, it just adds to the list
                             ArrayList<Listing> existingListings = currentUser.getMyListingHistory();
-                            for (Listing p : existingListings) {
-                                if (p.getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
-                                    existingListings.remove(p);
+
+                            for (int i=0; i<existingListings.size(); i++) {
+                                if (existingListings.get(i).getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
+                                    existingListings.remove(existingListings.get(i));
+                                    i--;
                                 }
                             }
+
+                            //This was causing concurrent modification exception
+//                            for (Listing p : existingListings) {
+//                                if (p.getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
+//                                    existingListings.remove(p);
+//                                }
+//                            }
+
                             existingListings.add(newList.get(0));
 //                            currentUser.addToListingHistory(newList);
                             currentUser.setMyListingHistory(existingListings);

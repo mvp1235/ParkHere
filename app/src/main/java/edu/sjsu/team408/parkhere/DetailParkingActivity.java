@@ -348,6 +348,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == LISTING_EDIT_CODE && resultCode == RESULT_OK) {      //take input from listing editting page and reflect changes to database here
+            setResult(RESULT_OK);
             finish();
         } else if (requestCode == WRITE_REVIEW_CODE && resultCode == RESULT_OK) {
             finish();
@@ -860,8 +861,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         if (hour > 12) {
             hour = hour % 12;
             ampm = "PM";
-        } else if (hour == 0) {
-            hour = 12;
         } else if (hour == 12) {
             ampm = "PM";
         }
@@ -880,8 +879,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         if (hour > 12) {
             hour = hour % 12;
             ampm = "PM";
-        } else if (hour == 0) {
-            hour = 12;
         } else if (hour == 12) {
             ampm = "PM";
         }
@@ -896,8 +893,8 @@ public class DetailParkingActivity extends AppCompatActivity {
     public void setReserveFromDate(int year, int month, int day){
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
-        monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
-        dayString = (day < 10) ? "0" + Integer.toString(day) : Integer.toString(day);
+        monthString = Integer.toString(month);
+        dayString = Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
         reserveFromDate.setText("From Date: " +completeDate);
@@ -906,8 +903,8 @@ public class DetailParkingActivity extends AppCompatActivity {
     public void setReserveToDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
-        monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
-        dayString = (day < 10) ? "0" + Integer.toString(day) : Integer.toString(day);
+        monthString = Integer.toString(month);
+        dayString = Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
         reserveToDate.setText("To Date: " + completeDate);
