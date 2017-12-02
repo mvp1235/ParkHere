@@ -27,8 +27,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/available"
             android:gravity="center_vertical"
+            android:text="@string/available"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:textStyle="bold" />
 
         <TextView
@@ -52,8 +53,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/price"
             android:gravity="center_vertical"
+            android:text="@string/price"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:textStyle="bold" />
 
         <TextView
@@ -78,8 +80,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
-            android:text="@string/distance"
             android:gravity="center_vertical"
+            android:text="@string/distance"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:textStyle="bold" />
 
         <TextView

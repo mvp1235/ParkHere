@@ -475,8 +475,6 @@ public class EditListingActivity extends AppCompatActivity {
         if (hour > 12) {
             hour = hour % 12;
             ampm = "PM";
-        } else if (hour == 0) {
-            hour = 12;
         } else if (hour == 12) {
             ampm = "PM";
         }
@@ -495,8 +493,6 @@ public class EditListingActivity extends AppCompatActivity {
         if (hour > 12) {
             hour = hour % 12;
             ampm = "PM";
-        } else if (hour == 0) {
-            hour = 12;
         } else if (hour == 12) {
             ampm = "PM";
         }
@@ -511,8 +507,8 @@ public class EditListingActivity extends AppCompatActivity {
     public void setStartDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
-        monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
-        dayString = (day < 10) ? "0" + Integer.toString(day) : Integer.toString(day);
+        monthString = Integer.toString(month);
+        dayString = Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
         startDate.setText(completeDate);
@@ -521,8 +517,8 @@ public class EditListingActivity extends AppCompatActivity {
     public void setEndDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
-        monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
-        dayString = (day < 10) ? "0" + Integer.toString(day) : Integer.toString(day);
+        monthString = Integer.toString(month);
+        dayString = Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
         endDate.setText(completeDate);
@@ -537,73 +533,101 @@ public class EditListingActivity extends AppCompatActivity {
      * @param startTime start time
      * @param endTime   end time
      */
-    public void editListingOnDatabase(String startDate, String endDate, String startTime,
-                                        String endTime, LatLng point) {
-        String startDateList[] = startDate.split("-");
-        String endDateList[] = endDate.split("-");
-        int startTimeSystem[] = get24HoursTimeSystem(startTime);
-        int endTimeSystem[] = get24HoursTimeSystem(endTime);
+    public void editListingOnDatabase(final String startDate, final String endDate, final String startTime,
+                                        final String endTime, final LatLng point) {
 
-        int starthour = startTimeSystem[0];
-        int startMinutes = startTimeSystem[1];
-        int endHour = endTimeSystem[0];
-        int endMinutes = endTimeSystem[1];
-
-
-        int startMonth = Integer.parseInt(startDateList[0]);
-        int startDay = Integer.parseInt(startDateList[1]);
-        int startYear = Integer.parseInt(startDateList[2]);
-
-        int endMonth = Integer.parseInt(endDateList[0]);
-        int endDay = Integer.parseInt(endDateList[1]);
-        int endYear = Integer.parseInt(endDateList[2]);
-
-        GregorianCalendar startDateCalendar = new GregorianCalendar(startYear, startMonth - 1, startDay);
-        GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
-
-
-        String owner = this.owner.getText().toString();
-        String price = this.price.getText().toString();
+        String ownerStr = owner.getText().toString();
+        String priceStr = price.getText().toString();
         String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
 
-        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingID; //starthour-startminutes-endhour-endminutes-currentParkingID
-        String parentKey;
+        final Listing parking = getParkingSpace(startDate, endDate, startTime, endTime, userID, ownerStr, priceStr, address, point, currentParkingID);
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                for (DataSnapshot d : dataSnapshot.child("AvailableParkings").getChildren()) {
+                    if (d.hasChild(currentListingID)) {
+                        d.child(currentListingID).getRef().removeValue();
+                    }
+                }
+
+                String startDateList[] = startDate.split("-");
+                String endDateList[] = endDate.split("-");
+                int startTimeSystem[] = get24HoursTimeSystem(startTime);
+                int endTimeSystem[] = get24HoursTimeSystem(endTime);
+
+                int starthour = startTimeSystem[0];
+                int startMinutes = startTimeSystem[1];
+                int endHour = endTimeSystem[0];
+                int endMinutes = endTimeSystem[1];
+
+
+                int startMonth = Integer.parseInt(startDateList[0]);
+                int startDay = Integer.parseInt(startDateList[1]);
+                int startYear = Integer.parseInt(startDateList[2]);
+
+                int endMonth = Integer.parseInt(endDateList[0]);
+                int endDay = Integer.parseInt(endDateList[1]);
+                int endYear = Integer.parseInt(endDateList[2]);
+
+                GregorianCalendar startDateCalendar = new GregorianCalendar(startYear, startMonth - 1, startDay);
+                GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
+
+
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentListingID; //starthour-startminutes-endhour-endminutes-currentParkingID
+                String parentKey;
 //        String parkingSpaceUidKey;
-        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime, userID, owner, price, address, point, currentParkingID);
 
-        //Adding special instruction to parking (if any is provided)
-        String specialIns = specialInstructions.getText().toString();
-        parking.setSpecialInstruction(specialIns);
+                //Adding special instruction to parking (if any is provided)
+                String specialIns = specialInstructions.getText().toString();
+                parking.setSpecialInstruction(specialIns);
 
-        String childKey;
+                String childKey;
 //        parkingSpaceUidKey = databaseReference.child("AvailableParkings").push().getKey();    // no longer using these, gonna use the member variable currentParkingID
 
-        while(!startDateCalendar.equals(endDateCalendar)) {
-            int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
-            int currentYear = startDateCalendar.get(Calendar.YEAR);
-            int currentDay = startDateCalendar.get(Calendar.DAY_OF_MONTH);
+                while(!startDateCalendar.equals(endDateCalendar)) {
+                    int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
+                    int currentYear = startDateCalendar.get(Calendar.YEAR);
+                    int currentDay = startDateCalendar.get(Calendar.DAY_OF_MONTH);
 
 
-            String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
+                    String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-            childKey = currentParkingID;
-            parentKey = currentDate;
+                    childKey = currentListingID;
+                    parentKey = currentDate;
 
-            databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                    databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
 
 
-            startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
-        }
-        if(startDateCalendar.equals(endDateCalendar)) {
-            childKey = currentParkingID;
-            parentKey = endDate;
+                    startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
+                }
+                if(startDateCalendar.equals(endDateCalendar)) {
 
-            databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
-        }
+                    int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
+                    int currentYear = startDateCalendar.get(Calendar.YEAR);
+                    int currentDay = startDateCalendar.get(Calendar.DAY_OF_MONTH);
+
+                    String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
+
+                    childKey = currentListingID;
+                    parentKey = currentDate;
+
+
+                    databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
+                }
+                databaseReference.child("Listings").child(currentListingID).setValue(parking);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
         editUserListing(parking);
-        databaseReference.child("Listings").child(currentParkingID).setValue(parking);
     }
+
 
 
     /**
@@ -665,11 +689,21 @@ public class EditListingActivity extends AppCompatActivity {
                             //To edit, first delete the old listing value, then add the new one in, so there won't be duplicates
                             //Before this, the user's listing history doesn't remove the old listing, it just adds to the list
                             ArrayList<Listing> existingListings = currentUser.getMyListingHistory();
-                            for (Listing p : existingListings) {
-                                if (p.getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
-                                    existingListings.remove(p);
+
+                            for (int i=0; i<existingListings.size(); i++) {
+                                if (existingListings.get(i).getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
+                                    existingListings.remove(existingListings.get(i));
+                                    i--;
                                 }
                             }
+
+                            //This was causing concurrent modification exception
+//                            for (Listing p : existingListings) {
+//                                if (p.getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
+//                                    existingListings.remove(p);
+//                                }
+//                            }
+
                             existingListings.add(newList.get(0));
 //                            currentUser.addToListingHistory(newList);
                             currentUser.setMyListingHistory(existingListings);

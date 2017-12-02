@@ -75,6 +75,9 @@
     <string name="createParkingSpace">Create A New Parking Space</string>
     <string name="editParkingSpace">Edit Parking Space</string>
     <string name="numReviewsSample">(10 reviews)</string>
+    <string name="reviewDescriptionSample">Great parking</string>
+    <string name="writtenBy">Written by:</string>
+    <string name="reviews">Reviews</string>
 
 
 </resources>

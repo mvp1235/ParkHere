@@ -55,7 +55,7 @@
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/textView3"
+            android:id="@+id/paymentSeekerInfoTV"
             android:layout_width="250dp"
             android:layout_height="50dp"
             android:layout_weight="1"
@@ -70,20 +70,19 @@
         <TextView
             android:id="@+id/paymentAmountLabel"
             android:layout_width="50dp"
-            android:layout_height="match_parent"
+            android:layout_height="50dp"
             android:layout_weight="1"
             android:text="Amount:"
             android:textAlignment="viewStart"
             android:textStyle="bold" />
 
-        <EditText
+        <TextView
             android:id="@+id/paymentAmountTV"
             android:layout_width="250dp"
-            android:layout_height="50dp"
+            android:layout_height="match_parent"
             android:layout_weight="1"
-            android:ems="10"
-            android:inputType="textPersonName|number"
-            android:text="Booking Amount" />
+            android:text="TextView" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -97,6 +96,7 @@
             android:layout_weight="1" />
 
         <Button
+            android:id="@+id/paymentButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -45,12 +46,14 @@ public class DetailParkingActivity extends AppCompatActivity {
     private final static int LISTING_EDIT_CODE = 10;
     private final static int RESERVATION_LIST_VIEW_CODE = 11;
     private static final int WRITE_REVIEW_CODE = 11;
+    private static final int MAKE_PAYMENT_CODE = 10000;
 
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
-    private Button reserveBtn, editBtn, reserveListBtn, reviewBtn;
+    private Button reserveBtn, editBtn, reserveListBtn, reviewBtn, deleteBtn;
     private RatingBar ratingBar;
+    private LinearLayout ratingLL;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
@@ -96,6 +99,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             }
         });
         reviewBtn = (Button) findViewById(R.id.bookingReviewBtn);
+        deleteBtn = (Button) findViewById(R.id.deleteListingBtn);
 
         //seeker set reservation from date to date, from time to time.
         reserveFromDate = (TextView) findViewById(R.id.reserveFromDateTV);
@@ -103,9 +107,14 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveFromTime = (TextView) findViewById(R.id.reserveFromTimeTV);
         reserveToTime = (TextView) findViewById(R.id.reserveToTimeTV);
 
-
-
         //**************
+        ratingLL = (LinearLayout) findViewById(R.id.detailParkingRatingLL);
+        ratingLL.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showRatings();
+            }
+        });
 
 
 
@@ -187,9 +196,11 @@ public class DetailParkingActivity extends AppCompatActivity {
                         //remind owner they cannot reserve their own parking.
                         Toast.makeText(getApplicationContext(), "Cannot Book Your Own Parking Space...", Toast.LENGTH_SHORT).show();
                     } else {
-                        makeReservation();    //Duoc -- i will continue fixing this part tmr.
-                        notifyOwner();
-                        startPaymentActivity();
+                        boolean paymentComplete = startPaymentActivity();
+                        if(paymentComplete) {
+                            makeReservation();    //Duoc -- i will continue fixing this part tmr.
+                            notifyOwner();
+                        }
                     }
                     //updateDatabase();
                 }
@@ -203,14 +214,16 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveBtn.setText("Reserve");
             reserveListBtn.setVisibility(View.GONE);
             reviewBtn.setVisibility(View.GONE);
+            deleteBtn.setVisibility(View.GONE);
         } else if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_) {
             reserveBtn.setVisibility(View.GONE);    //book again should be taken out since it depends on the listing owner, i.e. you can't really book again if it's not up for listing
             editBtn.setVisibility(View.GONE);       // only show edit button on listing history
-            reserveToDate.setVisibility(View.GONE);
-            reserveFromDate.setVisibility(View.GONE);
-            reserveToTime.setVisibility(View.GONE);
-            reserveFromTime.setVisibility(View.GONE);
-            reserveListBtn.setVisibility(View.GONE);
+            reserveToDate.setVisibility(View.INVISIBLE);
+            reserveFromDate.setVisibility(View.INVISIBLE);
+            reserveToTime.setVisibility(View.INVISIBLE);
+            reserveFromTime.setVisibility(View.INVISIBLE);
+            reserveListBtn.setVisibility(View.INVISIBLE);
+            deleteBtn.setVisibility(View.GONE);
             reviewBtn.setVisibility(View.VISIBLE);
             reviewBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -218,7 +231,6 @@ public class DetailParkingActivity extends AppCompatActivity {
                     writeOwnerReview();
                 }
             });
-//            reserveBtn.setText("Book Again");
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
             reserveToDate.setVisibility(View.GONE);
@@ -226,6 +238,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveToTime.setVisibility(View.GONE);
             reserveFromTime.setVisibility(View.GONE);
             reviewBtn.setVisibility(View.GONE);
+            deleteBtn.setVisibility(View.VISIBLE);
             //An edit button will be shown on this screen as well to allow user to edit the listings he/she posted
             editBtn.setVisibility(View.VISIBLE);
             editBtn.setOnClickListener(new View.OnClickListener() {
@@ -235,11 +248,18 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
             });
 
-        }
-        if(request == ReservationListActivity.VIEW_DETAIL_RESERVATION) {
+            deleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
+        }else if(request == ReservationListActivity.VIEW_DETAIL_RESERVATION) {
             reserveListBtn.setVisibility(View.GONE);
             editBtn.setVisibility(View.GONE);
             reserveBtn.setVisibility(View.GONE);
+            deleteBtn.setVisibility(View.GONE);
             seekerLabel.setText("Seeker: ");
             seekerPhoneLabel.setText("Seeker Phone:");
             seekerEmailLabel.setText("Seeker Email: ");
@@ -258,6 +278,9 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveToDate.setOnClickListener(null);
             reserveFromTime.setOnClickListener(null);
             reserveToTime.setOnClickListener(null);
+
+            ratingLL.setVisibility(View.GONE);
+
         }
 
         //Hide distance if user is checking history
@@ -282,7 +305,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                         int numReviews = 0;
                         if (p != null) {
                             avgRating = p.getAverageRating();
-                            numReviews = p.getReviews().size();
+                            if (p.getReviews() != null)
+                                numReviews = p.getReviews().size();
                         }
                         ratingBar.setRating((float)avgRating);
                         reviewCount.setText("(" + String.valueOf(numReviews) + " reviews)");
@@ -299,13 +323,29 @@ public class DetailParkingActivity extends AppCompatActivity {
         
     }
 
-    public void startPaymentActivity(){
-        Intent intent = new Intent();
+    public boolean startPaymentActivity() {
+        Intent intent = new Intent(DetailParkingActivity.this, PaymentActivity.class);
         String ownerName = clickedParking.getOwner().getName();
         String ownerEmail = clickedParking.getOwner().getEmailAddress();
+        String seekerName = currentUser.getName();
+        String seekerEmail = currentUser.getEmailAddress();
+        String amount = clickedParking.getPrice() + "";
+        intent.putExtra("ownerName",ownerName);
+        intent.putExtra("ownerEmail", ownerEmail);
+        intent.putExtra("seekerName", seekerName);
+        intent.putExtra("seekerEmail", seekerEmail);
+        intent.putExtra("amount", amount);
+
+        startActivityForResult(intent, MAKE_PAYMENT_CODE);
+
+        return true;
+    }
 
 
-
+    private void showRatings() {
+        Intent intent = new Intent(DetailParkingActivity.this, ViewRatingsActivity.class);
+        intent.putExtra(SearchResultActivity.PARKING_ID_REF, clickedParking.getParkingIDRef());
+        startActivity(intent);
     }
 
     public boolean checkReservingYourOwnParking() {
@@ -333,6 +373,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == LISTING_EDIT_CODE && resultCode == RESULT_OK) {      //take input from listing editting page and reflect changes to database here
+            setResult(RESULT_OK);
             finish();
         } else if (requestCode == WRITE_REVIEW_CODE && resultCode == RESULT_OK) {
             finish();
@@ -353,8 +394,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         intent.putExtra("price", priceTV.getText().toString().substring(1)); //get rid of substring before sending over intent to edit listing activity
         intent.putExtra("specialInstructions", specialInstructionTV.getText().toString());
         intent.putExtra("parkingID", clickedParking.getParkingIDRef());
-        Intent i = getIntent();
-        intent.putExtra("listingID", i.getStringExtra(SearchResultActivity.LISTING_ID));
+        intent.putExtra("listingID", clickedParking.getId());
         startActivityForResult(intent, LISTING_EDIT_CODE);
     }
 
@@ -428,9 +468,12 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Listing[] spaces = splitParkingSpace(clickedParking);  //0.
         listingToBook = spaces[0];
-        deleteParkingReference(clickedParking);     //1.
-        deleteParkingListing(parkingID);        //2.
-        addSplittedParkingsToDatabase(spaces);  //6
+        deleteParkingReference(clickedParking, spaces);     //1.
+
+        //combined 2 and 6 inside 1 to prevent concurrency problem (too many listener for data change at once) - Huy
+//        deleteParkingListing(parkingID);        //2.
+//        addSplittedParkingsToDatabase(spaces);  //6
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -442,16 +485,20 @@ public class DetailParkingActivity extends AppCompatActivity {
                             currentUser.addReservedParking(listingToBook);     //3.
                             String currentUserID = currentUser.getId();
                             databaseReference.child("Users").child(currentUserID).setValue(currentUser); //4.
+
                             setResult(RESULT_OK);
                             finish();
                         }
                     }
                 }
+
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
             }
         });
+
+
 
     }
 
@@ -666,7 +713,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         return splitted;
     }
 
-    public void deleteParkingReference(Listing clickedParking) {
+    public void deleteParkingReference(final Listing clickedParking, final Listing[] spaces) {
         final String listingID = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
@@ -696,6 +743,11 @@ public class DetailParkingActivity extends AppCompatActivity {
                         }
                     }
                 }
+
+                if(dataSnapshot.child("Listings").hasChild(clickedParking.getId())) {
+                    databaseReference.child("Listings").child(clickedParking.getId()).removeValue();
+                }
+                addSplittedParkingsToDatabase(spaces);
             }
 
             @Override
@@ -721,12 +773,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
-
-
-    public void updateDatabase(){
-
-    }
-
     public void addSplittedParkingsToDatabase(Listing[] spaces) {
         int i = 1;
         int outOfBounds = spaces.length;
@@ -734,9 +780,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         while(p != null && (i < outOfBounds)) {
             p = spaces[i];
             if (p != null) {
-                p.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
+                p.setId(clickedParking.getId());
 
-                String p1ChildKey = p.getParkingIDRef();
+                String p1ChildKey = p.getId();
 
                 GregorianCalendar start = getGregorianCalendarDate(p.getStartDate());
                 GregorianCalendar end = getGregorianCalendarDate(p.getEndDate());
@@ -748,7 +794,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                 int endHour = endTimeSystem[0];
                 int endMinutes = endTimeSystem[1];
 
-                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getParkingIDRef();
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getId();
 
                 while (!start.equals(end)) {
                     String p1ParentKey = getDate(start);
@@ -770,6 +816,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         int month = g.get(Calendar.MONTH) + 1;
         int day = g.get(Calendar.DAY_OF_MONTH);
         int year = g.get(Calendar.YEAR);
+
         return month + "-" + day + "-" + year;
     }
 
@@ -787,9 +834,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         int minute = Integer.parseInt(tokens[1]);
         return new GregorianCalendar(2018,0,1, hour, minute);
     }
-
-
-
 
     @Override
     protected Dialog onCreateDialog(int id) {
@@ -854,8 +898,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         if (hour > 12) {
             hour = hour % 12;
             ampm = "PM";
-        } else if (hour == 0) {
-            hour = 12;
         } else if (hour == 12) {
             ampm = "PM";
         }
@@ -874,8 +916,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         if (hour > 12) {
             hour = hour % 12;
             ampm = "PM";
-        } else if (hour == 0) {
-            hour = 12;
         } else if (hour == 12) {
             ampm = "PM";
         }
@@ -890,8 +930,8 @@ public class DetailParkingActivity extends AppCompatActivity {
     public void setReserveFromDate(int year, int month, int day){
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
-        monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
-        dayString = (day < 10) ? "0" + Integer.toString(day) : Integer.toString(day);
+        monthString = Integer.toString(month);
+        dayString = Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
         reserveFromDate.setText("From Date: " +completeDate);
@@ -900,8 +940,8 @@ public class DetailParkingActivity extends AppCompatActivity {
     public void setReserveToDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
-        monthString = (month < 10) ? "0" + Integer.toString(month) : Integer.toString(month);
-        dayString = (day < 10) ? "0" + Integer.toString(day) : Integer.toString(day);
+        monthString = Integer.toString(month);
+        dayString = Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
         reserveToDate.setText("To Date: " + completeDate);

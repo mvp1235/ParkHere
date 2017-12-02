@@ -81,6 +81,8 @@ public class BookingReviewActivity extends AppCompatActivity {
                     if (dataSnapshot.child("Users").hasChild(currentUserId)) {
                         User user = dataSnapshot.child("Users").child(currentUserId).getValue(User.class);
                         currentUserReviews = user.getMyReviews();
+                        if (currentUserReviews == null)
+                            currentUserReviews = new ArrayList<>();
                     }
                 }
             }

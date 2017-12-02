@@ -51,7 +51,7 @@
         <activity android:name=".ManageParkingSpaceActivity" />
         <activity android:name=".EditParkingSpaceActivity" />
         <activity android:name=".PaymentActivity" />
-
+        <activity android:name=".ViewRatingsActivity"></activity>
     </application>
 
 </manifest>
