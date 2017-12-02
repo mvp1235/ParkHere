@@ -31,6 +31,8 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_marginStart="10dp"
+                android:layout_marginEnd="10dp"
                 android:orientation="vertical">
 
                 <TextView
@@ -63,7 +65,11 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_weight="1"
-                    android:text="@string/reserve" />
+                    android:layout_marginTop="2.5dp"
+                    android:layout_marginBottom="2.5dp"
+                    android:background="@android:color/holo_blue_bright"
+                    android:text="@string/reserve"
+                    android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
                 <Button
                     android:id="@+id/detailEditBtn"
@@ -71,21 +77,46 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="bottom"
                     android:layout_weight="1"
-                    android:text="@string/edit" />
+                    android:layout_marginTop="2.5dp"
+                    android:layout_marginBottom="2.5dp"
+                    android:background="@android:color/holo_orange_light"
+                    android:text="@string/edit"
+                    android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
                 <Button
                     android:id="@+id/seeWhoBookedMyParkingSpace"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:text="ReserveList" />
+                    android:layout_marginTop="2.5dp"
+                    android:layout_marginBottom="2.5dp"
+                    android:background="@android:color/holo_purple"
+                    android:text="ReserveList"
+                    android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
+                <Button
+                    android:id="@+id/deleteListingBtn"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginTop="2.5dp"
+                    android:layout_marginBottom="2.5dp"
+                    android:background="@android:color/holo_red_light"
+                    android:text="@string/delete"
+                    android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
                 <Button
                     android:id="@+id/bookingReviewBtn"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    android:background="@android:color/holo_green_light"
+                    android:text="@string/review"
                     android:layout_weight="1"
-                    android:text="@string/review" />
+                    android:layout_marginTop="2.5dp"
+                    android:layout_marginBottom="2.5dp"
+                    android:layout_gravity="center_vertical"
+                    android:textColor="@color/common_google_signin_btn_text_dark_default" />
+
             </LinearLayout>
 
 

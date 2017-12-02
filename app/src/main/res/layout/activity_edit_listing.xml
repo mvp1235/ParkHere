@@ -309,6 +309,7 @@
             android:layout_gravity="center"
             android:text="@string/save"
             android:textAlignment="center"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
             android:textStyle="bold" />
 
     </LinearLayout>

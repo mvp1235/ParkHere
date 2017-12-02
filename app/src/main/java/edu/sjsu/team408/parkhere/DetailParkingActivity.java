@@ -9,6 +9,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -49,7 +50,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
-    private Button reserveBtn, editBtn, reserveListBtn, reviewBtn;
+    private Button reserveBtn, editBtn, reserveListBtn, reviewBtn, deleteBtn;
     private RatingBar ratingBar;
     private LinearLayout ratingLL;
     private DatabaseReference databaseReference;
@@ -97,6 +98,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             }
         });
         reviewBtn = (Button) findViewById(R.id.bookingReviewBtn);
+        deleteBtn = (Button) findViewById(R.id.deleteListingBtn);
 
         //seeker set reservation from date to date, from time to time.
         reserveFromDate = (TextView) findViewById(R.id.reserveFromDateTV);
@@ -206,14 +208,16 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveBtn.setText("Reserve");
             reserveListBtn.setVisibility(View.GONE);
             reviewBtn.setVisibility(View.GONE);
+            deleteBtn.setVisibility(View.GONE);
         } else if (request == BookingHistoryActivity.VIEW_DETAIL_HISTORY_BOOKING_) {
             reserveBtn.setVisibility(View.GONE);    //book again should be taken out since it depends on the listing owner, i.e. you can't really book again if it's not up for listing
             editBtn.setVisibility(View.GONE);       // only show edit button on listing history
-            reserveToDate.setVisibility(View.GONE);
-            reserveFromDate.setVisibility(View.GONE);
-            reserveToTime.setVisibility(View.GONE);
-            reserveFromTime.setVisibility(View.GONE);
-            reserveListBtn.setVisibility(View.GONE);
+            reserveToDate.setVisibility(View.INVISIBLE);
+            reserveFromDate.setVisibility(View.INVISIBLE);
+            reserveToTime.setVisibility(View.INVISIBLE);
+            reserveFromTime.setVisibility(View.INVISIBLE);
+            reserveListBtn.setVisibility(View.INVISIBLE);
+            deleteBtn.setVisibility(View.GONE);
             reviewBtn.setVisibility(View.VISIBLE);
             reviewBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -221,7 +225,6 @@ public class DetailParkingActivity extends AppCompatActivity {
                     writeOwnerReview();
                 }
             });
-//            reserveBtn.setText("Book Again");
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
             reserveToDate.setVisibility(View.GONE);
@@ -229,6 +232,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveToTime.setVisibility(View.GONE);
             reserveFromTime.setVisibility(View.GONE);
             reviewBtn.setVisibility(View.GONE);
+            deleteBtn.setVisibility(View.VISIBLE);
             //An edit button will be shown on this screen as well to allow user to edit the listings he/she posted
             editBtn.setVisibility(View.VISIBLE);
             editBtn.setOnClickListener(new View.OnClickListener() {
@@ -238,11 +242,11 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
             });
 
-        }
-        if(request == ReservationListActivity.VIEW_DETAIL_RESERVATION) {
+        }else if(request == ReservationListActivity.VIEW_DETAIL_RESERVATION) {
             reserveListBtn.setVisibility(View.GONE);
             editBtn.setVisibility(View.GONE);
             reserveBtn.setVisibility(View.GONE);
+            deleteBtn.setVisibility(View.GONE);
             seekerLabel.setText("Seeker: ");
             seekerPhoneLabel.setText("Seeker Phone:");
             seekerEmailLabel.setText("Seeker Email: ");
@@ -261,6 +265,9 @@ public class DetailParkingActivity extends AppCompatActivity {
             reserveToDate.setOnClickListener(null);
             reserveFromTime.setOnClickListener(null);
             reserveToTime.setOnClickListener(null);
+
+            ratingLL.setVisibility(View.GONE);
+
         }
 
         //Hide distance if user is checking history
