@@ -567,7 +567,7 @@ public class EditListingActivity extends AppCompatActivity {
         String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
 
-        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingID; //starthour-startminutes-endhour-endminutes-currentParkingID
+        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentListingID; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 //        String parkingSpaceUidKey;
         Listing parking = getParkingSpace(startDate, endDate, startTime, endTime, userID, owner, price, address, point, currentParkingID);
@@ -587,7 +587,7 @@ public class EditListingActivity extends AppCompatActivity {
 
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-            childKey = currentParkingID;
+            childKey = currentListingID;
             parentKey = currentDate;
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
@@ -596,13 +596,21 @@ public class EditListingActivity extends AppCompatActivity {
             startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
         }
         if(startDateCalendar.equals(endDateCalendar)) {
-            childKey = currentParkingID;
-            parentKey = endDate;
+
+            int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
+            int currentYear = startDateCalendar.get(Calendar.YEAR);
+            int currentDay = startDateCalendar.get(Calendar.DAY_OF_MONTH);
+
+            String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
+
+            childKey = currentListingID;
+            parentKey = currentDate;
+
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
         }
         editUserListing(parking);
-        databaseReference.child("Listings").child(currentParkingID).setValue(parking);
+        databaseReference.child("Listings").child(currentListingID).setValue(parking);
     }
 
 

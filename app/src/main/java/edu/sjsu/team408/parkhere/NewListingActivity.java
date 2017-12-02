@@ -570,8 +570,14 @@ public class NewListingActivity extends AppCompatActivity{
             startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
         }
         if(startDateCalendar.equals(endDateCalendar)) {
+            int currentMonth = startDateCalendar.get(Calendar.MONTH) + 1 ;
+            int currentYear = startDateCalendar.get(Calendar.YEAR);
+            int currentDay = startDateCalendar.get(Calendar.DAY_OF_MONTH);
+
+            String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
+
             childKey = currentListingIDRef;
-            parentKey = endDate;
+            parentKey = currentDate;
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
         }

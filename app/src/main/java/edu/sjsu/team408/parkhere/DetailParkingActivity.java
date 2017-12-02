@@ -368,8 +368,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         intent.putExtra("price", priceTV.getText().toString().substring(1)); //get rid of substring before sending over intent to edit listing activity
         intent.putExtra("specialInstructions", specialInstructionTV.getText().toString());
         intent.putExtra("parkingID", clickedParking.getParkingIDRef());
-        Intent i = getIntent();
-        intent.putExtra("listingID", i.getStringExtra(SearchResultActivity.LISTING_ID));
+        intent.putExtra("listingID", clickedParking.getId());
         startActivityForResult(intent, LISTING_EDIT_CODE);
     }
 
