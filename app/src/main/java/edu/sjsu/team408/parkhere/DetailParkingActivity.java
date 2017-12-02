@@ -796,7 +796,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         int minute = Integer.parseInt(tokens[1]);
         return new GregorianCalendar(2018,0,1, hour, minute);
     }
-    
+
     @Override
     protected Dialog onCreateDialog(int id) {
         // TODO Auto-generated method stub
