@@ -242,6 +242,13 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
             });
 
+            deleteBtn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                }
+            });
+
         }else if(request == ReservationListActivity.VIEW_DETAIL_RESERVATION) {
             reserveListBtn.setVisibility(View.GONE);
             editBtn.setVisibility(View.GONE);

@@ -205,8 +205,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:hint="@string/dateSample"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:hint="@string/dateSample" />
 
         </LinearLayout>
 
@@ -307,6 +307,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:background="@android:color/holo_blue_bright"
             android:text="@string/save"
             android:textAlignment="center"
             android:textColor="@color/common_google_signin_btn_text_dark_default"
