@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -35,9 +36,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class DetailParkingActivity extends AppCompatActivity {
 
+    private static final double MILES_TO_METER = 1609.344;
     private final static int FROM_DATE = 0;
     private final static int TO_DATE = 1;
     private final static int FROM_TIME = 2;
@@ -47,7 +50,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private final static int RESERVATION_LIST_VIEW_CODE = 11;
     private static final int WRITE_REVIEW_CODE = 11;
 
-    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
+    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, distanceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
     private Button reserveBtn, editBtn, reserveListBtn, reviewBtn, deleteBtn;
@@ -77,6 +80,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         seekerPhoneLabel = (TextView) findViewById(R.id.detailAddressLabel);
         seekerEmailLabel = (TextView) findViewById(R.id.detailDateLabel);
         priceLabel = (TextView) findViewById(R.id.detailPriceLabel);
+        distanceTV = (TextView) findViewById(R.id.detailParkingDistance);
         distanceLabel = (TextView) findViewById(R.id.detailDistanceLabel);
         specialInstructionLabel = (TextView) findViewById(R.id.detailSpecialInstructionLabel);
         ratingBar = (RatingBar) findViewById(R.id.detailParkingRatingBar);
@@ -154,6 +158,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
 
         clickedParking = new Listing(bundle);
+
+        //setting distance Textview
+        String distanceAway = getDistanceAway(intent);
+        distanceAway = String.format(Locale.US, "%.2f miles away", Double.parseDouble(distanceAway));
+        distanceTV.setText(distanceAway);
 
         //This part is for default testing only****
         reserveFromDate.setText("From Date: " + clickedParking.getStartDate());
@@ -316,6 +325,22 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         
     }
+
+    private String getDistanceAway(Intent intent) {
+        double lat = intent.getDoubleExtra(SearchResultActivity.LATITUDE, 0);
+        double lng = intent.getDoubleExtra(SearchResultActivity.LONGITUDE, 0);
+
+        Location location = new Location("");
+        location.setLatitude(lat);
+        location.setLongitude(lng);
+
+        Location thatLocation = new Location("");
+        thatLocation.setLatitude(clickedParking.getAddress().getLatitude());
+        thatLocation.setLongitude(clickedParking.getAddress().getLongitude());
+
+        return String.valueOf(location.distanceTo(thatLocation) / MILES_TO_METER);
+    }
+
 
     private void showRatings() {
         Intent intent = new Intent(DetailParkingActivity.this, ViewRatingsActivity.class);

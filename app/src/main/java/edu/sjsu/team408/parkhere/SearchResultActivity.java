@@ -52,6 +52,8 @@ public class SearchResultActivity extends ListActivity {
     static final String END_TIME = "endTime";
     static final String OWNER_PARKING_ID = "OwnerParkingID";
     static final String RESERVE_BY = "reservedBy";
+    static final String LATITUDE = "latitude";
+    static final String LONGITUDE = "longitude";
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
     private ArrayList<String> availableParkingSpacesOnDate;
@@ -219,6 +221,9 @@ public class SearchResultActivity extends ListActivity {
         b.putParcelable(RESERVE_BY, parking.getReservedBy());
         b.putString(LISTING_ID, parking.getId());
 
+        intent.putExtra(LATITUDE, mLocation.getLatitude());
+        intent.putExtra(LONGITUDE, mLocation.getLongitude());
+
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);
         startActivityForResult(intent, VIEW_DETAIL_PARKING_FROM_RESULT);
@@ -322,6 +327,8 @@ public class SearchResultActivity extends ListActivity {
             ListingAdapter adapter = new ListingAdapter(this, listings,
                     mLocation);
 
+            Log.i("TEST", mLocation.toString());
+
             // Attach the adapter to a ListView
             setListAdapter(adapter);
         } else {
@@ -334,7 +341,7 @@ public class SearchResultActivity extends ListActivity {
         //if no time is specify, we return all results
         if (searchTime.isEmpty())
             return true;
-        
+
         String availableTimeTokens[] = availableTime.split(":");
         int startHour = Integer.parseInt(availableTimeTokens[0]);
         int startMinute = Integer.parseInt(availableTimeTokens[1]);
