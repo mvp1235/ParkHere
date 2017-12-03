@@ -554,14 +554,12 @@ public class NewListingActivity extends AppCompatActivity{
             int currentYear = startDateCalendar.get(Calendar.YEAR);
             int currentDay = startDateCalendar.get(Calendar.DAY_OF_MONTH);
 
-
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
             childKey = currentListingIDRef;
             parentKey = currentDate;
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
-
 
             startDateCalendar.add(Calendar.DAY_OF_MONTH, 1); //increment
         }
@@ -594,15 +592,13 @@ public class NewListingActivity extends AppCompatActivity{
         int hour = Integer.parseInt(timeList[0]);
         int minutes = Integer.parseInt(timeList[1].substring(0,2));
         String hourSystem = timeList[1].substring(timeList[1].length()-2, timeList[1].length());    //AM or PM
-        if(hourSystem.equals("PM")) {
+        if(hourSystem.equals("PM") && hour != 12) {
             hour = hour + 12;
         }
         result[0] = Integer.parseInt(hour + "");
         result[1] = Integer.parseInt(minutes + "");
         return result;
     }
-
-
 
 
     //This method contains parkingID
@@ -624,19 +620,6 @@ public class NewListingActivity extends AppCompatActivity{
 
         //return result;
         return new Listing(currentListingIDRef, addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
-    }
-
-    public void populateDefaultValuesForTesting() {
-        addressStreetNumber.setText("1 Washington Square");
-        addressCity.setText("San Jose");
-        addressState.setText("CA");
-        addressZipCode.setText("95112");
-        price.setText("5");
-        startDate.setText("11-29-2017");
-        endDate.setText("11-29-2017");
-        startTime.setText("5:00 PM");
-        endTime.setText("10:00 PM");
-
     }
 
     private void addListingToUser(Listing ps) {

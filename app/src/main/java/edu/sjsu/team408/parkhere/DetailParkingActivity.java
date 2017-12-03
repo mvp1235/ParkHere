@@ -722,9 +722,9 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
 
                 //Remove the listing with the listingID
-                if(dataSnapshot.child("Listings").hasChild(listingID)) {
-                    databaseReference.child("Listings").child(listingID).removeValue();
-                }
+//                if(dataSnapshot.child("Listings").hasChild(listingID)) {
+//                    databaseReference.child("Listings").child(listingID).removeValue();
+//                }
                 addSplittedParkingsToDatabase(spaces);
             }
 
@@ -783,7 +783,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     String p1ParentKey = getDate(start);
                     databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
                 }
-                databaseReference.child("Listings").child(p1ChildKey).setValue(p);
+//                databaseReference.child("Listings").child(p1ChildKey).setValue(p);    //leave the original listing data alone
             }
             i++;
         }

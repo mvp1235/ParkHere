@@ -554,8 +554,8 @@ public class EditListingActivity extends AppCompatActivity {
 
                 String startDateList[] = startDate.split("-");
                 String endDateList[] = endDate.split("-");
-                int startTimeSystem[] = get24HoursTimeSystem(startTime);
-                int endTimeSystem[] = get24HoursTimeSystem(endTime);
+                int startTimeSystem[] = NewListingActivity.get24HoursTimeSystem(startTime);
+                int endTimeSystem[] = NewListingActivity.get24HoursTimeSystem(endTime);
 
                 int starthour = startTimeSystem[0];
                 int startMinutes = startTimeSystem[1];
@@ -627,29 +627,6 @@ public class EditListingActivity extends AppCompatActivity {
 
         editUserListing(parking);
     }
-
-
-
-    /**
-     * Converts time string into 24 hours time system
-     * @param time
-     * @return
-     */
-    public static int[] get24HoursTimeSystem(String time) {
-        int result[] = new int[2];    // out of bounds. Check if it's 25 that means it's wrong.
-        String timeList[] = time.split(":");
-        int hour = Integer.parseInt(timeList[0]);
-        int minutes = Integer.parseInt(timeList[1].substring(0,2));
-        String hourSystem = timeList[1].substring(timeList[1].length()-2, timeList[1].length());    //AM or PM
-        if(hourSystem.equals("PM")) {
-            hour = hour + 12;
-        }
-        result[0] = Integer.parseInt(hour + "");
-        result[1] = Integer.parseInt(minutes + "");
-        return result;
-    }
-
-
 
 
     //This method contains parkingID
