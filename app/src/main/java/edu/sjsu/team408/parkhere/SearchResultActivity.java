@@ -331,6 +331,10 @@ public class SearchResultActivity extends ListActivity {
 
 
     private static boolean isWithinAvailableTime(String searchTime, String availableTime) {
+        //if no time is specify, we return all results
+        if (searchTime.isEmpty())
+            return true;
+        
         String availableTimeTokens[] = availableTime.split(":");
         int startHour = Integer.parseInt(availableTimeTokens[0]);
         int startMinute = Integer.parseInt(availableTimeTokens[1]);
