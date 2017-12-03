@@ -90,7 +90,7 @@ public class SearchResultActivity extends ListActivity {
                         String p = userIDList.getValue(String.class);
                         availableParkingSpacesOnDate.add(p);
                     }
-                    searchResult(searchTimeTerm);
+                    searchResult(searchTimeTerm, dateSearchTerm);
                 }
             }
 
@@ -234,22 +234,34 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    private void searchResult (String searchTimeTerm) {
+    private void searchResult (String searchTimeTerm, final String dateSearchTerm) {
         listings = new ArrayList<>();  // get the parking spaces.
         if(availableParkingSpacesOnDate.size() > 0) {
             for(String available: availableParkingSpacesOnDate) {
                 String tokens[] = available.split("/"); //[0] contains time, [1] contains parkingID to search database
-                final String parkingID = tokens[1];
-                String availableTime = tokens[0];   //starthour-startminute-endhour-endminute
+                final String listingID = tokens[1];
+                final String availableTime = tokens[0];   //starthour-startminute-endhour-endminute
                 final boolean withinAvailableTime = isWithinAvailableTime(searchTimeTerm, availableTime);
                     databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if(withinAvailableTime) {
-                                if (dataSnapshot.child("Listings").hasChild(parkingID)) {
-                                    Listing p = dataSnapshot.child("Listings").child(parkingID).getValue(Listing.class);
-                                    listings.add(p);
-                                    showResult();
+                                if (dataSnapshot.child("AvailableParkings").hasChild(dateSearchTerm)) {
+                                    String s = dataSnapshot.child("AvailableParkings").child(dateSearchTerm).child(listingID).getValue(String.class);
+
+                                    String[] timeStrings = getTimeFormat(availableTime);
+
+                                    if (dataSnapshot.child("Listings").hasChild(listingID)) {
+                                        Listing p = dataSnapshot.child("Listings").child(listingID).getValue(Listing.class);
+                                        p.setStartDate(dateSearchTerm);
+                                        p.setEndDate(dateSearchTerm);
+                                        p.setStartTime(timeStrings[0]);
+                                        p.setEndTime(timeStrings[1]);
+
+                                        listings.add(p);
+                                        showResult();
+                                    }
+
                                 }
                             }
                         }
@@ -262,6 +274,45 @@ public class SearchResultActivity extends ListActivity {
 
             }
         }
+    }
+
+    private String[] getTimeFormat(String availableTime) {
+        String[] results = new String[2];
+        String availableTimeTokens[] = availableTime.split(":");
+        String startHour = availableTimeTokens[0];
+        String startMinute = availableTimeTokens[1];
+        String endHour = availableTimeTokens[2];
+        String endMinute = availableTimeTokens[3];
+
+        String startAMPM = "AM";
+        String endAMPM = "AM";
+
+        int startHourInt = Integer.parseInt(startHour);
+        if (startHourInt > 11) {
+            startAMPM = "PM";
+            if (startHourInt != 12) {
+                startHourInt = startHourInt % 12;
+                startHour = String.valueOf(startHourInt);
+            }
+
+        }
+        int endHourInt = Integer.parseInt(endHour);
+        if (endHourInt > 11) {
+            endAMPM = "PM";
+            if (endHourInt != 12) {
+                endHourInt = endHourInt % 12;
+                endHour = String.valueOf(endHourInt);
+            }
+        }
+        if(Integer.parseInt(startMinute) < 10)
+            startMinute = "0" + startMinute;
+        if(Integer.parseInt(endMinute) < 10)
+            endMinute = "0" + endMinute;
+
+        results[0] = startHour + ":" + startMinute + " " + startAMPM;   //start time
+        results[1] = endHour + ":" + endMinute + " " + endAMPM;   //end time
+
+        return results;
     }
 
     private void showResult() {

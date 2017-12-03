@@ -701,6 +701,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                //Remove all existing available parkings with the currentListingID
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
@@ -710,6 +711,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
                 }
+                //Remove all existing available parkings with the currentListingID
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
@@ -719,8 +721,9 @@ public class DetailParkingActivity extends AppCompatActivity {
                     }
                 }
 
-                if(dataSnapshot.child("Listings").hasChild(clickedParking.getId())) {
-                    databaseReference.child("Listings").child(clickedParking.getId()).removeValue();
+                //Remove the listing with the listingID
+                if(dataSnapshot.child("Listings").hasChild(listingID)) {
+                    databaseReference.child("Listings").child(listingID).removeValue();
                 }
                 addSplittedParkingsToDatabase(spaces);
             }
