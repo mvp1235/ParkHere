@@ -83,7 +83,7 @@ public class SearchResultActivity extends ListActivity {
         else
             userHasDesiredLocation = true;
 
-        databaseReference.addValueEventListener(new ValueEventListener() {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(dataSnapshot.child("AvailableParkings").hasChild(dateSearchTerm)) {
