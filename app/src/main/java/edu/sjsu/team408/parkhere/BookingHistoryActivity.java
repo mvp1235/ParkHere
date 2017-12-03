@@ -2,7 +2,6 @@ package edu.sjsu.team408.parkhere;
 
 import android.app.ListActivity;
 import android.content.Intent;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ListView;
@@ -20,7 +19,7 @@ public class BookingHistoryActivity extends ListActivity {
 
     public static final int VIEW_DETAIL_HISTORY_BOOKING_ = 5000;
 
-    private ArrayList<ParkingSpace> parkingSpaces;
+    private ArrayList<Listing> listings;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
@@ -33,7 +32,7 @@ public class BookingHistoryActivity extends ListActivity {
         firebaseAuth = FirebaseAuth.getInstance();
 
 
-        parkingSpaces = new ArrayList<>();
+        listings = new ArrayList<>();
 
         //populateDataForTesting();
 
@@ -47,7 +46,7 @@ public class BookingHistoryActivity extends ListActivity {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
 
-                            parkingSpaces = currentUser.getMyCurrentReservedParkings();
+                            listings = currentUser.getMyCurrentReservedParkings();
                             showCurrentlyReservedParkings();
                         }
                     }
@@ -62,7 +61,7 @@ public class BookingHistoryActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ParkingSpace parking = (ParkingSpace)getListAdapter().getItem(position);
+        Listing parking = (Listing)getListAdapter().getItem(position);
         Intent intent = new Intent(this, DetailParkingActivity.class);
 
         Bundle b = new Bundle();
@@ -86,12 +85,12 @@ public class BookingHistoryActivity extends ListActivity {
     }
 
     private void showCurrentlyReservedParkings() {
-        if(parkingSpaces == null) {
+        if(listings == null) {
             //empty
             return;
         }
         // Create the adapter to convert the array to views
-        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, parkingSpaces);
+        HistoryParkingSpaceAdapter adapter = new HistoryParkingSpaceAdapter(this, listings);
 
         // Attach the adapter to a ListView
         setListAdapter(adapter);

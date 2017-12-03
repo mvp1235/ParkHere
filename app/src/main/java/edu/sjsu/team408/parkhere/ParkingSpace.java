@@ -1,91 +1,91 @@
 package edu.sjsu.team408.parkhere;
 
-import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import java.security.acl.Owner;
+import java.util.ArrayList;
 
 /**
- * Created by MVP on 10/31/17.
+ * Created by MVP on 11/28/2017.
  */
 
-public class ParkingSpace implements Parcelable{
+public class ParkingSpace implements Parcelable {
 
     private Address address;
     private User owner;
     private String parkingImageUrl;
     private String specialInstruction;
-    private String startDate;
-    private String endDate;
-    private String startTime;
-    private String endTime;
-    private double price;
-    private String parkingIDRef;
-    private String ownerParkingID;
-    private User reservedBy;
+    private String parkingID;
+    private ArrayList<String> reviews;
+    private double totalRating;
+    private double averageRating;
 
 
-    public ParkingSpace(){}
-
-    public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction,
-                        String startDate, String endDate, String startTime, String endTime, double price, String parkingIDRef) {
-        this.address = address;
-        this.owner = owner;
-        this.parkingImageUrl = parkingImageUrl;
-        this.specialInstruction = specialInstruction;
-        this.startDate = startDate;
-        this.endDate = endDate;
-        this.price = price;
-        this.startTime = startTime;
-        this.endTime = endTime;
-        this.parkingIDRef = parkingIDRef;
-    }
-
-    public ParkingSpace(Bundle b) {
-        this.address = b.getParcelable(SearchResultActivity.ADDRESS);
-        this.owner = b.getParcelable(SearchResultActivity.OWNER);
-        this.parkingImageUrl = b.getString(SearchResultActivity.PARKING_IMAGE_URL, "");
-        this.specialInstruction = b.getString(SearchResultActivity.SPECIAL_INSTRUCTION, "");
-        this.startDate = b.getString(SearchResultActivity.START_DATE, "");
-        this.endDate = b.getString(SearchResultActivity.END_DATE, "");
-        this.startTime = b.getString(SearchResultActivity.START_TIME, "");
-        this.endTime = b.getString(SearchResultActivity.END_TIME, "");
-        this.price = b.getDouble(SearchResultActivity.PRICE, 0);
-        this.parkingIDRef = b.getString(SearchResultActivity.PARKING_ID_REF, "");
-        this.ownerParkingID = b.getString(SearchResultActivity.OWNER_PARKING_ID, "");
-        this.reservedBy = b.getParcelable(SearchResultActivity.RESERVE_BY);
-    }
 
     protected ParkingSpace(Parcel in) {
         address = in.readParcelable(Address.class.getClassLoader());
         owner = in.readParcelable(User.class.getClassLoader());
         parkingImageUrl = in.readString();
         specialInstruction = in.readString();
-        startDate = in.readString();
-        endDate = in.readString();
-        price = in.readDouble();
-        parkingIDRef = in.readString();
+        parkingID = in.readString();
     }
 
-    public static final Creator<ParkingSpace> CREATOR = new Creator<ParkingSpace>() {
-        @Override
-        public ParkingSpace createFromParcel(Parcel in) {
-            return new ParkingSpace(in);
-        }
+    public ParkingSpace() {}
 
-        @Override
-        public ParkingSpace[] newArray(int size) {
-            return new ParkingSpace[size];
-        }
-    };
-
-    public String getParkingIDRef() {
-        return parkingIDRef;
+    public ParkingSpace(Address address, User owner, String parkingImageUrl, String specialInstruction, String parkingID, String ownerID) {
+        this.address = address;
+        this.owner = owner;
+        this.parkingImageUrl = parkingImageUrl;
+        this.specialInstruction = specialInstruction;
+        this.parkingID = parkingID;
+        reviews = new ArrayList<>();
+        totalRating = 0;
+        averageRating = 0;
     }
 
-    public void setParkingIDRef(String parkingIDRef) {
-        this.parkingIDRef = parkingIDRef;
+    public void addRatingAndCalculate(double newRating) {
+        totalRating += newRating;
+        averageRating = totalRating/reviews.size();
+    }
+
+    public double getTotalRating() {
+        return totalRating;
+    }
+
+    public void setTotalRating(double totalRating) {
+        this.totalRating = totalRating;
+    }
+
+    public double getAverageRating() {
+        return averageRating;
+    }
+
+    public void setAverageRating(double averageRating) {
+        this.averageRating = averageRating;
+    }
+
+    public void addToReviewList(String reviewID, double newRating, double oldRating) {
+        if (reviews == null)
+            reviews = new ArrayList<>();
+
+        //only add review id if it doesn't exist
+        if (!reviews.contains(reviewID)) {  //adding a brand new review
+            reviews.add(reviewID);
+            totalRating += newRating;
+            averageRating = totalRating/reviews.size();
+        } else {    //updating an existing review
+            totalRating -= oldRating;    //subtract old rating first
+            totalRating += newRating;   //add new rating to total
+            averageRating = totalRating/reviews.size(); //calculate new average value
+        }
+    }
+
+    public ArrayList<String> getReviews() {
+        return reviews;
+    }
+
+    public void setReviews(ArrayList<String> reviews) {
+        this.reviews = reviews;
     }
 
     public Address getAddress() {
@@ -120,74 +120,60 @@ public class ParkingSpace implements Parcelable{
         this.specialInstruction = specialInstruction;
     }
 
-    public String getStartDate() {
-        return startDate;
+    public String getParkingID() {
+        return parkingID;
     }
 
-    public void setStartDate(String startDate) {
-        this.startDate = startDate;
+    public void setParkingID(String parkingID) {
+        this.parkingID = parkingID;
     }
 
-    public String getEndDate() {
-        return endDate;
-    }
+    public static final Creator<ParkingSpace> CREATOR = new Creator<ParkingSpace>() {
+        @Override
+        public ParkingSpace createFromParcel(Parcel in) {
+            return new ParkingSpace(in);
+        }
 
-    public void setEndDate(String endDate) {
-        this.endDate = endDate;
-    }
+        @Override
+        public ParkingSpace[] newArray(int size) {
+            return new ParkingSpace[size];
+        }
+    };
 
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
-    }
-
-    public String getStartTime() {return this.startTime;}
-
-    public void setStartTime(String startTime) {this.startTime = startTime;}
-
-    public String getEndTime() { return this.endTime;}
-
-    public void setEndTime(String endTime) {this.endTime = endTime;}
-
-    public void setOwnerParkingID(String id) {this.ownerParkingID = id;}
-
-    public String getOwnerParkingID() {return this.ownerParkingID;}
-
-    public void setReservedBy(User seeker) {
-        this.reservedBy = seeker;
-    }
-
-    public User getReservedBy(){return this.reservedBy;}
-
+    /**
+     * Describe the kinds of special objects contained in this Parcelable
+     * instance's marshaled representation. For example, if the object will
+     * include a file descriptor in the output of {@link #writeToParcel(Parcel, int)},
+     * the return value of this method must include the
+     * {@link #CONTENTS_FILE_DESCRIPTOR} bit.
+     *
+     * @return a bitmask indicating the set of special object types marshaled
+     * by this Parcelable object instance.
+     */
     @Override
     public int describeContents() {
         return 0;
     }
 
+    /**
+     * Flatten this object in to a Parcel.
+     *
+     * @param dest  The Parcel in which the object should be written.
+     * @param flags Additional flags about how the object should be written.
+     *              May be 0 or {@link #PARCELABLE_WRITE_RETURN_VALUE}.
+     */
     @Override
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeParcelable(address, flags);
         dest.writeParcelable(owner, flags);
         dest.writeString(parkingImageUrl);
         dest.writeString(specialInstruction);
-        dest.writeString(startDate);
-        dest.writeString(endDate);
-        dest.writeDouble(price);
-        dest.writeString(parkingIDRef);
+        dest.writeString(parkingID);
     }
 
-    public ParkingSpace clone() {
-        ParkingSpace p = new ParkingSpace(address, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime,
-                endTime, price, parkingIDRef);
-        p.setOwnerParkingID(this.ownerParkingID);
-        p.setReservedBy(this.reservedBy);
-        return p;
-    }
-
+    //Use for displaying parking space names in new listing activity
+    @Override
     public String toString() {
-        return address.toString() + " " + owner.toString() + " " + startDate + " " + endDate + " "+ startTime + " " + endTime + "" + price;
+        return parkingID;
     }
 }

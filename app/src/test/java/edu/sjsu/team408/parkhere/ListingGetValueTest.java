@@ -1,20 +1,18 @@
 package edu.sjsu.team408.parkhere;
 
-import android.test.ActivityUnitTestCase;
 import com.google.android.gms.maps.model.LatLng;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import static org.junit.Assert.*;
 
 /**
  * Created by DuocNguyen on 11/8/17.
  */
-public class ParkingSpaceGetValueTest {
+public class ListingGetValueTest {
     @Test
     /**
      * Tests the helper function getValue() in NewListingActivity.java class.
-     * This test should return a ParkingSpace with data value.
+     * This test should return a Listing with data value.
      */
     public void getParkingSpaceDataValue1() throws Exception {
         String startDate = "10-10-2017";
@@ -33,8 +31,8 @@ public class ParkingSpaceGetValueTest {
         Address a = new Address(address,point);
         User u = new User();
         u.setName(ownerName);
-        ParkingSpace expectedParkingSpace = new ParkingSpace(a, u, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime, Double.parseDouble(price), parkingID);
-        String expected = expectedParkingSpace.toString();
+        Listing expectedListing = new Listing(a, u, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime, Double.parseDouble(price), parkingID);
+        String expected = expectedListing.toString();
 
         assertEquals(expected, NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point, parkingID).toString());
     }

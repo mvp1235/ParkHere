@@ -45,7 +45,12 @@
         <activity android:name=".ListingHistoryActivity" />
         <activity android:name=".ReservationListActivity" />
         <activity android:name=".EditListingActivity" />
-        <activity android:name=".BookingReviewActivity"></activity>
+        <activity android:name=".BookingReviewActivity" />
+        <activity android:name=".NewParkingSpaceActivity" />
+        <activity android:name=".ViewParkingSpacesActivity" />
+        <activity android:name=".ManageParkingSpaceActivity" />
+        <activity android:name=".EditParkingSpaceActivity" />
+        <activity android:name=".ViewRatingsActivity"></activity>
         <activity android:name=".ChatDetailActivity" />
     </application>
 

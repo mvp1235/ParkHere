@@ -2,6 +2,7 @@ package edu.sjsu.team408.parkhere;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.ArrayList;
 
@@ -16,11 +17,12 @@ public class User implements Parcelable{
     private String phoneNumber;
     private String emailAddress;
     private String profileURL;
-    private ArrayList<ParkingSpace> myCurrentReservedParkings;
-    private ArrayList<ParkingSpace> myListingHistory;
-    private ArrayList<ParkingSpace> myReservationList;
+    private ArrayList<Listing> myCurrentReservedParkings;
+    private ArrayList<Listing> myListingHistory;
+    private ArrayList<Listing> myReservationList;
     private ArrayList<String> myFeedbacks;        // feedback reviews received from others who rented my parking space
     private ArrayList<String> myReviews;          // reviews left on other listing owners
+    private ArrayList<String> myParkingSpaces;
 
     public User(){};
 
@@ -36,6 +38,7 @@ public class User implements Parcelable{
         this.myReservationList = new ArrayList<>();
         this.myReviews = new ArrayList<>();
         this.myFeedbacks = new ArrayList<>();
+        this.myParkingSpaces = new ArrayList<>();
     }
 
 
@@ -123,49 +126,49 @@ public class User implements Parcelable{
         this.profileURL = profileURL;
     }
 
-    public void addReservedParking(ParkingSpace p) {
+    public void addReservedParking(Listing p) {
         if(myCurrentReservedParkings == null) {
-            myCurrentReservedParkings = new ArrayList<ParkingSpace>();
+            myCurrentReservedParkings = new ArrayList<Listing>();
         }
         myCurrentReservedParkings.add(p);
     }
 
-    public ArrayList<ParkingSpace> getMyCurrentReservedParkings() {
+    public ArrayList<Listing> getMyCurrentReservedParkings() {
         return myCurrentReservedParkings;
     }
 
-    public void addToListingHistory(ArrayList<ParkingSpace> newList) {
+    public void addToListingHistory(ArrayList<Listing> newList) {
         if(myListingHistory == null) {
             this.myListingHistory = newList;
         } else {
-            ArrayList<ParkingSpace> newListHistory = newList;
-            for (ParkingSpace ps : myListingHistory) {
+            ArrayList<Listing> newListHistory = newList;
+            for (Listing ps : myListingHistory) {
                 newList.add(ps);
             }
             this.myListingHistory = newListHistory;
         }
     }
 
-    public ArrayList<ParkingSpace> getMyListingHistory() {return this.myListingHistory;}
+    public ArrayList<Listing> getMyListingHistory() {return this.myListingHistory;}
 
-    public void setMyListingHistory(ArrayList<ParkingSpace> myListingHistory) {
+    public void setMyListingHistory(ArrayList<Listing> myListingHistory) {
         this.myListingHistory = myListingHistory;
     }
 
-    public void setMyCurrentReservedParkings(ArrayList<ParkingSpace> myCurrentReservedParkings){
+    public void setMyCurrentReservedParkings(ArrayList<Listing> myCurrentReservedParkings){
         this.myCurrentReservedParkings = myCurrentReservedParkings;
     }
 
-    public ArrayList<ParkingSpace> getMyReservationList(){
+    public ArrayList<Listing> getMyReservationList(){
         return this.myReservationList;
     }
 
-    public void setMyReservationList(ArrayList<ParkingSpace> myReservationList){
+    public void setMyReservationList(ArrayList<Listing> myReservationList){
         this.myReservationList = myReservationList;
     }
-    public void addToMyReservetionList(ParkingSpace p) {
+    public void addToMyReservetionList(Listing p) {
         if(myReservationList == null) {
-            myReservationList = new ArrayList<ParkingSpace>();
+            myReservationList = new ArrayList<Listing>();
         }
         myReservationList.add(p);
     }
@@ -178,13 +181,6 @@ public class User implements Parcelable{
         return getName();
     }
 
-    public ArrayList<String> getMyReviews() {
-        return myReviews;
-    }
-
-    public void setMyReviews(ArrayList<String> myReviews) {
-        this.myReviews = myReviews;
-    }
 
     public void addToReviewList(String reviewID) {
         if (myReviews == null)
@@ -195,13 +191,6 @@ public class User implements Parcelable{
             myReviews.add(reviewID);
     }
 
-    public ArrayList<String> getMyFeedbacks() {
-        return myFeedbacks;
-    }
-
-    public void setMyFeedbacks(ArrayList<String> myFeedbacks) {
-        this.myFeedbacks = myFeedbacks;
-    }
 
     public void addToFeedbackList(String reviewID) {
         if (myFeedbacks == null)
@@ -212,4 +201,46 @@ public class User implements Parcelable{
             myFeedbacks.add(reviewID);
     }
 
+    public void addToParkingSpacesList(String pID) {
+        if (myParkingSpaces == null)
+            myParkingSpaces = new ArrayList<>();
+
+        //only add parkingSpace id if it doesn't exist
+        if (!myParkingSpaces.contains(pID))
+            myParkingSpaces.add(pID);
+    }
+
+    public void deleteFromParkingSpaces(String pID) {
+        if (myParkingSpaces == null)
+            myParkingSpaces = new ArrayList<>();
+        //only add parkingSpace id if it doesn't exist
+        if (myParkingSpaces.contains(pID)) {
+            myParkingSpaces.remove(pID);
+        }
+    }
+
+    public ArrayList<String> getMyFeedbacks() {
+        return myFeedbacks;
+    }
+
+    public void setMyFeedbacks(ArrayList<String> myFeedbacks) {
+        this.myFeedbacks = myFeedbacks;
+    }
+    public ArrayList<String> getMyReviews() {
+        return myReviews;
+    }
+
+    public void setMyReviews(ArrayList<String> myReviews) {
+        this.myReviews = myReviews;
+    }
+
+    public ArrayList<String> getMyParkingSpaces() {
+        if (myParkingSpaces == null)
+            myParkingSpaces = new ArrayList<>();
+        return myParkingSpaces;
+    }
+
+    public void setMyParkingSpaces(ArrayList<String> myParkingSpaces) {
+        this.myParkingSpaces = myParkingSpaces;
+    }
 }

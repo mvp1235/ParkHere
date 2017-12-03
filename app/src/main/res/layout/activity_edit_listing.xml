@@ -10,6 +10,8 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
         android:layout_marginLeft="@dimen/activity_horizontal_margin"
         android:layout_marginRight="@dimen/activity_horizontal_margin">
 
@@ -40,9 +42,11 @@
                 android:id="@+id/editListingEditPhotoBtn"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
                 android:layout_gravity="center_vertical"
-                android:text="@string/editProfile" />
+                android:layout_weight="1"
+                android:text="@string/editProfile"
+                android:background="@android:color/holo_orange_light"
+                android:textColor="@color/common_google_signin_btn_text_dark_default" />
 
         </LinearLayout>
 
@@ -201,8 +205,8 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
-                android:hint="@string/dateSample"
-                android:focusable="false"/>
+                android:focusable="false"
+                android:hint="@string/dateSample" />
 
         </LinearLayout>
 
@@ -303,8 +307,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:background="@android:color/holo_blue_bright"
             android:text="@string/save"
             android:textAlignment="center"
+            android:textColor="@color/common_google_signin_btn_text_dark_default"
             android:textStyle="bold" />
 
     </LinearLayout>

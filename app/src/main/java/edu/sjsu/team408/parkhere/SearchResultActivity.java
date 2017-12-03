@@ -12,6 +12,7 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -37,6 +38,7 @@ public class SearchResultActivity extends ListActivity {
     private static final String TAG = SearchResultActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
 
+    static final String LISTING_ID = "listingID";
     static final String PARKING_BUNDLE = "parkingBundle";
     static final String ADDRESS = "address";
     static final String OWNER = "owner";
@@ -54,7 +56,7 @@ public class SearchResultActivity extends ListActivity {
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
     private ArrayList<String> availableParkingSpacesOnDate;
     private DatabaseReference databaseReference;
-    private ArrayList<ParkingSpace> parkingSpaces;
+    private ArrayList<Listing> listings;
 
     private FusedLocationProviderClient mFusedLocationClient;
     private Location mLocation;
@@ -78,9 +80,6 @@ public class SearchResultActivity extends ListActivity {
             userHasDesiredLocation = false;
         else
             userHasDesiredLocation = true;
-
-
-
 
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
@@ -202,7 +201,7 @@ public class SearchResultActivity extends ListActivity {
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ParkingSpace parking = (ParkingSpace)getListAdapter().getItem(position);
+        Listing parking = (Listing)getListAdapter().getItem(position);
         Intent intent = new Intent(this, DetailParkingActivity.class);
 
         Bundle b = new Bundle();
@@ -218,6 +217,7 @@ public class SearchResultActivity extends ListActivity {
         b.putString(PARKING_IMAGE_URL, parking.getParkingImageUrl());
         b.putString(OWNER_PARKING_ID, parking.getOwnerParkingID());
         b.putParcelable(RESERVE_BY, parking.getReservedBy());
+        b.putString(LISTING_ID, parking.getId());
 
         intent.putExtra(PARKING_BUNDLE, b);
         intent.putExtra("requestCode", VIEW_DETAIL_PARKING_FROM_RESULT);
@@ -235,7 +235,7 @@ public class SearchResultActivity extends ListActivity {
     }
 
     private void searchResult (String searchTimeTerm) {
-        parkingSpaces = new ArrayList<>();  // get the parking spaces.
+        listings = new ArrayList<>();  // get the parking spaces.
         if(availableParkingSpacesOnDate.size() > 0) {
             for(String available: availableParkingSpacesOnDate) {
                 String tokens[] = available.split("/"); //[0] contains time, [1] contains parkingID to search database
@@ -247,8 +247,8 @@ public class SearchResultActivity extends ListActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             if(withinAvailableTime) {
                                 if (dataSnapshot.child("Listings").hasChild(parkingID)) {
-                                    ParkingSpace p = dataSnapshot.child("Listings").child(parkingID).getValue(ParkingSpace.class);
-                                    parkingSpaces.add(p);
+                                    Listing p = dataSnapshot.child("Listings").child(parkingID).getValue(Listing.class);
+                                    listings.add(p);
                                     showResult();
                                 }
                             }
@@ -268,7 +268,7 @@ public class SearchResultActivity extends ListActivity {
         // if a location is specified
         if (mLocation != null) {
             // Create the adapter to convert the array to views
-            ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, parkingSpaces,
+            ListingAdapter adapter = new ListingAdapter(this, listings,
                     mLocation);
 
             // Attach the adapter to a ListView
@@ -278,11 +278,6 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    public void showReservationList(ArrayList<ParkingSpace> list){
-
-        ParkingSpaceAdapter adapter = new ParkingSpaceAdapter(this, list, null);
-        setListAdapter(adapter);
-    }
 
     private static boolean isWithinAvailableTime(String searchTime, String availableTime) {
         String availableTimeTokens[] = availableTime.split(":");

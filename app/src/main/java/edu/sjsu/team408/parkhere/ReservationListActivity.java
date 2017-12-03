@@ -26,7 +26,7 @@ public class ReservationListActivity extends ListActivity{
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private User currentUser;
-    private ArrayList<ParkingSpace> reservationList;
+    private ArrayList<Listing> reservationList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +65,7 @@ public class ReservationListActivity extends ListActivity{
 
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
-        ParkingSpace parking = (ParkingSpace)getListAdapter().getItem(position);
+        Listing parking = (Listing)getListAdapter().getItem(position);
         Intent intent = new Intent(this, DetailParkingActivity.class);
 
         Bundle b = new Bundle();

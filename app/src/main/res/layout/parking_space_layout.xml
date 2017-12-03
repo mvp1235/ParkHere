@@ -1,70 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:orientation="vertical" android:layout_width="match_parent"
     android:layout_margin="@dimen/activity_vertical_margin"
     android:paddingLeft="@dimen/profile_item_padding"
     android:paddingRight="@dimen/profile_item_padding"
-    android:orientation="vertical">
-
-    <ImageView
-        android:id="@+id/parkingPhoto"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:scaleType="fitXY"
-        android:layout_marginTop="30dp"
-        app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
+    android:layout_height="match_parent">
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/profile_item_margin"
-        android:orientation="horizontal">
+        android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/dateLabel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/available"
-            android:textColor="@color/common_google_signin_btn_text_dark_focused"
-            android:textStyle="bold" />
+        <ImageView
+            android:id="@+id/parkingPhoto"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:scaleType="fitXY"
+            android:layout_marginTop="30dp"
+            app:srcCompat="@drawable/common_google_signin_btn_icon_dark" />
 
-        <TextView
-            android:id="@+id/parkingDate"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="3"
-            android:gravity="center_vertical"
-            android:text="@string/dateSample" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:orientation="horizontal">
-
-        <TextView
-            android:id="@+id/priceLabel"
-            android:layout_width="0dp"
-            android:layout_height="match_parent"
-            android:layout_weight="1"
-            android:gravity="center_vertical"
-            android:text="@string/price"
-            android:textColor="@color/common_google_signin_btn_text_dark_focused"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/parkingPrice"
-            android:layout_width="0dp"
-            android:layout_weight="3"
-            android:layout_height="match_parent"
-            android:gravity="center_vertical"
-            android:text="@string/priceSample" />
 
     </LinearLayout>
 
@@ -76,26 +30,70 @@
         android:orientation="horizontal">
 
         <TextView
-            android:id="@+id/distanceLabel"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="@string/distance"
+            android:text="@string/parkingID"
             android:textColor="@color/common_google_signin_btn_text_dark_focused"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/parkingDistance"
+            android:id="@+id/parkingID"
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
+            android:gravity="center_vertical" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center_vertical"
-            android:text="@string/sampleDistance" />
+            android:text="@string/address"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/parkingAddress"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center_vertical" />
 
     </LinearLayout>
 
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="@dimen/activity_vertical_margin"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:gravity="center_vertical"
+            android:text="@string/specialInstruction"
+            android:textColor="@color/common_google_signin_btn_text_dark_focused"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/parkingInstruction"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:gravity="center_vertical" />
+
+    </LinearLayout>
 
 </LinearLayout>
-
