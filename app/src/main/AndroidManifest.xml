@@ -46,6 +46,7 @@
         <activity android:name=".ReservationListActivity" />
         <activity android:name=".EditListingActivity" />
         <activity android:name=".BookingReviewActivity"></activity>
+        <activity android:name=".ChatDetailActivity" />
     </application>
 
 </manifest>

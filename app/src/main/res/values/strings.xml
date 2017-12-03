@@ -64,6 +64,11 @@
     <string name="reviewHint">give a description about your experience</string>
     <string name="submit">Submit</string>
     <string name="reservations">Reservations</string>
+    <string name="Users">Users</string>
+    <string name="chats">chats</string>
+    <string name="chatsOfUsersDatabaseField">chats</string>
+    <string name="membersOfChats">membersOfChats</string>
+    <string name="currentlyChatWiths">currentlyChatWiths</string>
 
 
 </resources>

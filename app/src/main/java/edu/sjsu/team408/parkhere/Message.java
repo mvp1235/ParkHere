@@ -15,7 +15,7 @@ import java.util.Map;
 //when serializing to a class annotated with this annotation.
 @IgnoreExtraProperties
 public class Message {
-    private String userId;
+    private String authorId;
     private String author;
     private String content;
     private Date timestamp;
@@ -24,11 +24,11 @@ public class Message {
         // Default constructor required for calls to DataSnapshot.getValue(Post.class)
     }
 
-    public Message(String userId,
+    public Message(String authorId,
                    String author,
                    String content,
                    Date timestamp) {
-        this.userId = userId;
+        this.authorId = authorId;
         this.author = author;
         this.content = content;
         this.timestamp = timestamp;
@@ -37,7 +37,7 @@ public class Message {
     @Exclude //Marks a field as excluded from the Database.
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
-        result.put("userId", userId);
+        result.put("authorId", authorId);
         result.put("author", author);
         result.put("content", content);
         result.put("timestamp", timestamp);
@@ -45,12 +45,12 @@ public class Message {
         return result;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getAuthorId() {
+        return authorId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setAuthorId(String authorId) {
+        this.authorId = authorId;
     }
 
     public String getAuthor() {

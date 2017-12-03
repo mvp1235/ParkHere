@@ -19,10 +19,17 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     public static class ViewHolder extends RecyclerView.ViewHolder {
         public TextView chatWithLabel;
         public TextView lastMessageLabel;
+        public TextView timestampLabel;
         public ViewHolder(View itemView) {
             super(itemView);
             chatWithLabel = itemView.findViewById(R.id.chatWithLabel);
             lastMessageLabel = itemView.findViewById(R.id.lastMessageLabel);
+            timestampLabel = itemView.findViewById(R.id.timestampLabel);
+        }
+        public void bindToPost(Chat chat) {
+            chatWithLabel.setText(chat.getChatWithName());
+            lastMessageLabel.setText(chat.getLastMessage());
+            timestampLabel.setText(chat.getTimestamp().toString());
         }
     }
 
@@ -30,11 +37,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         this.listOfChats = listOfChats;
     }
 
-    @Override
-    public int getItemCount() {
-        return listOfChats.size();
-    }
-
+    // Create new views (invoked by the layout manager)
     @Override
     public ChatAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater
@@ -43,6 +46,7 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return new ViewHolder(v);
     }
 
+    // Replace the contents of a view (invoked by the layout manager)
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.chatWithLabel.setText(listOfChats.get(position).getChatWithName());
@@ -52,5 +56,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
     @Override
     public void onAttachedToRecyclerView(RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    // Return the size of the dataset (invoked by the layout manager)
+    @Override
+    public int getItemCount() {
+        return listOfChats.size();
     }
 }

@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 
 import static android.support.test.espresso.Espresso.closeSoftKeyboard;
 import static android.support.test.espresso.Espresso.onView;
+import static android.support.test.espresso.Espresso.pressBack;
 import static android.support.test.espresso.action.ViewActions.click;
 import static android.support.test.espresso.action.ViewActions.typeText;
 import static android.support.test.espresso.matcher.ViewMatchers.withId;
@@ -37,13 +38,43 @@ public class ChatFragmentTest {
         closeSoftKeyboard();
         onView(withId(R.id.new_message_button))
                 .perform(click());
-        slowDown2Secs();
+        slowDown1Secs();
+    }
+
+    @Test
+    public void createANewChatTest() {
+        slowDown1Secs();
+        onView(withId(R.id.navigation_messaging))
+                .perform(click());
+        slowDown1Secs();
+        onView(withId(R.id.new_message_button))
+                .perform(click());
+        slowDown1Secs();
+        onView(withId(R.id.toAutoCompleteTextView))
+                .perform(typeText("huy1"));
+        closeSoftKeyboard();
+        slowDown1Secs();
+        onView(withId(R.id.input_message_editText))
+                .perform(typeText("hello"));
+        closeSoftKeyboard();
+        onView(withId(R.id.send_message_button))
+                .perform(click());
+        slowDown1Secs();
+        onView(withId(R.id.input_message_editText))
+                .perform(typeText("how are"));
+        closeSoftKeyboard();
+        slowDown1Secs();
+        onView(withId(R.id.send_message_button))
+                .perform(click());
+        slowDown1Secs();
+        pressBack();
+        slowDown1Secs();
     }
 
     // A function to delay the automated test in order to see it in action.
-    private void slowDown2Secs() {
+    private void slowDown1Secs() {
         try {
-            Thread.sleep(2000);
+            Thread.sleep(1000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }

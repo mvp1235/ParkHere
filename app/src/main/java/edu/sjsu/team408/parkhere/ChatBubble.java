@@ -20,4 +20,15 @@ public class ChatBubble {
     public boolean getMyMessage() {
         return myMessage;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        ChatBubble that = (ChatBubble) o;
+
+        if (myMessage != that.myMessage) return false;
+        return content != null ? content.equals(that.content) : that.content == null;
+    }
 }
