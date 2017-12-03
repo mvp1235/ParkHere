@@ -468,7 +468,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Listing[] spaces = splitParkingSpace(clickedParking);  //0.
         listingToBook = spaces[0];
-        deleteParkingReference(clickedParking, spaces);     //1.
+        updateListingReferences(clickedParking, spaces);     //1.
 
         //combined 2 and 6 inside 1 to prevent concurrency problem (too many listener for data change at once) - Huy
 //        deleteParkingListing(parkingID);        //2.
@@ -713,7 +713,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         return splitted;
     }
 
-    public void deleteParkingReference(final Listing clickedParking, final Listing[] spaces) {
+    public void updateListingReferences(final Listing clickedParking, final Listing[] spaces) {
         final String listingID = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
