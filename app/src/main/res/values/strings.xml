@@ -83,6 +83,7 @@
     <string name="chatsOfUsersDatabaseField">chats</string>
     <string name="membersOfChats">membersOfChats</string>
     <string name="currentlyChatWiths">currentlyChatWiths</string>
+    <string name="currentLocation">Current Location if leave blank</string>
 
 
 </resources>
