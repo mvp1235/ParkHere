@@ -502,7 +502,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         parkingSpaceToBook = spaces[0];
 
         deleteParkingReference(clickedParking);     //1.
-        deleteParkingListing(listingID);        //2.
+//        deleteParkingListing(listingID);        //2.  // Huy - I think we still should keep all the listings, even after it being booked, so we can reference to it later in history
         addSplittedParkingsToDatabase(spaces);  //6
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -802,7 +802,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         while(p != null && (i < outOfBounds)) {
             p = spaces[i];
             if (p != null) {
-                p.setId(databaseReference.child("AvailableParkings").push().getKey());
+                String newListingID = databaseReference.child("AvailableParkings").push().getKey();
+                p.setId(newListingID);
 
                 String p1ChildKey = p.getId();
 
@@ -829,6 +830,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
                 databaseReference.child("Listings").child(p1ChildKey).setValue(p);
             }
+
             i++;
         }
 
