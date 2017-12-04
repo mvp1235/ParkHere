@@ -65,7 +65,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private TextView reserveToTime, reserveFromDate, reserveToDate, reserveFromTime;
     private Calendar calendar;
     private int year, month, day;
-    private Listing listingToBook;
+    private Listing parkingSpaceToBook;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -497,14 +497,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         //5. Update owner that they have reserved which portion of the available time.
         //6. add the splitted parking space to database if there are remainding ones.
 
-        Listing[] spaces = splitParkingSpace(clickedParking);  //0.
-        listingToBook = spaces[0];
-        updateListingReferences(clickedParking, spaces);     //1.
-
-        //combined 2 and 6 inside 1 to prevent concurrency problem (too many listener for data change at once) - Huy
-        //deleteParkingListing(parkingID);        //2.
-        //addSplittedParkingsToDatabase(spaces);  //6
-
+        Listing [] spaces = splitParkingSpace(clickedParking);  //0.
+        parkingSpaceToBook = spaces[0];
+        deleteParkingReference(clickedParking);     //1.
+        deleteParkingListing(parkingID);        //2.
+        addSplittedParkingsToDatabase(spaces);  //6
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -513,16 +510,14 @@ public class DetailParkingActivity extends AppCompatActivity {
                     if(!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                            currentUser.addReservedParking(listingToBook);     //3.
+                            currentUser.addReservedParking(parkingSpaceToBook);     //3.
                             String currentUserID = currentUser.getId();
                             databaseReference.child("Users").child(currentUserID).setValue(currentUser); //4.
-
                             setResult(RESULT_OK);
                             finish();
                         }
                     }
                 }
-
             }
             @Override
             public void onCancelled(DatabaseError databaseError) {
@@ -530,34 +525,33 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
 
 
-
     }
 
 
     public void notifyOwner() {
-        final String ownerID = listingToBook.getOwnerParkingID();
+        final String ownerID = parkingSpaceToBook.getOwnerParkingID();
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                    if(currentUser == null){
-                        if(firebaseAuth.getCurrentUser() != null) {
-                            String targetID = firebaseAuth.getCurrentUser().getUid();
-                            if (!targetID.isEmpty()) {
-                                if (dataSnapshot.child("Users").hasChild(targetID)) {
-                                    currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-                                }
+                if(currentUser == null){
+                    if(firebaseAuth.getCurrentUser() != null) {
+                        String targetID = firebaseAuth.getCurrentUser().getUid();
+                        if (!targetID.isEmpty()) {
+                            if (dataSnapshot.child("Users").hasChild(targetID)) {
+                                currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
                             }
                         }
                     }
-                    Listing p = listingToBook.clone();
-                    User currentUserPublicInfo = currentUser.clone();
-                    p.setReservedBy(currentUserPublicInfo);
-                    if (dataSnapshot.child("Users").hasChild(ownerID)) {
-                        User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
-                        owner.addToMyReservetionList(p);
-                        databaseReference.child("Users").child(ownerID).setValue(owner);
-                    }
                 }
+                Listing p = parkingSpaceToBook.clone();
+                User currentUserPublicInfo = currentUser.clone();
+                p.setReservedBy(currentUserPublicInfo);
+                if (dataSnapshot.child("Users").hasChild(ownerID)) {
+                    User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                    owner.addToMyReservetionList(p);
+                    databaseReference.child("Users").child(ownerID).setValue(owner);
+                }
+            }
 
 
             @Override
@@ -588,7 +582,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         if(clickedParkingStartDate.equals(reserveStartDate) && reserveEndDate.equals(clickedParkingEndDate)){
             //reserving the entire clicked parking.
-                reserveParking = clickedParking;
+            reserveParking = clickedParking;
             if(clickedParkingStartTime.equals(reserveStartTime) && clickedParkingEndTime.equals(reserveEndTime)) {
                 //do nothing
                 splittedParking1 = null;
@@ -744,44 +738,35 @@ public class DetailParkingActivity extends AppCompatActivity {
         return splitted;
     }
 
-    public void updateListingReferences(final Listing clickedParking, final Listing[] spaces) {
-        final String listingID = clickedParking.getId();
+    public void deleteParkingReference(Listing clickedParking) {
+        final String parkingIDRef = clickedParking.getParkingIDRef();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
 
         final GregorianCalendar startDateRef = getGregorianCalendarDate(startDate);
         final GregorianCalendar endDateRef = getGregorianCalendarDate(endDate);
 
-
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
-                //Remove all existing available parkings with the currentListingID
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
                         }
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
                 }
-                //Remove all existing available parkings with the currentListingID
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingID)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(listingID).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
                         }
                     }
                 }
-
-                //Remove the listing with the listingID
-//                if(dataSnapshot.child("Listings").hasChild(listingID)) {
-//                    databaseReference.child("Listings").child(listingID).removeValue();
-//                }
-                addSplittedParkingsToDatabase(spaces);
             }
 
             @Override
@@ -814,9 +799,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         while(p != null && (i < outOfBounds)) {
             p = spaces[i];
             if (p != null) {
-                p.setId(clickedParking.getId());
+                p.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
 
-                String p1ChildKey = p.getId();
+                String p1ChildKey = p.getParkingIDRef();
 
                 GregorianCalendar start = getGregorianCalendarDate(p.getStartDate());
                 GregorianCalendar end = getGregorianCalendarDate(p.getEndDate());
@@ -828,7 +813,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                 int endHour = endTimeSystem[0];
                 int endMinutes = endTimeSystem[1];
 
-                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getId();
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getParkingIDRef();
 
                 while (!start.equals(end)) {
                     String p1ParentKey = getDate(start);
@@ -839,7 +824,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     String p1ParentKey = getDate(start);
                     databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
                 }
-//                databaseReference.child("Listings").child(p1ChildKey).setValue(p);    //leave the original listing data alone
+                databaseReference.child("Listings").child(p1ChildKey).setValue(p);
             }
             i++;
         }

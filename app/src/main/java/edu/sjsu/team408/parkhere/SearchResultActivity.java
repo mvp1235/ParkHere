@@ -59,7 +59,7 @@ public class SearchResultActivity extends ListActivity {
     static final String LONGITUDE = "longitude";
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
-    private ArrayList<String> availableParkingSpacesOnDate;
+    private ArrayList<String> availableParkingSpaces;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
     private ArrayList<Listing> listings;
@@ -77,7 +77,7 @@ public class SearchResultActivity extends ListActivity {
         Intent intent = getIntent();
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
-        availableParkingSpacesOnDate = new ArrayList<String>();
+        availableParkingSpaces = new ArrayList<String>();
         //get user input for location
         final String dateSearchTerm = intent.getStringExtra("date");
         final String locationSearchTerm = intent.getStringExtra("location");
@@ -95,9 +95,9 @@ public class SearchResultActivity extends ListActivity {
                     for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings")
                             .child(dateSearchTerm).getChildren()) {
                         String p = userIDList.getValue(String.class);
-                        availableParkingSpacesOnDate.add(p);
+                        availableParkingSpaces.add(p);
                     }
-                    searchResult(searchTimeTerm, dateSearchTerm);
+                    searchResult(searchTimeTerm);
                 }
             }
 
@@ -266,43 +266,31 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
-    private void searchResult (String searchTimeTerm, final String dateSearchTerm) {
+    private void searchResult (String searchTimeTerm) {
         listings = new ArrayList<>();  // get the parking spaces.
-        if(availableParkingSpacesOnDate.size() > 0) {
-            for(String available: availableParkingSpacesOnDate) {
+        if(availableParkingSpaces.size() > 0) {
+            for(String available: availableParkingSpaces) {
                 String tokens[] = available.split("/"); //[0] contains time, [1] contains parkingID to search database
-                final String listingID = tokens[1];
-                final String availableTime = tokens[0];   //starthour-startminute-endhour-endminute
+                final String parkingID = tokens[1];
+                String availableTime = tokens[0];   //starthour-startminute-endhour-endminute
                 final boolean withinAvailableTime = isWithinAvailableTime(searchTimeTerm, availableTime);
-                    databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            if(withinAvailableTime) {
-                                if (dataSnapshot.child("AvailableParkings").hasChild(dateSearchTerm)) {
-                                    String s = dataSnapshot.child("AvailableParkings").child(dateSearchTerm).child(listingID).getValue(String.class);
-
-                                    String[] timeStrings = getTimeFormat(availableTime);
-
-                                    if (dataSnapshot.child("Listings").hasChild(listingID)) {
-                                        Listing p = dataSnapshot.child("Listings").child(listingID).getValue(Listing.class);
-                                        p.setStartDate(dateSearchTerm);
-                                        p.setEndDate(dateSearchTerm);
-                                        p.setStartTime(timeStrings[0]);
-                                        p.setEndTime(timeStrings[1]);
-
-                                        listings.add(p);
-                                        showResult();
-                                    }
-
-                                }
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        if(withinAvailableTime) {
+                            if (dataSnapshot.child("Listings").hasChild(parkingID)) {
+                                Listing p = dataSnapshot.child("Listings").child(parkingID).getValue(Listing.class);
+                                listings.add(p);
+                                showResult();
                             }
                         }
+                    }
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    });
+                    }
+                });
 
             }
         }

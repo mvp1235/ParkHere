@@ -545,6 +545,7 @@ public class NewListingActivity extends AppCompatActivity{
         GregorianCalendar startDateCalendar = new GregorianCalendar(startYear, startMonth - 1, startDay);
         GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
 
+        currentListingIDRef= parkingSpaceSpinner.getSelectedItem().toString();
 
         String owner = this.owner.getText().toString();
         String price = this.price.getText().toString();
@@ -554,8 +555,8 @@ public class NewListingActivity extends AppCompatActivity{
         String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentListingIDRef; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 
-        String pID = parkingSpaceSpinner.getSelectedItem().toString();
-        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, pID);
+
+        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentListingIDRef);
         String ownerParkingID = userID;
         parking.setOwnerParkingID(ownerParkingID);
 
