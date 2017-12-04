@@ -239,7 +239,7 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
             JsonObjectRequest stateReq = new JsonObjectRequest(Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
                 @Override
                 public void onResponse(JSONObject response) {
-                    JSONObject location;
+                    final JSONObject location;
                     try {
                         // Get JSON Array called "results" and then get the 0th
                         // complete object as JSON
@@ -247,18 +247,35 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
                         // Get the value of the attribute whose name is
                         // "formatted_string"
                         if (location.getDouble("lat") != 0 && location.getDouble("lng") != 0) {
-                            LatLng latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
-                            ParkingSpace p = new ParkingSpace();
-                            Address address = new Address(streetNumString, cityString, stateString, zipcodeString, latLng.latitude, latLng.longitude);
-                            User owner = new User(userID+"", null, null,null,null,null);
 
-                            p.setAddress(address);
-                            p.setParkingImageUrl("https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png");
-                            p.setSpecialInstruction(specialInstructionString);
-                            p.setParkingID(currentParkingID);
-                            p.setOwner(owner);
+                            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    if (dataSnapshot.child("ParkingSpaces").hasChild(currentParkingID)) {
 
-                            editParkingDatabase(p);
+                                        LatLng latLng = null;
+                                        try {
+                                            latLng = new LatLng(location.getDouble("lat"), location.getDouble("lng"));
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                        ParkingSpace p = dataSnapshot.child("ParkingSpaces").child(currentParkingID).getValue(ParkingSpace.class);
+                                        Address address = new Address(streetNumString, cityString, stateString, zipcodeString, latLng.latitude, latLng.longitude);
+
+                                        p.setAddress(address);
+                                        p.setSpecialInstruction(specialInstructionString);
+
+                                        editParkingDatabase(p);
+                                    }
+                                }
+
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
+
+                                }
+                            });
+
                             //Do what you want
                         }
                     } catch (JSONException e1) {
