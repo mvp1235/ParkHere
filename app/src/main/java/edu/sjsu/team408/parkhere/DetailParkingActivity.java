@@ -4,6 +4,7 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.location.Location;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -35,9 +36,11 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import java.util.Locale;
 
 public class DetailParkingActivity extends AppCompatActivity {
 
+    private static final double MILES_TO_METER = 1609.344;
     private final static int FROM_DATE = 0;
     private final static int TO_DATE = 1;
     private final static int FROM_TIME = 2;
@@ -48,7 +51,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private static final int WRITE_REVIEW_CODE = 11;
     private static final int MAKE_PAYMENT_CODE = 10000;
 
-    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
+    private TextView addressTV, ownerTV, specialInstructionTV, dateTV, priceTV, distanceTV, seekerLabel, seekerPhoneLabel, seekerEmailLabel, reviewCount;
     private TextView priceLabel, distanceLabel, specialInstructionLabel;
     private ImageView parkingPhoto;
     private Button reserveBtn, editBtn, reserveListBtn, reviewBtn, deleteBtn;
@@ -78,6 +81,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         seekerPhoneLabel = (TextView) findViewById(R.id.detailAddressLabel);
         seekerEmailLabel = (TextView) findViewById(R.id.detailDateLabel);
         priceLabel = (TextView) findViewById(R.id.detailPriceLabel);
+        distanceTV = (TextView) findViewById(R.id.detailParkingDistance);
         distanceLabel = (TextView) findViewById(R.id.detailDistanceLabel);
         specialInstructionLabel = (TextView) findViewById(R.id.detailSpecialInstructionLabel);
         ratingBar = (RatingBar) findViewById(R.id.detailParkingRatingBar);
@@ -157,6 +161,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         currentUser = (User) seekerBundle.get(SearchResultActivity.SEEKER);
 
         clickedParking = new Listing(bundle);
+
+        //setting distance Textview
+        String distanceAway = getDistanceAway(intent);
+        distanceAway = String.format(Locale.US, "%.2f miles away", Double.parseDouble(distanceAway));
+        distanceTV.setText(distanceAway);
 
         //This part is for default testing only****
         reserveFromDate.setText("From Date: " + clickedParking.getStartDate());
@@ -329,14 +338,28 @@ public class DetailParkingActivity extends AppCompatActivity {
         String seekerName = currentUser.getName();
         String seekerEmail = currentUser.getEmailAddress();
         String amount = clickedParking.getPrice() + "";
-        intent.putExtra("ownerName",ownerName);
+        intent.putExtra("ownerName", ownerName);
         intent.putExtra("ownerEmail", ownerEmail);
         intent.putExtra("seekerName", seekerName);
         intent.putExtra("seekerEmail", seekerEmail);
         intent.putExtra("amount", amount);
 
         startActivityForResult(intent, MAKE_PAYMENT_CODE);
+    }
 
+    private String getDistanceAway(Intent intent) {
+        double lat = intent.getDoubleExtra(SearchResultActivity.LATITUDE, 0);
+        double lng = intent.getDoubleExtra(SearchResultActivity.LONGITUDE, 0);
+
+        Location location = new Location("");
+        location.setLatitude(lat);
+        location.setLongitude(lng);
+
+        Location thatLocation = new Location("");
+        thatLocation.setLatitude(clickedParking.getAddress().getLatitude());
+        thatLocation.setLongitude(clickedParking.getAddress().getLongitude());
+
+        return String.valueOf(location.distanceTo(thatLocation) / MILES_TO_METER);
     }
 
 
@@ -463,7 +486,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         //here add the reserved parking to user's myCurrentReservedParkings lists
 
         //0. Split the parking space depending on seeker's booking range.
-        //1. Delete reference from AvailableParkings
+        //1. Delete reference from AvailableParkings, then add new splitted listings
         //2. Delete parking from Listings then split it.
         //3. Take seeker's desire booking range and reserve the space.
         //4. Update seeker's object in database.
@@ -472,7 +495,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Listing[] spaces = splitParkingSpace(clickedParking);  //0.
         listingToBook = spaces[0];
-        deleteParkingReference(clickedParking, spaces);     //1.
+        updateListingReferences(clickedParking, spaces);     //1.
 
         //combined 2 and 6 inside 1 to prevent concurrency problem (too many listener for data change at once) - Huy
 //        deleteParkingListing(parkingID);        //2.
@@ -717,7 +740,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         return splitted;
     }
 
-    public void deleteParkingReference(final Listing clickedParking, final Listing[] spaces) {
+    public void updateListingReferences(final Listing clickedParking, final Listing[] spaces) {
         final String listingID = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
@@ -730,6 +753,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
+                //Remove all existing available parkings with the currentListingID
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
@@ -739,6 +763,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
                 }
+                //Remove all existing available parkings with the currentListingID
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
@@ -748,9 +773,10 @@ public class DetailParkingActivity extends AppCompatActivity {
                     }
                 }
 
-                if(dataSnapshot.child("Listings").hasChild(clickedParking.getId())) {
-                    databaseReference.child("Listings").child(clickedParking.getId()).removeValue();
-                }
+                //Remove the listing with the listingID
+//                if(dataSnapshot.child("Listings").hasChild(listingID)) {
+//                    databaseReference.child("Listings").child(listingID).removeValue();
+//                }
                 addSplittedParkingsToDatabase(spaces);
             }
 
@@ -809,7 +835,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     String p1ParentKey = getDate(start);
                     databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
                 }
-                databaseReference.child("Listings").child(p1ChildKey).setValue(p);
+//                databaseReference.child("Listings").child(p1ChildKey).setValue(p);    //leave the original listing data alone
             }
             i++;
         }

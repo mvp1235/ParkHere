@@ -78,6 +78,7 @@
     <string name="reviewDescriptionSample">Great parking</string>
     <string name="writtenBy">Written by:</string>
     <string name="reviews">Reviews</string>
+    <string name="currentLocation">Current Location if leave blank</string>
 
 
 </resources>
