@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ public class MessageAdapter extends ArrayAdapter<ChatBubble> {
 
     private Activity activity;
     private List<ChatBubble> messages;
+    private String side;
 
     public MessageAdapter(Activity context, int resource, List<ChatBubble> objects) {
         super(context, resource, objects);
@@ -25,14 +27,16 @@ public class MessageAdapter extends ArrayAdapter<ChatBubble> {
         ViewHolder holder;
         LayoutInflater inflater = (LayoutInflater) activity.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
 
-        int layoutResource = 0; // determined by view type
+        int layoutResource; // determined by view type
         ChatBubble ChatBubble = getItem(position);
         int viewType = getItemViewType(position);
 
-        if (ChatBubble.getMyMessage()) {
+        if (ChatBubble.getIsMyMessage()) {
             layoutResource = R.layout.right_chat_bubble;
+            side = "right";
         } else {
             layoutResource = R.layout.left_chat_bubble;
+            side = "left";
         }
 
         if (convertView != null) {
@@ -44,7 +48,7 @@ public class MessageAdapter extends ArrayAdapter<ChatBubble> {
         }
 
         //set message content
-        holder.msg.setText(ChatBubble.getContent());
+        holder.msg.setText(ChatBubble.getMessage().getContent());
 
         return convertView;
     }
@@ -66,7 +70,11 @@ public class MessageAdapter extends ArrayAdapter<ChatBubble> {
         private TextView msg;
 
         public ViewHolder(View v) {
-            msg = (TextView) v.findViewById(R.id.txt_msg);
+            if (side.equals("right"))
+                msg = v.findViewById(R.id.txt_msg);
+            else if (side.equals("left"))
+                msg = v.findViewById(R.id.txt_msg);
         }
     }
+
 }

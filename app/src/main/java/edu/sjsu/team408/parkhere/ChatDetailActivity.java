@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -30,10 +31,11 @@ public class ChatDetailActivity extends AppCompatActivity {
 
     public static final String CURRENT_CHAT_KEY = "chat_key";
     private ListView listView;
-    private View sendButton;
+    private Button sendButton;
+    private Button deleteChatButton;
     private EditText editText;
     private TextView chatWithLabel;
-    private AutoCompleteTextView toAutoCompleteTextView;
+    private AutoCompleteTextView autoCompleteTextView;
     private ArrayList<User> userList;
 
     boolean myMessage = true;
@@ -43,13 +45,14 @@ public class ChatDetailActivity extends AppCompatActivity {
     private DatabaseReference mDatabase;
     private FirebaseUser user;
     private String chatKey;
-    String chatKeyString;
+    private boolean chatBetweenDoesExist;
 
     private DatabaseReference membersOfChatsReference;
     private DatabaseReference chatsReference;
     private DatabaseReference messagesReference;
     private DatabaseReference userChatsReference;
     private DatabaseReference userListReference;
+    private boolean hasListenedToMessagesRef;
 
 
     @Override
@@ -63,48 +66,46 @@ public class ChatDetailActivity extends AppCompatActivity {
         listView = findViewById(R.id.chat_listView);
         sendButton = findViewById(R.id.send_message_button);
         editText = findViewById(R.id.input_message_editText);
-        chatWithLabel = findViewById(R.id.friendLabel);
-        toAutoCompleteTextView = findViewById(R.id.toAutoCompleteTextView);
+        chatWithLabel = findViewById(R.id.chattingWithLabel);
+        autoCompleteTextView = findViewById(R.id.toAutoCompleteTextView);
 
+        chatKey = "";
         mDatabase = FirebaseDatabase.getInstance().getReference();
         user = FirebaseAuth.getInstance().getCurrentUser();
+        setupChildReferences();
 
         // Get chat key from intent
-        chatKey = getIntent().getStringExtra(CURRENT_CHAT_KEY);
         final String[] foundChatWithName = new String[1];
-        foundChatWithName[0] = "";
-        if (chatKey == null) {
-            // make a new chat
-            chatKey = mDatabase.child(getString(R.string.chats)).push().getKey();
-            setupChildReferences();
-        } else {
-            setupChildReferences();
+        if (getIntent().hasExtra(CURRENT_CHAT_KEY)) {
+            chatKey = getIntent().getStringExtra(CURRENT_CHAT_KEY);
+            setupChildReferencesDependentOnChatKey();
             userChatsReference
                     .child(chatKey)
                     .addListenerForSingleValueEvent(
-                    new ValueEventListener() {
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            Chat chat = dataSnapshot.getValue(Chat.class);
-                            foundChatWithName[0] = chat.getChatWithName();
-                            hideAutoCompleteTextViewAndShowChatWithNameLabel(
-                                    foundChatWithName[0]
-                            );
-                            sendButton.setEnabled(true);
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
+                            new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot dataSnapshot) {
+                                    Chat chat = dataSnapshot.getValue(Chat.class);
+                                    foundChatWithName[0] = chat.getChatWithName();
+                                    hideAutoCompleteTextViewAndShowChatWithNameLabel(
+                                            foundChatWithName[0]
+                                    );
+                                }
+                                @Override
+                                public void onCancelled(DatabaseError databaseError) {
 
-                        }
-                    }
-            );
+                                }
+                            }
+                    );
+        } else {
+            chatKey = "";
+            foundChatWithName[0] = "";
         }
 
         final String author = user.getEmail().split("@")[0];
-        setupChildReferences();
 
         //set ListView adapter first
-        adapter = new MessageAdapter(this, R.layout.right_chat_bubble, chatBubbleList);
+        adapter = new MessageAdapter(this, 0, chatBubbleList);
         listView.setAdapter(adapter);
 
         // setting up the autocomplete text field
@@ -129,75 +130,142 @@ public class ChatDetailActivity extends AppCompatActivity {
 
             }
         });
-        toAutoCompleteTextView.setAdapter(autoComplete);
+        autoCompleteTextView.setAdapter(autoComplete);
 
-        toAutoCompleteTextView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View v, boolean hasFocus) {
-                if (!hasFocus) {
-                    if (toAutoCompleteTextFieldIsValid()) {
-                        sendButton.setEnabled(true);
-                    } else {
-                        sendButton.setEnabled(false);
-                    }
-                }
-            }
-        });
+        // The "to:" field has to be filled in order to enable the sendButton.
+//        autoCompleteTextView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+//            @Override
+//            public void onFocusChange(View v, boolean hasFocus) {
+//                if (!hasFocus) {
+//                    if (autoCompleteTextFieldIsValid()) {
+//                        sendButton.setEnabled(true);
+//                    } else {
+//                        sendButton.setEnabled(false);
+//                    }
+//                }
+//            }
+//        });
 
         //event for button SEND
         sendButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (editText.getText().toString().trim().equals("")) {
+                // Check if input message is empty, then shows error message.
+                if (editText.getText().toString().trim().isEmpty()) {
                     makeToast("Please enter some text...");
                 } else {
-                    if (toAutoCompleteTextFieldIsValid()) {
+                    if (autoCompleteTextFieldIsValid()) {
                         String chatWithName;
                         String chatWithUid;
-                        if (foundChatWithName[0].equals("")) {
-                            chatWithName = toAutoCompleteTextView.getText().toString();
+
+                        if (foundChatWithName[0].isEmpty()) {
+                            chatWithName = autoCompleteTextView.getText().toString();
                         } else {
                             chatWithName = foundChatWithName[0];
                         }
                         chatWithUid = findUidByName(userList, chatWithName);
-                        if (chatWithUid.equals("")) {
+                        if (chatWithUid.isEmpty()) {
                             makeToast("The user you want to message to cannot be found." +
                                     "Please enter another user name");
                         } else {
-                            makeNewChat(author, user.getUid(), chatWithName, chatWithUid);
                             hideAutoCompleteTextViewAndShowChatWithNameLabel(chatWithName);
                             //add message to list
                             String messageContent = editText.getText().toString();
-                            writeNewMessage(author, user.getUid(), chatWithName, chatWithUid
-                                    , messageContent);
+                            makeANewChatIfNecessaryAndWriteNewMessage(author, user.getUid(),
+                                    chatWithName, chatWithUid, messageContent);
                         }
                     }
                 }
             }
         });
+        deleteChatButton = findViewById(R.id.deleteChatButton);
 
+        // messagesReference is chatKey dependent.
+        // Once chatKey is defined
+        if (!chatKey.isEmpty()) {
+            listenToMessagesReferenceChanges();
+            hasListenedToMessagesRef = true;
+
+            userChatsReference.child(chatKey).addValueEventListener(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            Chat chat = dataSnapshot.getValue(Chat.class);
+                            try {
+                                final String chatWithUid = chat.getChatWithUid();
+                                final String chatWithName = chat.getChatWithName();
+                                deleteChatButton.setOnClickListener(
+                                        new View.OnClickListener() {
+                                            @Override
+                                            public void onClick(View v) {
+                                                userListReference
+                                                        .child(user.getUid())
+                                                        .child(getString(R.string.chats))
+                                                        .child(chatKey)
+                                                        .removeValue();
+                                                userListReference
+                                                        .child(user.getUid())
+                                                        .child(getString(R.string.currentlyChatWiths))
+                                                        .child(chatWithName)
+                                                        .removeValue();
+                                                messagesReference.removeValue();
+                                                userListReference
+                                                        .child(chatWithUid)
+                                                        .child(getString(R.string.chats))
+                                                        .child(chatKey)
+                                                        .removeValue();
+                                                userListReference
+                                                        .child(chatWithUid)
+                                                        .child(getString(R.string.currentlyChatWiths))
+                                                        .child(author)
+                                                        .removeValue();
+                                                membersOfChatsReference
+                                                        .child(chatKey)
+                                                        .removeValue();
+                                                finish();
+                                            }
+                                        }
+                                );
+                            } catch (NullPointerException e) {
+
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+
+                        }
+                    }
+            );
+        }
+    }
+
+    private void listenToMessagesReferenceChanges() {
         messagesReference.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
                 Message newMessage = dataSnapshot.getValue(Message.class);
                 if (newMessage.getAuthorId().equals(user.getUid())) {
-                    addMessageToList(newMessage.getContent(), true);
+                    addMessageToList(newMessage, true);
                 } else {
-                    addMessageToList(newMessage.getContent(), false);
+                    addMessageToList(newMessage, false);
                 }
             }
+
             @Override
             public void onChildChanged(DataSnapshot dataSnapshot, String s) {
 
             }
+
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {
-
             }
+
             @Override
             public void onChildMoved(DataSnapshot dataSnapshot, String s) {
 
             }
+
             @Override
             public void onCancelled(DatabaseError databaseError) {
 
@@ -206,33 +274,34 @@ public class ChatDetailActivity extends AppCompatActivity {
     }
 
     private void hideAutoCompleteTextViewAndShowChatWithNameLabel(String chatWithName) {
-        if (toAutoCompleteTextView.getVisibility() == View.VISIBLE) {
-            toAutoCompleteTextView.setEnabled(false);
-            toAutoCompleteTextView.setVisibility(View.INVISIBLE);
+        if (autoCompleteTextView.getVisibility() == View.VISIBLE) {
+            autoCompleteTextView.setEnabled(false);
+            autoCompleteTextView.setVisibility(View.INVISIBLE);
         }
         chatWithLabel.setVisibility(View.VISIBLE);
         chatWithLabel.setText(chatWithName);
     }
 
-    private boolean chatBetweenDoesNotExist(final String chatWithUser) {
-        final boolean[] chatIsFound = {false};
+    private void chatBetweenExists(final String chatWithUser) {
         userListReference
                 .child(user.getUid())
                 .child(getString(R.string.currentlyChatWiths))
-                .addListenerForSingleValueEvent(new ValueEventListener() {
+                .addValueEventListener(new ValueEventListener() {
                     @Override
                     public void onDataChange(DataSnapshot dataSnapshot) {
-                        if (dataSnapshot.hasChild(chatWithUser)) {
-                            chatIsFound[0] = true;
+                        for (DataSnapshot data : dataSnapshot.getChildren()) {
+                            String someName = data.getValue(String.class);
+                            if (someName.equals(chatWithUser)) {
+                                chatBetweenDoesExist = true;
+                                break;
+                            }
                         }
                     }
-
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
 
                     }
                 });
-        return chatIsFound[0];
     }
 
     // must be called after chatKey has been initialized.
@@ -242,44 +311,123 @@ public class ChatDetailActivity extends AppCompatActivity {
                 .child(user.getUid())
                 .child(getString(R.string.chatsOfUsersDatabaseField));
         membersOfChatsReference = mDatabase
-                .child(getString(R.string.membersOfChats))
-                .child(chatKey);
+                .child(getString(R.string.membersOfChats));
+
+    }
+    private void setupChildReferencesDependentOnChatKey() {
+//                .child(chatKey);
         chatsReference = mDatabase
                 .child("chats")
                 .child(chatKey);
         messagesReference = mDatabase.child("messages").child(chatKey);
     }
 
-    private void makeNewChat(String author, String authorUid, String chatWithName, String chatWithUid) {
-        if (chatBetweenDoesNotExist(chatWithName)) {
-            String Users_field = "/" + getString(R.string.Users) + "/";
-            String Users_uid_chats_field = "/" + getString(R.string.chats) + "/";
-            String Users_currentlyChatWiths_field = "/" + getString(R.string.currentlyChatWiths) + "/";
-            Date timestamp = null;
-            String lastMessage = "";
-            Chat authorChat = new Chat(chatWithName, chatWithUid, lastMessage, timestamp);
-            Chat receiverChat = new Chat(author, authorUid, lastMessage, timestamp);
+    private void makeANewChatIfNecessaryAndWriteNewMessage(final String author,
+                                                           final String authorUid,
+                                                           final String chatWithName,
+                                                           final String chatWithUid,
+                                                           final String messageContent) {
+        if (chatKey.isEmpty()) {
+            membersOfChatsReference.addListenerForSingleValueEvent(
+                    new ValueEventListener() {
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                if (data.hasChild(author) && data.hasChild(chatWithName)) {
+                                    chatKey = data.getKey();
+                                    break;
+                                }
+                            }
+                            // If there is no current chat between author and chatWithName exists,
+                            // make a new chat with a new key.
+                            if (chatKey.isEmpty())
+                                chatKey = mDatabase.child(getString(R.string.chats)).push().getKey();
+                            setupChildReferencesDependentOnChatKey();
+                            makeNewChat(author, authorUid, chatWithName, chatWithUid);
+                            writeNewMessage(author, user.getUid(), chatWithName, chatWithUid, messageContent);
+                        }
 
-//        chatsReference.setValue(newChat);
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
 
-            Map<String, Object> childUpdates = new HashMap<>();
-            // push to author
-            childUpdates.put(Users_field + user.getUid() + Users_uid_chats_field + chatKeyString,
-                    authorChat);
-            childUpdates.put(Users_field + user.getUid() + Users_currentlyChatWiths_field,
-                    chatWithName);
-            membersOfChatsReference.child(author).setValue(true);
+                        }
+                    }
+            );
 
-            // push to receiver
-            childUpdates.put(Users_field + chatWithUid + Users_uid_chats_field + chatKeyString,
-                    receiverChat);
-            childUpdates.put(Users_field + chatWithUid + Users_currentlyChatWiths_field,
-                    author);
-            membersOfChatsReference.child(chatWithName).setValue(true);
-
-            mDatabase.updateChildren(childUpdates);
+        } else {
+            setupChildReferencesDependentOnChatKey();
+            writeNewMessage(author, user.getUid(), chatWithName, chatWithUid, messageContent);
         }
+        deleteChatButton.setOnClickListener(
+                new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        userListReference
+                                .child(user.getUid())
+                                .child(getString(R.string.chats))
+                                .child(chatKey)
+                                .removeValue();
+                        userListReference
+                                .child(user.getUid())
+                                .child(getString(R.string.currentlyChatWiths))
+                                .child(chatWithName)
+                                .removeValue();
+                        messagesReference.removeValue();
+                        userListReference
+                                .child(chatWithUid)
+                                .child(getString(R.string.chats))
+                                .child(chatKey)
+                                .removeValue();
+                        userListReference
+                                .child(chatWithUid)
+                                .child(getString(R.string.currentlyChatWiths))
+                                .child(author)
+                                .removeValue();
+                        membersOfChatsReference
+                                .child(chatKey)
+                                .removeValue();
+                        finish();
+                    }
+                }
+        );
     }
+
+    private void makeNewChat(String author, String authorUid, String chatWithName, String chatWithUid) {
+        String Users_field = "/" + getString(R.string.Users) + "/";
+        String Users_uid_chats_field = "/" + getString(R.string.chats) + "/";
+        String Users_currentlyChatWiths_field = "/" + getString(R.string.currentlyChatWiths) + "/";
+        String membersOfChat_field = "/" + getString(R.string.membersOfChats) + "/";
+        Date timestamp = new Date();
+        String lastMessage = "";
+        Chat authorChat = new Chat(chatWithName, chatWithUid, lastMessage, timestamp);
+        Chat receiverChat = new Chat(author, authorUid, lastMessage, timestamp);
+
+        Map<String, Object> childUpdates = new HashMap<>();
+        final String users_uid_chats_chatKey =
+                Users_field + user.getUid() + Users_uid_chats_field + chatKey;
+        final String users_uid_currentlyChatWiths_chatWithName =
+                Users_field + user.getUid() + Users_currentlyChatWiths_field + chatWithName;
+        final String membersOfChat_chatKey_author = membersOfChat_field + chatKey + "/" + author;
+        // push to author
+        childUpdates.put(users_uid_chats_chatKey, authorChat);
+        childUpdates.put(users_uid_currentlyChatWiths_chatWithName, chatWithName);
+        childUpdates.put(membersOfChat_chatKey_author, true);
+
+        final String receiver_uid_chats_chatKey =
+                Users_field + chatWithUid + Users_uid_chats_field + chatKey;
+        final String receiver_uid_currentlyChatWiths_author =
+                Users_field + chatWithUid + Users_currentlyChatWiths_field + author;
+        final String membersOfChat_chatKey_receiver = membersOfChat_field + chatKey + "/" + chatWithName;
+        // push to receiver
+        childUpdates.put(receiver_uid_chats_chatKey, receiverChat);
+        childUpdates.put(receiver_uid_currentlyChatWiths_author, author);
+        childUpdates.put(membersOfChat_chatKey_receiver, true);
+
+        mDatabase.updateChildren(childUpdates);
+        if (!hasListenedToMessagesRef)
+            listenToMessagesReferenceChanges();
+    }
+
 
     private void writeNewMessage(String author, String authorUid, String chatWithName,
                                  String chatWithUid, String messageContent) {
@@ -313,24 +461,21 @@ public class ChatDetailActivity extends AppCompatActivity {
         return "";
     }
 
-    private boolean toAutoCompleteTextFieldIsValid() {
+    private boolean autoCompleteTextFieldIsValid() {
         boolean validity = false;
-        if (!toAutoCompleteTextView.getText().toString().trim().equals("") ||
-                toAutoCompleteTextView.getVisibility() == View.INVISIBLE)
+        if (!autoCompleteTextView.getText().toString().trim().equals("") ||
+                autoCompleteTextView.getVisibility() == View.INVISIBLE) {
             validity = true;
+        }
         return validity;
     }
 
-    private void addMessageToList(String messageContent, Boolean isMyMessage) {
-        ChatBubble chatBubble = new ChatBubble(messageContent, isMyMessage);
-        if (chatBubbleList.isEmpty() ||
-                !chatBubbleList.get(chatBubbleList.size() - 1).equals(chatBubble)) {
-            chatBubbleList.add(chatBubble);
-            adapter.notifyDataSetChanged();
-        }
+    private void addMessageToList(Message message, Boolean isMyMessage) {
+        ChatBubble chatBubble = new ChatBubble(message, isMyMessage);
+        chatBubbleList.add(chatBubble);
+        adapter.notifyDataSetChanged();
     }
-    private void makeToast(String text) {
+    public void makeToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
 }
-

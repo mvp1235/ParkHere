@@ -158,7 +158,7 @@
 //                                user.getUid(), author, messageContent, chatWithName);
 //                        addMessageToList(messageContent, true);
 //                        editText.setText("");
-////                    getMyMessage = !getMyMessage;
+////                    getIsMyMessage = !getIsMyMessage;
 //                    }
 //                }
 //            }

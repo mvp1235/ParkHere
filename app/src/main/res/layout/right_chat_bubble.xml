@@ -6,7 +6,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
-        android:background="@drawable/ic_right_chat_bubble"
         android:orientation="vertical"
         android:paddingBottom="10dp">
 
@@ -14,8 +13,10 @@
             android:id="@+id/txt_msg"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:maxWidth="100dp"
+            android:maxWidth="250dp"
             android:padding="5dp"
+            android:textSize="20sp"
+            android:text="place holder"
             android:textColor="@android:color/holo_green_dark" />
 
     </LinearLayout>

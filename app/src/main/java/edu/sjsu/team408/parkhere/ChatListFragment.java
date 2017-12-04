@@ -133,15 +133,11 @@ public class ChatListFragment extends Fragment {
     }
 
     private Query getQuery(DatabaseReference databaseReference) {
-
         Query chatsQuery = databaseReference
                 .child("Users")
                 .child(getUid())
                 .child("chats")
                 .limitToFirst(100);
-
-
-
         return chatsQuery;
     }
 

@@ -24,6 +24,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
             android:layout_alignParentBottom="true"
+            android:text="time"
             android:gravity="bottom"
             android:textSize="15sp" />
     </RelativeLayout>
@@ -34,6 +35,5 @@
         android:gravity="center_vertical"
         android:text="last message content"
         android:textSize="15sp"/>
-
 </LinearLayout>
 

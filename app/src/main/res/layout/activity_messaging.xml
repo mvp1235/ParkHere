@@ -6,23 +6,13 @@
     android:orientation="vertical"
     android:padding="20dp">
 
-    <Button
-        android:id="@+id/send_message_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:enabled="false"
-        android:background="@color/background_floating_material_dark"
-        android:text="Send"
-        android:textColor="@color/background_material_light" />
 
     <AutoCompleteTextView
         android:id="@+id/toAutoCompleteTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/friendLabel"
-        android:layout_alignBottom="@+id/friendLabel"
+        android:layout_alignBaseline="@+id/chattingWithLabel"
+        android:layout_alignBottom="@+id/chattingWithLabel"
         android:layout_alignParentStart="true"
         android:hint="To:"
         android:textSize="20sp" />
@@ -31,25 +21,41 @@
         android:id="@+id/input_message_editText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
+        android:layout_alignBottom="@+id/send_message_button"
+        android:layout_toStartOf="@+id/send_message_button"
         android:hint="Input message" />
+    <Button
+        android:id="@+id/send_message_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:background="@color/background_floating_material_dark"
+        android:text="Send"
+        android:textColor="@color/background_material_light" />
 
     <TextView
-        android:id="@+id/friendLabel"
+        android:id="@+id/chattingWithLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:text="User Friend"
         android:visibility="invisible"
-        android:textSize="20sp" />
+        android:textStyle="bold"
+        android:textSize="30sp" />
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Delete"
+        android:id="@+id/deleteChatButton"
+        android:layout_alignParentEnd="true"/>
 
     <ListView
         android:id="@+id/chat_listView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/input_message_editText"
-        android:layout_below="@id/friendLabel"
+        android:layout_below="@id/chattingWithLabel"
         android:layout_alignParentStart="true"
         android:divider="@null"
         android:listSelector="@android:color/transparent"

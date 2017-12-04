@@ -5,30 +5,19 @@ package edu.sjsu.team408.parkhere;
  */
 
 public class ChatBubble {
-    private String content;
-    private boolean myMessage;
+    private Message message;
+    private boolean isMyMessage;
 
-    public ChatBubble(String content, boolean myMessage) {
-        this.content = content;
-        this.myMessage = myMessage;
+    public ChatBubble(Message message, boolean isMyMessage) {
+        this.message = message;
+        this.isMyMessage = isMyMessage;
     }
 
-    public String getContent() {
-        return content;
+    public Message getMessage() {
+        return message;
     }
 
-    public boolean getMyMessage() {
-        return myMessage;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        ChatBubble that = (ChatBubble) o;
-
-        if (myMessage != that.myMessage) return false;
-        return content != null ? content.equals(that.content) : that.content == null;
+    public boolean getIsMyMessage() {
+        return isMyMessage;
     }
 }

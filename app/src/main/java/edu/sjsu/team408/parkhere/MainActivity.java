@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity {
 
         //Set default option to the Home view fragmemt.
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(R.id.content, new HomeFragment());
+        transaction.replace(R.id.content, new ChatListFragment());
         transaction.commit();
 
     }
