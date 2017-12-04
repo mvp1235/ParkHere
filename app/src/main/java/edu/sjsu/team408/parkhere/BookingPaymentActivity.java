@@ -80,6 +80,7 @@ public class BookingPaymentActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+                finish();
             }else if(resultCode == PaymentActivity.RESULT_CANCELED){
                 Toast.makeText(this, "Cancel", Toast.LENGTH_LONG).show();
             }
@@ -99,6 +100,8 @@ public class BookingPaymentActivity extends AppCompatActivity {
         intent.putExtra(PaymentActivity.EXTRA_PAYMENT, payPalPayment);
         startActivityForResult(intent, REQUEST_CODE_PAYMENT);
     }
+
+
 
     public void getPaymentInfo(){
         Intent intent = getIntent();

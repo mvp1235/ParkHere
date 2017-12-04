@@ -196,11 +196,10 @@ public class DetailParkingActivity extends AppCompatActivity {
                         //remind owner they cannot reserve their own parking.
                         Toast.makeText(getApplicationContext(), "Cannot Book Your Own Parking Space...", Toast.LENGTH_SHORT).show();
                     } else {
-                        boolean paymentComplete = startPaymentActivity();
-                        if(paymentComplete) {
-                            makeReservation();    //Duoc -- i will continue fixing this part tmr.
-                            notifyOwner();
-                        }
+                        startPaymentActivity();
+                           // makeReservation();    //Duoc -- i will continue fixing this part tmr.
+                            //notifyOwner();
+
                     }
                     //updateDatabase();
                 }
@@ -323,7 +322,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         
     }
 
-    public boolean startPaymentActivity() {
+    public void startPaymentActivity() {
         Intent intent = new Intent(DetailParkingActivity.this, BookingPaymentActivity.class);
         String ownerName = clickedParking.getOwner().getName();
         String ownerEmail = clickedParking.getOwner().getEmailAddress();
@@ -338,7 +337,6 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         startActivityForResult(intent, MAKE_PAYMENT_CODE);
 
-        return false;
     }
 
 
@@ -379,6 +377,12 @@ public class DetailParkingActivity extends AppCompatActivity {
             finish();
         }
 
+        if(requestCode == MAKE_PAYMENT_CODE && resultCode == RESULT_OK) {
+            makeReservation();    //Duoc -- i will continue fixing this part tmr.
+            notifyOwner();
+            finish();
+        }
+        
     }
 
 

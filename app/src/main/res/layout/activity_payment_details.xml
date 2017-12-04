@@ -15,9 +15,51 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/detailPaymentTransactionID"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Transaction ID: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
         android:id="@+id/detailPaymentStatus"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="STATUS"
-        android:textAlignment="center" />
+        android:layout_height="50dp"
+        android:text="Status: "
+        android:textAlignment="viewStart"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/detailPaymentAmountTV"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="Amount: "
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/detailPaymentFinishButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Finish" />
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="50dp"
+            android:layout_weight="1" />
+    </LinearLayout>
 </LinearLayout>
