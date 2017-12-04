@@ -72,6 +72,7 @@ public class NewListingActivity extends AppCompatActivity{
     private StorageReference storageReference;
     private String userID;
     private User currentUser;
+    private static String currentParkingIDRef;
     private static String currentListingIDRef;
 
 
@@ -545,7 +546,11 @@ public class NewListingActivity extends AppCompatActivity{
         GregorianCalendar startDateCalendar = new GregorianCalendar(startYear, startMonth - 1, startDay);
         GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
 
-        currentListingIDRef= parkingSpaceSpinner.getSelectedItem().toString();
+        //this is where it caused the listingID to become parkingID, the parkingID should be set here isntead
+//        currentListingIDRef = parkingSpaceSpinner.getSelectedItem().toString();
+        currentParkingIDRef = parkingSpaceSpinner.getSelectedItem().toString();
+
+
 
         String owner = this.owner.getText().toString();
         String price = this.price.getText().toString();
@@ -556,7 +561,9 @@ public class NewListingActivity extends AppCompatActivity{
         String parentKey;
 
 
-        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentListingIDRef);
+        //the last argument should be parkingID, not listingID
+        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentParkingIDRef);    //This here should be currentPrakingIDRef instead of currentListingIDRef
+
         String ownerParkingID = userID;
         parking.setOwnerParkingID(ownerParkingID);
 

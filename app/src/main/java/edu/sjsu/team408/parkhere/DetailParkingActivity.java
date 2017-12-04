@@ -486,6 +486,7 @@ public class DetailParkingActivity extends AppCompatActivity {
      */
     public void makeReservation() {
         final String parkingID = clickedParking.getParkingIDRef();
+        final String listingID = clickedParking.getId();
 
         //here add the reserved parking to user's myCurrentReservedParkings lists
 
@@ -499,8 +500,9 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Listing [] spaces = splitParkingSpace(clickedParking);  //0.
         parkingSpaceToBook = spaces[0];
+
         deleteParkingReference(clickedParking);     //1.
-        deleteParkingListing(parkingID);        //2.
+        deleteParkingListing(listingID);        //2.
         addSplittedParkingsToDatabase(spaces);  //6
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -569,7 +571,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         String reserveEndTime = reserveToTime.getText().toString().split("-")[1].trim();
 
 
-        String clickedParkingStartDate= clickedParking.getStartDate();
+        String clickedParkingStartDate = clickedParking.getStartDate();
         String clickedParkingEndDate = clickedParking.getEndDate();
         String clickedParkingStartTime = clickedParking.getStartTime();
         String clickedParkingEndTime = clickedParking.getEndTime();
@@ -740,6 +742,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     public void deleteParkingReference(Listing clickedParking) {
         final String parkingIDRef = clickedParking.getParkingIDRef();
+        final String listingIDRef = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
 
@@ -753,8 +756,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(listingIDRef).removeValue();
                         }
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
@@ -762,8 +765,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(listingIDRef).removeValue();
                         }
                     }
                 }
@@ -776,12 +779,12 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
-    public void deleteParkingListing(final String parkingID) {
+    public void deleteParkingListing(final String listingID) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("Listings").hasChild(parkingID)) {
-                    databaseReference.child("Listings").child(parkingID).removeValue();
+                if(dataSnapshot.child("Listings").hasChild(listingID)) {
+                    databaseReference.child("Listings").child(listingID).removeValue();
                 }
             }
 
@@ -799,9 +802,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         while(p != null && (i < outOfBounds)) {
             p = spaces[i];
             if (p != null) {
-                p.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
+                p.setId(databaseReference.child("AvailableParkings").push().getKey());
 
-                String p1ChildKey = p.getParkingIDRef();
+                String p1ChildKey = p.getId();
 
                 GregorianCalendar start = getGregorianCalendarDate(p.getStartDate());
                 GregorianCalendar end = getGregorianCalendarDate(p.getEndDate());
@@ -813,7 +816,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                 int endHour = endTimeSystem[0];
                 int endMinutes = endTimeSystem[1];
 
-                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getParkingIDRef();
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getId();
 
                 while (!start.equals(end)) {
                     String p1ParentKey = getDate(start);
@@ -953,7 +956,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         dayString = Integer.toString(day);
 
         String completeDate = monthString + "-" + dayString + "-" + yearString;
-        reserveFromDate.setText("From Date: " +completeDate);
+        reserveFromDate.setText("From Date: " + completeDate);
     }
 
     public void setReserveToDate(int year, int month, int day) {
