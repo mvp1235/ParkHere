@@ -158,7 +158,9 @@ public class DetailParkingActivity extends AppCompatActivity {
 
         Bundle bundle = intent.getBundleExtra(SearchResultActivity.PARKING_BUNDLE);
         Bundle seekerBundle = intent.getBundleExtra(SearchResultActivity.SEEKER_BUNDLE);
-        currentUser = (User) seekerBundle.get(SearchResultActivity.SEEKER);
+        if(seekerBundle != null) {
+            currentUser = (User) seekerBundle.get(SearchResultActivity.SEEKER);
+        }
 
         clickedParking = new Listing(bundle);
 
@@ -391,18 +393,20 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+        //super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == LISTING_EDIT_CODE && resultCode == RESULT_OK) {      //take input from listing editting page and reflect changes to database here
             setResult(RESULT_OK);
             finish();
         } else if (requestCode == WRITE_REVIEW_CODE && resultCode == RESULT_OK) {
+            setResult(RESULT_OK);
             finish();
         }
 
         if(requestCode == MAKE_PAYMENT_CODE && resultCode == RESULT_OK) {
             makeReservation();    //Duoc -- i will continue fixing this part tmr.
             notifyOwner();
+            setResult(RESULT_OK);
             finish();
         }
         
@@ -498,8 +502,8 @@ public class DetailParkingActivity extends AppCompatActivity {
         updateListingReferences(clickedParking, spaces);     //1.
 
         //combined 2 and 6 inside 1 to prevent concurrency problem (too many listener for data change at once) - Huy
-//        deleteParkingListing(parkingID);        //2.
-//        addSplittedParkingsToDatabase(spaces);  //6
+        //deleteParkingListing(parkingID);        //2.
+        //addSplittedParkingsToDatabase(spaces);  //6
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

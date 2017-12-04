@@ -37,6 +37,7 @@ public class PaymentDetails extends AppCompatActivity {
         finishbtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setResult(RESULT_OK);
                 finish();
             }
         });
@@ -47,7 +48,7 @@ public class PaymentDetails extends AppCompatActivity {
         try {
             statusTV.setText("Status: " + response.getString("state"));
             transactionIDTV.setText("Transaction ID: " + response.getString("id"));
-            amountTV.setText("Amount: " + response.getString(String.format("$%s", paymentAmount)));
+            amountTV.setText("Amount: " + paymentAmount);
 
         } catch (JSONException e) {
             e.printStackTrace();

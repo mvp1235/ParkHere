@@ -261,6 +261,7 @@ public class SearchResultActivity extends ListActivity {
         if(requestCode == VIEW_DETAIL_PARKING_FROM_RESULT) {
             if (resultCode == RESULT_OK) {
                 finish();
+
             }
         }
     }

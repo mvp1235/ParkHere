@@ -80,6 +80,7 @@ public class BookingPaymentActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
                 }
+                setResult(RESULT_OK);
                 finish();
             }else if(resultCode == PaymentActivity.RESULT_CANCELED){
                 Toast.makeText(this, "Cancel", Toast.LENGTH_LONG).show();
