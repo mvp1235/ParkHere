@@ -71,7 +71,7 @@ public class NewListingActivity extends AppCompatActivity{
     private FirebaseAuth firebaseAuth;
     private StorageReference storageReference;
     private String userID;
-
+    private User currentUser;
     private static String currentListingIDRef;
 
 
@@ -84,7 +84,7 @@ public class NewListingActivity extends AppCompatActivity{
         firebaseAuth = FirebaseAuth.getInstance();
         userID = firebaseAuth.getCurrentUser().getUid();
         storageReference = FirebaseStorage.getInstance().getReference();
-
+        currentUser = null;
         //Get the parking id and use it throughout the activity
         currentListingIDRef = databaseReference.child("AvailableParkings").push().getKey();
 
@@ -105,6 +105,23 @@ public class NewListingActivity extends AppCompatActivity{
         parkingSpaceSpinner = (Spinner) findViewById(R.id.newListingParkingSpinner);
         listingPhoto = (ImageView) findViewById(R.id.listingPhoto);
 
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(firebaseAuth.getCurrentUser() != null) {
+                    String targetID = firebaseAuth.getCurrentUser().getUid();
+                    if(!targetID.isEmpty()) {
+                        if (dataSnapshot.child("Users").hasChild(targetID)) {
+                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
+                        }
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+            }
+        });
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -528,6 +545,7 @@ public class NewListingActivity extends AppCompatActivity{
         GregorianCalendar startDateCalendar = new GregorianCalendar(startYear, startMonth - 1, startDay);
         GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
 
+        currentListingIDRef= parkingSpaceSpinner.getSelectedItem().toString();
 
         String owner = this.owner.getText().toString();
         String price = this.price.getText().toString();
@@ -537,10 +555,11 @@ public class NewListingActivity extends AppCompatActivity{
         String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentListingIDRef; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 
-        String pID = parkingSpaceSpinner.getSelectedItem().toString();
-        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, pID);
+
+        Listing parking = getParkingSpace(startDate, endDate, startTime, endTime,userID, owner, price, address, point, currentListingIDRef);
         String ownerParkingID = userID;
         parking.setOwnerParkingID(ownerParkingID);
+
         //Adding special instruction to parking (if any is provided)
         String specialIns = specialInstructions.getText().toString();
         parking.setSpecialInstruction(specialIns);
@@ -602,7 +621,7 @@ public class NewListingActivity extends AppCompatActivity{
 
 
     //This method contains parkingID
-    public static Listing getParkingSpace(String startDate, String endDate, String startTime,
+    public Listing getParkingSpace(String startDate, String endDate, String startTime,
                                           String endTime, String userID, String ownerName,
                                           String price, String address, LatLng point, String parkingID) {
         if(startDate.isEmpty() || endDate.isEmpty() || startTime.isEmpty() || endTime.isEmpty() ||
@@ -612,14 +631,15 @@ public class NewListingActivity extends AppCompatActivity{
         //String result ="";
         //result +=  startDate + ":" + endDate + ":" + startTime + ":" + endTime + ":" + ownerName + ":" + userID + ":" + price + ":" + address;
         Address addr = new Address(address, point);    //correct format later
-        User owner = new User(userID+"", ownerName, null,null,null,null);
+        String ownerEmail = currentUser.getEmailAddress();
+        User owner1 = new User(userID+"", ownerName, null,null,ownerEmail,null);
         String parkingImageUrl = "https://d30y9cdsu7xlg0.cloudfront.net/png/47205-200.png";   //default for testing
 
         String specialInstruction = "";
 
 
         //return result;
-        return new Listing(currentListingIDRef, addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
+        return new Listing(currentListingIDRef, addr, owner1, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
     private void addListingToUser(Listing ps) {

@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/paymentLabel"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:text="PAYMENT"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="118dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/paymentOwnerLabel"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Owner:"
+            android:textAlignment="viewStart"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/paymentOwnerTV"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Owner Info"
+            android:textAlignment="viewStart" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/paymentSeekerLabel"
+            android:layout_width="50dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="Seeker:"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/paymentSeekerInfoTV"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Seeker Info" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/paymentAmountLabel"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_weight="1"
+            android:text="Amount:"
+            android:textAlignment="viewStart"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/paymentAmountTV"
+            android:layout_width="250dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:text="TextView" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
+        <Button
+            android:id="@+id/paymentButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Make Payment" />
+
+        <TextView
+            android:id="@+id/textView5"
+            android:layout_width="100dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+</LinearLayout>

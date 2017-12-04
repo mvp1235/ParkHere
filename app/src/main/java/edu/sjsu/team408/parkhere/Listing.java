@@ -164,6 +164,7 @@ public class Listing implements Parcelable{
 
     public void setOwnerParkingID(String id) {this.ownerParkingID = id;}
 
+
     public String getOwnerParkingID() {return this.ownerParkingID;}
 
     public void setReservedBy(User seeker) {

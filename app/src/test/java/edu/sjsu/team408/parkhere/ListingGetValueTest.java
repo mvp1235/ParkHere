@@ -31,7 +31,7 @@ public class ListingGetValueTest {
         Address a = new Address(address,point);
         User u = new User();
         u.setName(ownerName);
-        Listing expectedListing = new Listing(a, u, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime, Double.parseDouble(price), parkingID);
+        Listing expectedListing = new Listing("",a, u, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime, Double.parseDouble(price), parkingID);
         String expected = expectedListing.toString();
 
         assertEquals(expected, NewListingActivity.getValue(startDate, endDate, startTime, endTime, userID, ownerName, price, address, point, parkingID).toString());
