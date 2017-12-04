@@ -1,13 +1,13 @@
 package edu.sjsu.team408.parkhere;
 
+import android.Manifest;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -15,12 +15,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.android.volley.Request;
@@ -46,9 +43,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
+
 
 public class NewParkingSpaceActivity extends AppCompatActivity {
 
@@ -68,11 +63,31 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
 
     private String currentParkingIDRef;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_parking_space);
+
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            //Request runtime permission for camera access
+            if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                    != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(new String[]{android.Manifest.permission.CAMERA},
+                        REQUEST_IMAGE_CAPTURE);
+
+            }
+
+            //Request runtime permission for external storage writing permission
+            if (checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                requestPermissions(new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_IMAGE_CAPTURE);
+            }
+        }
+
+
 
         databaseReference = FirebaseDatabase.getInstance().getReference();  //gets database reference
         firebaseAuth = FirebaseAuth.getInstance();
@@ -112,6 +127,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
 
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
@@ -124,6 +140,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             ByteArrayOutputStream bytes = new ByteArrayOutputStream();
             parkingBitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
             String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), parkingBitmap, "Title", null);
+            Log.i("TEST", path + "sddsdsd");
             Uri imageUri = Uri.parse(path);
 
             StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingIDRef);
@@ -154,6 +171,21 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             });
             parkingSpacePhoto.setImageURI(imageUri);
             photoActionDialog.dismiss();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_IMAGE_CAPTURE) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Now user should be able to use camera
+            }
+            else {
+                // Your app will not have this permission. Turn off all functions
+                // that require this permission or it will force close like your
+                // original question
+            }
         }
     }
 
