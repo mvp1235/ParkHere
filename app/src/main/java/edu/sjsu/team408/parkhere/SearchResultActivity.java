@@ -38,6 +38,7 @@ import java.util.List;
 public class SearchResultActivity extends ListActivity {
     private static final String TAG = SearchResultActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
+    private static final String TIME_TAG = "MyActivity";
 
     static final String LISTING_ID = "listingID";
     static final String PARKING_BUNDLE = "parkingBundle";
@@ -290,6 +291,7 @@ public class SearchResultActivity extends ListActivity {
         if(requestCode == VIEW_DETAIL_PARKING_FROM_RESULT) {
             if (resultCode == RESULT_OK) {
                 finish();
+                Log.i(TIME_TAG, "Starting improved time after payment is done : " + System.currentTimeMillis()/10000 + " Seconds");
                 Intent intent = new Intent(this, BookingHistoryActivity.class);
                 intent.putExtra("parkingIDRef", parkingIDRef);
                 startActivity(intent);

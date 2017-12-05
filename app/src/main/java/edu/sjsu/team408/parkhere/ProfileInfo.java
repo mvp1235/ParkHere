@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,7 +16,7 @@ import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
 public class ProfileInfo extends AppCompatActivity {
-
+    private static final String TIME_TAG = "MyActivity";
     private TextView profileName, profileEmail, profilePhone, profileAddress;
     private ImageView profilePhoto;
     private StorageReference storageReference;
@@ -61,5 +62,6 @@ public class ProfileInfo extends AppCompatActivity {
                 }
             });
         }
+        Log.i(TIME_TAG, "Ending improved time after payment is done: " + System.currentTimeMillis()/1000 + " Seconds");
     }
 }

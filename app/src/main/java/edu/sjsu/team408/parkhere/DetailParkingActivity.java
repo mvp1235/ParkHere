@@ -39,7 +39,7 @@ import java.util.GregorianCalendar;
 import java.util.Locale;
 
 public class DetailParkingActivity extends AppCompatActivity {
-
+    private static final String TIME_TAG = "MyActivity";
     private static final double MILES_TO_METER = 1609.344;
     private final static int FROM_DATE = 0;
     private final static int TO_DATE = 1;
@@ -247,6 +247,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                     getUserInfo();
                 }
             });
+
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
             reserveToDate.setVisibility(View.GONE);
