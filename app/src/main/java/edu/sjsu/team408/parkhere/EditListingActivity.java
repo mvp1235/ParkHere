@@ -543,6 +543,7 @@ public class EditListingActivity extends AppCompatActivity {
 
         final Listing parking = getParkingSpace(startDate, endDate, startTime, endTime, userID, ownerStr, priceStr, address, point, currentParkingID);
 
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -624,7 +625,8 @@ public class EditListingActivity extends AppCompatActivity {
 
             }
         });
-
+        String ownerID = firebaseAuth.getCurrentUser().getUid();
+        parking.setOwnerParkingID(ownerID);
         editUserListing(parking);
     }
 
@@ -650,43 +652,24 @@ public class EditListingActivity extends AppCompatActivity {
         return new Listing(currentListingID, addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
-    private void editUserListing(Listing ps) {
-        final ArrayList<Listing> newList = new ArrayList<>();
-        newList.add(ps);
+    private void editUserListing(final Listing ps) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(firebaseAuth.getCurrentUser() != null) {
-                    String targetID = firebaseAuth.getCurrentUser().getUid();
-                    if(!targetID.isEmpty()) {
-                        if (dataSnapshot.child("Users").hasChild(targetID)) {
-                            User currentUser = null;
-                            currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
-
-                            //To edit, first delete the old listing value, then add the new one in, so there won't be duplicates
-                            //Before this, the user's listing history doesn't remove the old listing, it just adds to the list
-                            ArrayList<Listing> existingListings = currentUser.getMyListingHistory();
-
-                            for (int i=0; i<existingListings.size(); i++) {
-                                if (existingListings.get(i).getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
-                                    existingListings.remove(existingListings.get(i));
-                                    i--;
-                                }
-                            }
-
-                            //This was causing concurrent modification exception
-//                            for (Listing p : existingListings) {
-//                                if (p.getParkingIDRef().equalsIgnoreCase(currentParkingID)) {
-//                                    existingListings.remove(p);
-//                                }
-//                            }
-
-                            existingListings.add(newList.get(0));
-//                            currentUser.addToListingHistory(newList);
-                            currentUser.setMyListingHistory(existingListings);
-                            databaseReference.child("Users").child(currentUser.getId()).setValue(currentUser);
+                String ownerID = ps.getOwnerParkingID();
+                if(dataSnapshot.child("Users").hasChild(ownerID)) {
+                    User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                    ArrayList<Listing> ownerListing = owner.getMyListingHistory();
+                    Listing target = ownerListing.get(0);
+                    for (Listing l : ownerListing) {
+                        if (l.getParkingIDRef().equals(currentParkingID)) {
+                            target = l;
                         }
                     }
+                    ownerListing.remove(target);
+                    ownerListing.add(ps);
+                    owner.setMyListingHistory(ownerListing);
+                    databaseReference.child("Users").child(ownerID).setValue(owner);
                 }
             }
 
