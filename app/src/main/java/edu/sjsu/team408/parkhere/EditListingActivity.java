@@ -548,8 +548,8 @@ public class EditListingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 for (DataSnapshot d : dataSnapshot.child("AvailableParkings").getChildren()) {
-                    if (d.hasChild(currentListingID)) {
-                        d.child(currentListingID).getRef().removeValue();
+                    if (d.hasChild(currentParkingID)) {
+                        d.child(currentParkingID).getRef().removeValue();
                     }
                 }
 
@@ -576,7 +576,7 @@ public class EditListingActivity extends AppCompatActivity {
                 GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
 
 
-                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentListingID; //starthour-startminutes-endhour-endminutes-currentParkingID
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingID; //starthour-startminutes-endhour-endminutes-currentParkingID
                 String parentKey;
 //        String parkingSpaceUidKey;
 
@@ -595,7 +595,7 @@ public class EditListingActivity extends AppCompatActivity {
 
                     String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-                    childKey = currentListingID;
+                    childKey = currentParkingID;
                     parentKey = currentDate;
 
                     databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
@@ -611,13 +611,13 @@ public class EditListingActivity extends AppCompatActivity {
 
                     String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-                    childKey = currentListingID;
+                    childKey = currentParkingID;
                     parentKey = currentDate;
 
 
                     databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
                 }
-                databaseReference.child("Listings").child(currentListingID).setValue(parking);
+                databaseReference.child("Listings").child(currentParkingID).setValue(parking);
             }
 
             @Override
