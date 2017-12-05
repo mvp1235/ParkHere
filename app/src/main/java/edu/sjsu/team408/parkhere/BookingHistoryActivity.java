@@ -48,6 +48,7 @@ public class BookingHistoryActivity extends ListActivity {
 
                             listings = currentUser.getMyCurrentReservedParkings();
                             showCurrentlyReservedParkings();
+                            checkIntent();
                         }
                     }
                 }
@@ -57,6 +58,43 @@ public class BookingHistoryActivity extends ListActivity {
             public void onCancelled(DatabaseError databaseError) {}
         });
 
+
+
+    }
+
+    private void checkIntent() {
+        Intent afterPaymentIntent = getIntent();
+        String parkingIdRef = afterPaymentIntent.getStringExtra("parkingIDRef");
+        if(parkingIdRef == null) {
+            return;
+        }
+        int count = getListAdapter().getCount();
+        if(!parkingIdRef.equals("")) {
+            for (int i = 0; i < count; i++) {
+                Listing parking = (Listing) getListAdapter().getItem(i);
+                if (parkingIdRef.equals(parking.getParkingIDRef())) {
+                    Intent intent = new Intent(this, DetailParkingActivity.class);
+
+                    Bundle b = new Bundle();
+                    b.putParcelable(SearchResultActivity.ADDRESS, parking.getAddress());
+                    b.putParcelable(SearchResultActivity.OWNER, parking.getOwner());
+                    b.putString(SearchResultActivity.PARKING_IMAGE_URL, parking.getParkingImageUrl());
+                    b.putString(SearchResultActivity.SPECIAL_INSTRUCTION, parking.getSpecialInstruction());
+                    b.putString(SearchResultActivity.START_DATE, parking.getStartDate());
+                    b.putString(SearchResultActivity.END_DATE, parking.getEndDate());
+                    b.putString(SearchResultActivity.START_TIME, parking.getStartTime());
+                    b.putString(SearchResultActivity.END_TIME, parking.getEndTime());
+                    b.putDouble(SearchResultActivity.PRICE, parking.getPrice());
+                    b.putString(SearchResultActivity.OWNER_PARKING_ID, parking.getOwnerParkingID());
+                    b.putString(SearchResultActivity.PARKING_ID_REF, parking.getParkingIDRef());
+
+
+                    intent.putExtra(SearchResultActivity.PARKING_BUNDLE, b);
+                    intent.putExtra("requestCode", VIEW_DETAIL_HISTORY_BOOKING_);
+                    startActivityForResult(intent, VIEW_DETAIL_HISTORY_BOOKING_);
+                }
+            }
+        }
     }
 
     @Override

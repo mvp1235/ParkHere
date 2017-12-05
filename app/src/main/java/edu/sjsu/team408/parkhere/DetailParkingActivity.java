@@ -241,6 +241,12 @@ public class DetailParkingActivity extends AppCompatActivity {
                     writeOwnerReview();
                 }
             });
+            parkingPhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getUserInfo();
+                }
+            });
 
         } else if (request == ListingHistoryActivity.VIEW_DETAIL_HISTORY_LISTING) {
             reserveToDate.setVisibility(View.GONE);
@@ -331,6 +337,34 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
 
         
+    }
+
+    private void getUserInfo() {
+        final String ownerID = clickedParking.getOwnerParkingID();
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                User userInfo = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                startProfileInfo(userInfo);
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+
+    }
+
+    private void startProfileInfo(User user) {
+        Intent userInfoIntent = new Intent(this, ProfileInfo.class);
+        userInfoIntent.putExtra("name", user.getName());
+        userInfoIntent.putExtra("email", user.getEmailAddress());
+        userInfoIntent.putExtra("phone", user.getPhoneNumber());
+        userInfoIntent.putExtra("address", user.getAddress().toString());
+        userInfoIntent.putExtra("id", user.getId());
+        startActivity(userInfoIntent);
     }
 
     public void startPaymentActivity() {

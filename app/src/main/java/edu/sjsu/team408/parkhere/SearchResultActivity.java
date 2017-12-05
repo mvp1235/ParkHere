@@ -64,7 +64,7 @@ public class SearchResultActivity extends ListActivity {
     private FirebaseAuth firebaseAuth;
     private ArrayList<Listing> listings;
     private User currentUser;
-
+    private String parkingIDRef;
     private FusedLocationProviderClient mFusedLocationClient;
     private Location mLocation;
     private boolean userHasDesiredLocation;
@@ -106,6 +106,34 @@ public class SearchResultActivity extends ListActivity {
                 //not supported
             }
         });
+
+        /**
+         //old search algorithm, this one iterates through all dates in the "AvailableParkings"
+         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        @Override
+        public void onDataChange(DataSnapshot dataSnapshot) {
+        long startTime = System.currentTimeMillis(); //seconds
+        for(DataSnapshot dates: dataSnapshot.child("AvailableParkings").getChildren()){
+        String availableDate = dates.getKey();
+        if(availableDate.equals(dateSearchTerm)) {
+        for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings").child(dateSearchTerm).getChildren()){
+        String p = userIDList.getValue(String.class);
+        availableParkingSpaces.add(p);
+        }
+        searchResult(searchTimeTerm);
+        }
+        }
+        long endTime = System.currentTimeMillis(); //seconds
+        String totalSearchTime = endTime - startTime + " Millis";
+        Log.i(TAG, "Total search Time: " + totalSearchTime);
+        }
+
+        @Override
+        public void onCancelled(DatabaseError databaseError) {
+
+        }
+        });
+         */
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -227,6 +255,7 @@ public class SearchResultActivity extends ListActivity {
     @Override
     protected void onListItemClick(ListView l, View v, int position, long id) {
         Listing parking = (Listing)getListAdapter().getItem(position);
+        parkingIDRef = parking.getParkingIDRef();
         Intent intent = new Intent(this, DetailParkingActivity.class);
 
         Bundle b = new Bundle();
@@ -261,7 +290,9 @@ public class SearchResultActivity extends ListActivity {
         if(requestCode == VIEW_DETAIL_PARKING_FROM_RESULT) {
             if (resultCode == RESULT_OK) {
                 finish();
-
+                Intent intent = new Intent(this, BookingHistoryActivity.class);
+                intent.putExtra("parkingIDRef", parkingIDRef);
+                startActivity(intent);
             }
         }
     }
