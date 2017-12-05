@@ -33,6 +33,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -209,8 +210,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Cannot Book Your Own Parking Space...", Toast.LENGTH_SHORT).show();
                     } else {
                         startPaymentActivity();
-                           // makeReservation();    //Duoc -- i will continue fixing this part tmr.
-                            //notifyOwner();
+                        // makeReservation();    //Duoc -- i will continue fixing this part tmr.
+                        //notifyOwner();
 
                     }
                     //updateDatabase();
@@ -269,7 +270,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    deleteParkingListing(clickedParking.getId());
+
                 }
             });
 
@@ -338,7 +339,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             }
         });
 
-        
+
     }
 
     private void getUserInfo() {
@@ -445,7 +446,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             setResult(RESULT_OK);
             finish();
         }
-        
+
     }
 
 
@@ -535,11 +536,14 @@ public class DetailParkingActivity extends AppCompatActivity {
         //6. add the splitted parking space to database if there are remainding ones.
 
         Listing [] spaces = splitParkingSpace(clickedParking);  //0.
+        splittedListings = new ArrayList<Listing>();
         parkingSpaceToBook = spaces[0];
 
         deleteParkingReference(clickedParking);     //1.
-//        deleteParkingListing(listingID);        //2.  // Huy - I think we still should keep all the listings, even after it being booked, so we can reference to it later in history
+        deleteParkingListing(listingID);        //2.  // Huy - I think we still should keep all the listings, even after it being booked, so we can reference to it later in history
         addSplittedParkingsToDatabase(spaces);  //6
+        //updateOwnerListing(spaces);
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -581,11 +585,25 @@ public class DetailParkingActivity extends AppCompatActivity {
                         }
                     }
                 }
+                User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                ArrayList<Listing> ownerListing = owner.getMyListingHistory();
+                Listing target = ownerListing.get(0);
+                for(Listing l: ownerListing) {
+                    if(clickedParking.getParkingIDRef().equals(l.getParkingIDRef())){
+                        target = l;
+                    }
+                }
+                ownerListing.remove(target);
+                for(Listing l: splittedListings){
+                    ownerListing.add(l);
+                }
+                owner.setMyListingHistory(ownerListing);
+
                 Listing p = parkingSpaceToBook.clone();
                 User currentUserPublicInfo = currentUser.clone();
                 p.setReservedBy(currentUserPublicInfo);
                 if (dataSnapshot.child("Users").hasChild(ownerID)) {
-                    User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                    //User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
                     owner.addToMyReservetionList(p);
                     databaseReference.child("Users").child(ownerID).setValue(owner);
                 }
@@ -848,13 +866,12 @@ public class DetailParkingActivity extends AppCompatActivity {
 
 
 
-
-    public void deleteParkingListing(final String parkingID) {
+    public void deleteParkingListing(final String listingID) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("Listings").hasChild(parkingID)) {
-                    databaseReference.child("Listings").child(parkingID).removeValue();
+                if(dataSnapshot.child("Listings").hasChild(listingID)) {
+                    databaseReference.child("Listings").child(listingID).removeValue();
                 }
             }
 
@@ -872,10 +889,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         while(p != null && (i < outOfBounds)) {
             p = spaces[i];
             if (p != null) {
-                String newListingID = databaseReference.child("AvailableParkings").push().getKey();
-                p.setId(newListingID);
+                p.setParkingIDRef(databaseReference.child("AvailableParkings").push().getKey());
 
-                String p1ChildKey = p.getId();
+                String p1ChildKey = p.getParkingIDRef();
 
                 GregorianCalendar start = getGregorianCalendarDate(p.getStartDate());
                 GregorianCalendar end = getGregorianCalendarDate(p.getEndDate());
@@ -887,7 +903,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                 int endHour = endTimeSystem[0];
                 int endMinutes = endTimeSystem[1];
 
-                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getId();
+                String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + p.getParkingIDRef();
 
                 while (!start.equals(end)) {
                     String p1ParentKey = getDate(start);
@@ -899,8 +915,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                     databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
                 }
                 databaseReference.child("Listings").child(p1ChildKey).setValue(p);
+                splittedListings.add(p);
             }
-
             i++;
         }
 

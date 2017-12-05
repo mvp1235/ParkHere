@@ -534,7 +534,7 @@ public class EditListingActivity extends AppCompatActivity {
      * @param endTime   end time
      */
     public void editListingOnDatabase(final String startDate, final String endDate, final String startTime,
-                                        final String endTime, final LatLng point) {
+                                      final String endTime, final LatLng point) {
 
         String ownerStr = owner.getText().toString();
         String priceStr = price.getText().toString();
