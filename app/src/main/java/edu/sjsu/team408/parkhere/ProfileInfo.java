@@ -62,6 +62,6 @@ public class ProfileInfo extends AppCompatActivity {
                 }
             });
         }
-        Log.i(TIME_TAG, "Ending improved time after payment is done: " + System.currentTimeMillis()/1000 + " Seconds");
+        Log.i(TIME_TAG, "Ending time after payment is done: " + System.currentTimeMillis()/1000 + " Seconds");
     }
 }

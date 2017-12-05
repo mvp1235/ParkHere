@@ -33,6 +33,7 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -66,6 +67,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private Calendar calendar;
     private int year, month, day;
     private Listing parkingSpaceToBook;
+    private ArrayList<Listing> splittedListings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -534,11 +536,14 @@ public class DetailParkingActivity extends AppCompatActivity {
         //6. add the splitted parking space to database if there are remainding ones.
 
         Listing [] spaces = splitParkingSpace(clickedParking);  //0.
+        splittedListings = new ArrayList<Listing>();
         parkingSpaceToBook = spaces[0];
 
         deleteParkingReference(clickedParking);     //1.
-//        deleteParkingListing(listingID);        //2.  // Huy - I think we still should keep all the listings, even after it being booked, so we can reference to it later in history
+        deleteParkingListing(listingID);        //2.  // Huy - I think we still should keep all the listings, even after it being booked, so we can reference to it later in history
         addSplittedParkingsToDatabase(spaces);  //6
+        //updateOwnerListing(spaces);
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -580,11 +585,25 @@ public class DetailParkingActivity extends AppCompatActivity {
                         }
                     }
                 }
+                User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                ArrayList<Listing> ownerListing = owner.getMyListingHistory();
+                Listing target = ownerListing.get(0);
+                for(Listing l: ownerListing) {
+                    if(clickedParking.getParkingIDRef().equals(l.getParkingIDRef())){
+                        target = l;
+                    }
+                }
+                ownerListing.remove(target);
+                for(Listing l: splittedListings){
+                    ownerListing.add(l);
+                }
+                owner.setMyListingHistory(ownerListing);
+
                 Listing p = parkingSpaceToBook.clone();
                 User currentUserPublicInfo = currentUser.clone();
                 p.setReservedBy(currentUserPublicInfo);
                 if (dataSnapshot.child("Users").hasChild(ownerID)) {
-                    User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                    //User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
                     owner.addToMyReservetionList(p);
                     databaseReference.child("Users").child(ownerID).setValue(owner);
                 }
@@ -814,6 +833,39 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
+    public void updateOwnerListing(Listing[] spaces) {
+        final String ownerID = clickedParking.getOwnerParkingID();
+
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if(dataSnapshot.child("Users").hasChild(ownerID)) {
+                    User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                    ArrayList<Listing> ownerListing = owner.getMyListingHistory();
+                    Listing target = ownerListing.get(0);
+                    for(Listing l: ownerListing) {
+                        if(clickedParking.getParkingIDRef().equals(l.getParkingIDRef())){
+                            target = l;
+                        }
+                    }
+                    ownerListing.remove(target);
+                    for(Listing l: splittedListings){
+                        ownerListing.add(l);
+                    }
+                    owner.setMyListingHistory(ownerListing);
+                    databaseReference.child("Users").child(ownerID).setValue(owner);
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+
+
     public void deleteParkingListing(final String listingID) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -864,6 +916,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                     databaseReference.child("AvailableParkings").child(p1ParentKey).child(p1ChildKey).setValue(dataValue);
                 }
                 databaseReference.child("Listings").child(p1ChildKey).setValue(p);
+                splittedListings.add(p);
+
             }
 
             i++;

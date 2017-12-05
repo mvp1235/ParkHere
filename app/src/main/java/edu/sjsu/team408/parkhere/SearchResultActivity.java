@@ -291,7 +291,7 @@ public class SearchResultActivity extends ListActivity {
         if(requestCode == VIEW_DETAIL_PARKING_FROM_RESULT) {
             if (resultCode == RESULT_OK) {
                 finish();
-                Log.i(TIME_TAG, "Starting improved time after payment is done : " + System.currentTimeMillis()/10000 + " Seconds");
+                Log.i(TIME_TAG, "Starting time after payment is done : " + System.currentTimeMillis()/1000 + " Seconds");
                 Intent intent = new Intent(this, BookingHistoryActivity.class);
                 intent.putExtra("parkingIDRef", parkingIDRef);
                 startActivity(intent);
