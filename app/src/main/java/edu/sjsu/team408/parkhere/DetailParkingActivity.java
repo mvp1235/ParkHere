@@ -208,7 +208,7 @@ public class DetailParkingActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(), "Cannot Book Your Own Parking Space...", Toast.LENGTH_SHORT).show();
                     } else {
                         startPaymentActivity();
-                            makeReservation();    //Duoc -- i will continue fixing this part tmr.
+                           // makeReservation();    //Duoc -- i will continue fixing this part tmr.
                             //notifyOwner();
 
                     }
