@@ -149,6 +149,13 @@ public class User implements Parcelable{
         }
     }
 
+    public void deleteFromListingHistory(Listing l) {
+        if (myListingHistory.contains(l)) {
+            myListingHistory.remove(l);
+        }
+    }
+
+
     public ArrayList<Listing> getMyListingHistory() {return this.myListingHistory;}
 
     public void setMyListingHistory(ArrayList<Listing> myListingHistory) {

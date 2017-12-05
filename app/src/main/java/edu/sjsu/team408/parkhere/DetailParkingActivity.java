@@ -270,7 +270,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    deleteParkingListing(clickedParking.getId());
                 }
             });
 
@@ -870,9 +870,29 @@ public class DetailParkingActivity extends AppCompatActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                Listing toBeDeleted = dataSnapshot.child("Listings").child(listingID).getValue(Listing.class);
+
+                //Remove listing in "Listing"
                 if(dataSnapshot.child("Listings").hasChild(listingID)) {
                     databaseReference.child("Listings").child(listingID).removeValue();
                 }
+
+                //Remove all listings in "AvailableParkings"
+                for (DataSnapshot d : dataSnapshot.child("AvailableParkings").getChildren()) {
+                    if (d.hasChild(listingID)) {
+                        d.child(listingID).getRef().removeValue();
+                    }
+                }
+
+                //Remove from user's listing history
+                User u = dataSnapshot.child("Users").child(firebaseAuth.getCurrentUser().getUid()).getValue(User.class);
+                if (u != null) {
+                    u.deleteFromListingHistory(toBeDeleted);
+                }
+                dataSnapshot.child("Users").child(firebaseAuth.getCurrentUser().getUid()).getRef().setValue(u);
+
+                setResult(RESULT_OK);
+                finish();
             }
 
             @Override

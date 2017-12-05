@@ -202,4 +202,19 @@ public class Listing implements Parcelable{
     public String toString() {
         return address.toString() + " " + owner.toString() + " " + startDate + " " + endDate + " "+ startTime + " " + endTime + "" + price;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj != null && obj instanceof Listing) {
+            Listing l = (Listing) obj;
+            return this.id.equalsIgnoreCase(l.getId());
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
+    }
 }
