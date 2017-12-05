@@ -66,6 +66,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private Calendar calendar;
     private int year, month, day;
     private Listing parkingSpaceToBook;
+    private ArrayList<Listing> splittedListings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -814,7 +815,6 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
-<<<<<<< HEAD
     public void updateOwnerListing(Listing[] spaces) {
         final String ownerID = clickedParking.getOwnerParkingID();
 
@@ -848,10 +848,8 @@ public class DetailParkingActivity extends AppCompatActivity {
 
 
 
+
     public void deleteParkingListing(final String parkingID) {
-=======
-    public void deleteParkingListing(final String listingID) {
->>>>>>> parent of 4c63d2a... add splitted parkings into owner's listing history complete
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
