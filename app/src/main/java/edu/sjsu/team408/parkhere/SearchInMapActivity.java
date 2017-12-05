@@ -141,22 +141,23 @@ public class SearchInMapActivity extends AppCompatActivity
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
+                                    int haveBeenBookedCount = data.child("haveBeenBookedCount").getValue(int.class);
                                     Address address = data.child("address").getValue(Address.class);
                                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                                     double latitude = address.getLatitude();
                                     double longitude = address.getLongitude();
-                                    double increment = 0.0005;
+                                    double increment = 0.0003 / 2;
 
                                     // Add polygons to indicate areas on the map.
                                     Polygon polygon1 = googleMap.addPolygon(new PolygonOptions()
                                             .clickable(true)
                                             .add(
-                                                    new LatLng(latitude, longitude),
-                                                    new LatLng(latitude + increment, longitude),
+                                                    new LatLng(latitude - increment, longitude + increment),
                                                     new LatLng(latitude + increment, longitude + increment),
-                                                    new LatLng(latitude, longitude + increment)));
+                                                    new LatLng(latitude + increment, longitude - increment),
+                                                    new LatLng(latitude - increment, longitude - increment)));
                                     // Style the polygon.
-                                    stylePolygon(polygon1);
+                                    stylePolygon(polygon1, haveBeenBookedCount);
 
 
                                     googleMap.addMarker(
