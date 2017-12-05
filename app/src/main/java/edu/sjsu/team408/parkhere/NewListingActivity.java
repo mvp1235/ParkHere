@@ -87,7 +87,7 @@ public class NewListingActivity extends AppCompatActivity{
         storageReference = FirebaseStorage.getInstance().getReference();
         currentUser = null;
         //Get the parking id and use it throughout the activity
-        currentListingIDRef = databaseReference.child("AvailableParkings").push().getKey();
+        currentParkingIDRef = databaseReference.child("AvailableParkings").push().getKey();
 
         Intent intent = getIntent();
 
@@ -547,8 +547,8 @@ public class NewListingActivity extends AppCompatActivity{
         GregorianCalendar endDateCalendar = new GregorianCalendar(endYear, endMonth - 1, endDay);
 
         //this is where it caused the listingID to become parkingID, the parkingID should be set here isntead
-//        currentListingIDRef = parkingSpaceSpinner.getSelectedItem().toString();
-        currentParkingIDRef = parkingSpaceSpinner.getSelectedItem().toString();
+        currentListingIDRef = parkingSpaceSpinner.getSelectedItem().toString();
+        //currentParkingIDRef = parkingSpaceSpinner.getSelectedItem().toString();
 
 
 
@@ -557,7 +557,7 @@ public class NewListingActivity extends AppCompatActivity{
         String address = addressStreetNumber.getText().toString() + ", " + addressCity.getText().toString()
                 + ", " + addressState.getText().toString() + " " + addressZipCode.getText().toString();
 
-        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentListingIDRef; //starthour-startminutes-endhour-endminutes-currentParkingID
+        String dataValue = starthour + ":" + startMinutes + ":" + endHour + ":" + endMinutes + "/" + currentParkingIDRef; //starthour-startminutes-endhour-endminutes-currentParkingID
         String parentKey;
 
 
@@ -582,7 +582,7 @@ public class NewListingActivity extends AppCompatActivity{
 
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-            childKey = currentListingIDRef;
+            childKey = currentParkingIDRef;
             parentKey = currentDate;
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
@@ -596,14 +596,14 @@ public class NewListingActivity extends AppCompatActivity{
 
             String currentDate = currentMonth + "-" + currentDay + "-" + currentYear;
 
-            childKey = currentListingIDRef;
+            childKey = currentParkingIDRef;
             parentKey = currentDate;
 
             databaseReference.child("AvailableParkings").child(parentKey).child(childKey).setValue(dataValue); //add listing to database
         }
         addListingToUser(parking);
 
-        databaseReference.child("Listings").child(currentListingIDRef).setValue(parking);
+        databaseReference.child("Listings").child(currentParkingIDRef).setValue(parking);
     }
 
 

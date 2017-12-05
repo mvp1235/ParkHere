@@ -523,7 +523,6 @@ public class DetailParkingActivity extends AppCompatActivity {
      */
     public void makeReservation() {
         final String parkingID = clickedParking.getParkingIDRef();
-        final String listingID = clickedParking.getId();
 
         //here add the reserved parking to user's myCurrentReservedParkings lists
 
@@ -538,12 +537,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         Listing [] spaces = splitParkingSpace(clickedParking);  //0.
         splittedListings = new ArrayList<Listing>();
         parkingSpaceToBook = spaces[0];
-
         deleteParkingReference(clickedParking);     //1.
-        deleteParkingListing(listingID);        //2.  // Huy - I think we still should keep all the listings, even after it being booked, so we can reference to it later in history
+        deleteParkingListing(parkingID);        //2.
         addSplittedParkingsToDatabase(spaces);  //6
-        //updateOwnerListing(spaces);
-
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -794,9 +790,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         return splitted;
     }
 
+
     public void deleteParkingReference(Listing clickedParking) {
         final String parkingIDRef = clickedParking.getParkingIDRef();
-        final String listingIDRef = clickedParking.getId();
         String startDate = clickedParking.getStartDate();
         String endDate = clickedParking.getEndDate();
 
@@ -810,8 +806,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 while(!startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(listingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
                         }
                     }
                     startDateRef.add(Calendar.DAY_OF_MONTH, 1);     //increment
@@ -819,8 +815,8 @@ public class DetailParkingActivity extends AppCompatActivity {
                 if(startDateRef.equals(endDateRef)) {
                     String dateRef = getDate(startDateRef);
                     if (dataSnapshot.child("AvailableParkings").hasChild(dateRef)) {
-                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(listingIDRef)) {
-                            databaseReference.child("AvailableParkings").child(dateRef).child(listingIDRef).removeValue();
+                        if(dataSnapshot.child("AvailableParkings").child(dateRef).hasChild(parkingIDRef)) {
+                            databaseReference.child("AvailableParkings").child(dateRef).child(parkingIDRef).removeValue();
                         }
                     }
                 }
@@ -866,12 +862,12 @@ public class DetailParkingActivity extends AppCompatActivity {
 
 
 
-    public void deleteParkingListing(final String listingID) {
+    public void deleteParkingListing(final String parkingID) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("Listings").hasChild(listingID)) {
-                    databaseReference.child("Listings").child(listingID).removeValue();
+                if(dataSnapshot.child("Listings").hasChild(parkingID)) {
+                    databaseReference.child("Listings").child(parkingID).removeValue();
                 }
             }
 
