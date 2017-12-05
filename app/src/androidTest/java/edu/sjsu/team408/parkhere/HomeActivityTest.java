@@ -29,8 +29,30 @@ public class HomeActivityTest {
     @Rule
     public ActivityTestRule<MainActivity> homeActivityTestActivityTestRule =
             new ActivityTestRule<MainActivity>(MainActivity.class);
+    private void slowDown2Secs() {
+        try {
+            Thread.sleep(2000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    public void searchInListBeforeTest() {
+        onView(withId(R.id.locationSearchTerm))
+                .perform(typeText("5403 Stevens Creek Boulevard, Santa Clara, CA"));
+        closeSoftKeyboard();
+        onView(withId(R.id.searchDate))
+                .perform(typeText("12/08/2017"));
+        closeSoftKeyboard();
+        onView(withId(R.id.searchBtn))
+                .perform(click());
+        slowDown2Secs();
+        pressBack();
 
 
+
+    }
 
     /**
      *
