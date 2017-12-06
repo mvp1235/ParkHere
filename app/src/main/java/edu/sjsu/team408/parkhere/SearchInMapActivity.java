@@ -95,9 +95,9 @@ public class SearchInMapActivity extends AppCompatActivity
         List<PatternItem> pattern = null;
         int strokeColor = COLOR_BLACK_ARGB;
         int fillColor;
-        int countTier1 = Integer.getInteger(getString(R.string.countTier1));
-        int countTier2 = Integer.getInteger(getString(R.string.countTier2));
-        int countTier3 = Integer.getInteger(getString(R.string.countTier3));
+        int countTier1 = 10;
+        int countTier2 = 20;
+        int countTier3 = 50;
         if (haveBeenBookedCount < countTier1)
             fillColor = COLOR_WHITE_ARGB;
         else if (haveBeenBookedCount < countTier2)
