@@ -92,6 +92,9 @@
     <string name="lessCountTier2"><![CDATA[< 20]]></string>
     <string name="lessCountTier3"><![CDATA[< 50]]></string>
     <string name="greaterCountTier4"><![CDATA[>= 50]]></string>
+    <string name="parking_space_been_booked_for_times">Parking space been booked for times</string>
+    <string name="haveBeenBookedCount">haveBeenBookedCount</string>
+    <string name="ParkingSpaces">ParkingSpaces</string>
 
 
 </resources>

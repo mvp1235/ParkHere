@@ -1,44 +1,65 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
-        android:layout_gravity="top"
+    android:layout_height="match_parent">
+
+    <fragment
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
+        android:layout_gravity="top"
+        android:layout_weight="15"
         tools:context="edu.sjsu.team408.parkhere.SearchInMapActivity" />
-    <LinearLayout
+
+    <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_gravity="bottom">
+        android:text="@string/parking_space_been_booked_for_times"/>
+    <LinearLayout
+        android:id="@+id/mapLegend"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_gravity="bottom"
+        android:orientation="horizontal">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/lessCountTier1"/>
+            android:layout_weight="1"
+            android:background="@color/colorTier1"
+            android:gravity="center"
+            android:text="@string/lessCountTier1" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/lessCountTier2"/>
+            android:layout_weight="1"
+            android:background="@color/colorTier2"
+            android:gravity="center"
+            android:text="@string/lessCountTier2" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/lessCountTier3"/>
+            android:layout_weight="1"
+            android:background="@color/colorTier3"
+            android:gravity="center"
+            android:text="@string/lessCountTier3" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="@string/greaterCountTier4"/>
+            android:layout_weight="1"
+            android:background="@color/colorTier4"
+            android:gravity="center"
+            android:text="@string/greaterCountTier4" />
 
 
     </LinearLayout>
+
 
 
 </LinearLayout>

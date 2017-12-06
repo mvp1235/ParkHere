@@ -68,7 +68,10 @@ public class BookingHistoryActivity extends ListActivity {
         if(parkingIdRef == null) {
             return;
         }
-        int count = getListAdapter().getCount();
+//        int count = 0;
+//        if (getListAdapter() != null)
+           int count = getListAdapter().getCount();
+
         if(!parkingIdRef.equals("")) {
             for (int i = 0; i < count; i++) {
                 Listing parking = (Listing) getListAdapter().getItem(i);

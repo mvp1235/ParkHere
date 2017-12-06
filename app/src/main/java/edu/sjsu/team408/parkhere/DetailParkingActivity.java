@@ -572,6 +572,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     public void notifyOwner() {
         final String ownerID = clickedParking.getOwnerParkingID();
+
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -585,6 +586,25 @@ public class DetailParkingActivity extends AppCompatActivity {
                         }
                     }
                 }
+                Integer haveBeenBookedCount;
+                try {
+                    haveBeenBookedCount = dataSnapshot.child(getString(R.string.ParkingSpaces))
+                            .child(clickedParking.getId())
+                            .child(getString(R.string.haveBeenBookedCount))
+                            .getValue(Integer.class);
+                    haveBeenBookedCount = haveBeenBookedCount + 1;
+                    databaseReference.child(getString(R.string.ParkingSpaces))
+                            .child(clickedParking.getId())
+                            .child(getString(R.string.haveBeenBookedCount))
+                            .setValue(haveBeenBookedCount);
+                } catch (NullPointerException e) {
+                    haveBeenBookedCount = 1;
+                }
+                databaseReference.child(getString(R.string.ParkingSpaces))
+                        .child(clickedParking.getId())
+                        .child(getString(R.string.haveBeenBookedCount))
+                        .setValue(haveBeenBookedCount);
+
                 User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
                 ArrayList<Listing> ownerListing = owner.getMyListingHistory();
                 Listing target = ownerListing.get(0);

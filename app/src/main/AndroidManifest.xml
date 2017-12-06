@@ -68,8 +68,6 @@
         <activity android:name=".BookingPaymentActivity" />
         <activity android:name=".PaymentDetails" />
         <activity android:name=".SearchInMapActivity" />
-        <activity android:name=".ViewRatingsActivity" />
-        <activity android:name=".PaymentDetails" />
         <activity android:name=".ProfileInfo"></activity>
     </application>
 

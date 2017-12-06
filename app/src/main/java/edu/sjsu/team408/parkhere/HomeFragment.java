@@ -16,6 +16,8 @@ import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
+
+import java.util.ArrayList;
 import java.util.Calendar;
 
 
@@ -24,7 +26,7 @@ import java.util.Calendar;
  */
 public class HomeFragment extends Fragment {
 
-    private static final int VIEW_PARKINGS_CODE = 123;
+    static final int VIEW_PARKINGS_CODE = 232;
     private final static int SEARCH_TIME = 1;
 
     private Button searchBtn;
@@ -95,7 +97,7 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 String searchQuery = locationSearchTerm.getText().toString();
-                searchListing(searchQuery);
+                searchListing(searchQuery, false);
             }
         });
 
@@ -103,6 +105,9 @@ public class HomeFragment extends Fragment {
         searchInMapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                searchInMapButton.setEnabled(false);
+//                String searchQuery = locationSearchTerm.getText().toString();
+//                searchListing(searchQuery, true);
                 Intent intent = new Intent(getContext(), SearchInMapActivity.class);
                 startActivity(intent);
             }
@@ -119,8 +124,24 @@ public class HomeFragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case VIEW_PARKINGS_CODE:
+                Toast.makeText(getActivity(), ""+ searchInMapButton.isEnabled(), Toast.LENGTH_SHORT).show();
+                if (!searchInMapButton.isEnabled()) {
+                    searchInMapButton.setEnabled(true);
+                    // unexpected NullPointerException thrown here. Can't figure out why.
+                    Bundle bundle = data.getBundleExtra("bundle");
+                    Intent intent = new Intent(getContext(), SearchInMapActivity.class);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
 
-    public void searchListing(String location) {
+    public void searchListing(String location, boolean isMap) {
         String searchDate = searchDateET.getText().toString();
         String searchTime = searchTimeET.getText().toString();
         if (searchDate.isEmpty()) {
@@ -131,6 +152,7 @@ public class HomeFragment extends Fragment {
         intent.putExtra("date", searchDate);
         intent.putExtra("location", location);
         intent.putExtra("time", searchTime);
+        intent.putExtra("isMap", isMap);
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
     }
 

@@ -4,8 +4,11 @@ package edu.sjsu.team408.parkhere;
  * Created by robg on 12/4/17.
  */
 
+import android.content.Intent;
+import android.location.Location;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.LinearLayout;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -33,10 +36,14 @@ import java.util.List;
  * An activity that displays a Google map with a marker (pin) to indicate a particular location.
  */
 public class SearchInMapActivity extends AppCompatActivity
-        implements OnMapReadyCallback {
-    private ArrayList<Listing> foundListings;
+        implements OnMapReadyCallback,
+        GoogleMap.OnPolygonClickListener {
+//    private ArrayList<Listing> foundListings;
+//    private ArrayList<String> foundListingsParkingID;
+//    private Location mLocation;
     private DatabaseReference mDatabase;
 
+    private static final float ONE_MILES_RANGE = 1609.34f;
     private static final int COLOR_BLACK_ARGB = 0xff000000;
     private static final int COLOR_WHITE_ARGB = 0xffffffff;
     private static final int COLOR_RED_ARGB = 0xffff0000;
@@ -65,11 +72,36 @@ public class SearchInMapActivity extends AppCompatActivity
             Arrays.asList(DOT, GAP, DASH, GAP);
 
 
+//    private boolean locationIsWithinInRange(LatLng latLng) {
+//        float[] distance = new float[2];
+//        Location.distanceBetween(mLocation.getLatitude(), mLocation.getLongitude(),
+//                latLng.latitude, latLng.longitude, distance);
+//        return distance[0] <= ONE_MILES_RANGE;
+//    }
+//
+//    private boolean theParkingIsInFoundListings(String parkingId) {
+//        return foundListingsParkingID.contains(parkingId);
+//    }
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+//        Intent data = getIntent();
+//        Bundle bundle = data.getExtras();
+//        foundListings =
+//                (ArrayList<Listing>) bundle.getSerializable("foundLists");
+//        foundListingsParkingID = new ArrayList<>();
+//        for (Listing listing : foundListings) {
+//            foundListingsParkingID.add(listing.getId());
+//        }
+//        mLocation = (Location) bundle.getParcelable("location");
+
         // Retrieve the content view that renders the map.
         setContentView(R.layout.activity_maps);
+        LinearLayout mapLegend = findViewById(R.id.mapLegend);
+        mapLegend.bringToFront();
 
         mDatabase = FirebaseDatabase.getInstance().getReference();
 
@@ -127,8 +159,6 @@ public class SearchInMapActivity extends AppCompatActivity
         // Add a marker in Sydney, Australia,
         // and move the map's camera to the same location.
 
-
-//        for (Listing listing : foundListings) {
         mDatabase
                 .child("ParkingSpaces")
 //                    .child(listing.getParkingIDRef())
@@ -137,14 +167,20 @@ public class SearchInMapActivity extends AppCompatActivity
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                    int haveBeenBookedCount = 10;
-//                                    int haveBeenBookedCount = data.child("haveBeenBookedCount").getValue(int.class);
                                     Address address = data.child("address").getValue(Address.class);
+//                                    if (theParkingIsInFoundListings(data.getKey())) {
+                                    int haveBeenBookedCount;
+                                    try {
+                                        haveBeenBookedCount = data.child("haveBeenBookedCount").getValue(int.class);
+                                    } catch (NullPointerException e) {
+                                        haveBeenBookedCount = 0;
+                                    }
                                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                                     double latitude = address.getLatitude();
                                     double longitude = address.getLongitude();
                                     double increment = 0.0003 / 2;
 
+//                                        if (locationIsWithinInRange(latLng)) {
                                     // Add polygons to indicate areas on the map.
                                     Polygon polygon1 = googleMap.addPolygon(new PolygonOptions()
                                             .clickable(true)
@@ -161,7 +197,9 @@ public class SearchInMapActivity extends AppCompatActivity
                                             new MarkerOptions().position(latLng)
                                                     .title(address.getStreetAddress()));
                                     googleMap.moveCamera(
-                                            CameraUpdateFactory.newLatLngZoom(latLng,17.0f));
+                                            CameraUpdateFactory.newLatLngZoom(latLng, 17.0f));
+//                                        }
+//                                    }
                                 }
                             }
 
@@ -198,5 +236,10 @@ public class SearchInMapActivity extends AppCompatActivity
 //        googleMap.addMarker(new MarkerOptions().position(sydney)
 //                .title("Marker in Sydney"));
 //        googleMap.moveCamera(CameraUpdateFactory.newLatLng(sydney));
+    }
+
+    @Override
+    public void onPolygonClick(Polygon polygon) {
+
     }
 }

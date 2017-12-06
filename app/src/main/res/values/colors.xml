@@ -4,4 +4,8 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#ff4081</color>
     <color name="light_gray_background">#23c5c5c5</color>
+    <color name="colorTier4">#ff0000</color>
+    <color name="colorTier3">#f57f17</color>
+    <color name="colorTier2">#ffff00</color>
+    <color name="colorTier1">#0fffffff</color>
 </resources>

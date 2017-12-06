@@ -2,6 +2,7 @@ package edu.sjsu.team408.parkhere;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -31,6 +32,8 @@ import com.google.firebase.database.ValueEventListener;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static edu.sjsu.team408.parkhere.HomeFragment.VIEW_PARKINGS_CODE;
 
 /**
  * Created by DuocNguyen on 11/1/17.
@@ -72,6 +75,7 @@ public class SearchResultActivity extends ListActivity {
     private Location mLocation;
     private boolean userHasDesiredLocation;
 
+    private boolean isMap;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -85,7 +89,7 @@ public class SearchResultActivity extends ListActivity {
         final String dateSearchTerm = intent.getStringExtra("date");
         final String locationSearchTerm = intent.getStringExtra("location");
         final String searchTimeTerm = intent.getStringExtra("time");
-
+        isMap = intent.getBooleanExtra("isMap", false);
         if (locationSearchTerm.isEmpty())
             userHasDesiredLocation = false;
         else
@@ -273,7 +277,7 @@ public class SearchResultActivity extends ListActivity {
     private void startLocationPermissionRequest() {
         ActivityCompat.requestPermissions(SearchResultActivity.this,
                 new String[]{Manifest.permission.ACCESS_COARSE_LOCATION
-                , Manifest.permission.ACCESS_FINE_LOCATION},
+                        , Manifest.permission.ACCESS_FINE_LOCATION},
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
 
@@ -315,7 +319,7 @@ public class SearchResultActivity extends ListActivity {
         if(requestCode == VIEW_DETAIL_PARKING_FROM_RESULT) {
             if (resultCode == RESULT_OK) {
                 finish();
-                Log.i(TIME_TAG, "Starting improved time after payment is done : " + System.currentTimeMillis()/10000 + " Seconds");
+                Log.i(TIME_TAG, "Starting improved time after payment is done : " + System.currentTimeMillis() / 10000 + " Seconds");
                 Intent intent = new Intent(this, BookingHistoryActivity.class);
                 intent.putExtra("parkingIDRef", parkingIDRef);
                 startActivity(intent);
@@ -405,6 +409,15 @@ public class SearchResultActivity extends ListActivity {
         } else {
             Toast.makeText(this, R.string.addressInvalid, Toast.LENGTH_SHORT).show();
         }
+//        if (isMap) {
+//            finish();
+//            Intent toMapData = new Intent(SearchResultActivity.this, SearchInMapActivity.class);
+//            Bundle bundle = new Bundle();
+//            bundle.putSerializable("foundLists", listings);
+//            bundle.putParcelable("location", mLocation);
+//            toMapData.putExtra("bundle", bundle);
+//            startActivity(toMapData);
+//        }
     }
 
 
@@ -425,5 +438,4 @@ public class SearchResultActivity extends ListActivity {
 
         return (searchHour - startHour >= 0) && (searchHour - endHour <= 0);
     }
-
 }
