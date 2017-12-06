@@ -19,8 +19,6 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.PatternItem;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -41,9 +39,11 @@ public class SearchInMapActivity extends AppCompatActivity
 
     private static final int COLOR_BLACK_ARGB = 0xff000000;
     private static final int COLOR_WHITE_ARGB = 0xffffffff;
+    private static final int COLOR_RED_ARGB = 0xffff0000;
+    private static final int COLOR_YELLOW_ARGB = 0xffffff00;
+    private static final int COLOR_ORANGE_ARGB = 0xffF57F17;
     private static final int COLOR_GREEN_ARGB = 0xff388E3C;
     private static final int COLOR_PURPLE_ARGB = 0xff81C784;
-    private static final int COLOR_ORANGE_ARGB = 0xffF57F17;
     private static final int COLOR_BLUE_ARGB = 0xffF9A825;
 
     private static final int POLYLINE_STROKE_WIDTH_PX = 12;
@@ -83,8 +83,9 @@ public class SearchInMapActivity extends AppCompatActivity
     /**
      * Styles the polygon, based on type.
      * @param polygon The polygon object that needs styling.
+     * @param haveBeenBookedCount
      */
-    private void stylePolygon(Polygon polygon) {
+    private void stylePolygon(Polygon polygon, int haveBeenBookedCount) {
         String type = "";
         // Get the data object stored with the polygon.
         if (polygon.getTag() != null) {
@@ -93,25 +94,20 @@ public class SearchInMapActivity extends AppCompatActivity
 
         List<PatternItem> pattern = null;
         int strokeColor = COLOR_BLACK_ARGB;
-        int fillColor = COLOR_WHITE_ARGB;
+        int fillColor;
+        int countTier1 = Integer.getInteger(getString(R.string.countTier1));
+        int countTier2 = Integer.getInteger(getString(R.string.countTier2));
+        int countTier3 = Integer.getInteger(getString(R.string.countTier3));
+        if (haveBeenBookedCount < countTier1)
+            fillColor = COLOR_WHITE_ARGB;
+        else if (haveBeenBookedCount < countTier2)
+            fillColor = COLOR_YELLOW_ARGB;
+        else if (haveBeenBookedCount < countTier3)
+            fillColor = COLOR_ORANGE_ARGB;
+        else
+            fillColor = COLOR_RED_ARGB;
 
-//        switch (type) {
-//            // If no type is given, allow the API to use the default.
-//            case "alpha":
-//                // Apply a stroke pattern to render a dashed line, and define colors.
-//                pattern = PATTERN_POLYGON_ALPHA;
-//                strokeColor = COLOR_GREEN_ARGB;
-//                fillColor = COLOR_PURPLE_ARGB;
-//                break;
-//            case "beta":
-//                // Apply a stroke pattern to render a line of dots and dashes, and define colors.
-//                pattern = PATTERN_POLYGON_BETA;
-//                strokeColor = COLOR_ORANGE_ARGB;
-//                fillColor = COLOR_BLUE_ARGB;
-//                break;
-//        }
-
-        polygon.setStrokePattern(pattern);
+        polygon.setStrokePattern(null);
         polygon.setStrokeWidth(POLYGON_STROKE_WIDTH_PX);
         polygon.setStrokeColor(strokeColor);
         polygon.setFillColor(fillColor);
@@ -141,7 +137,8 @@ public class SearchInMapActivity extends AppCompatActivity
                             @Override
                             public void onDataChange(DataSnapshot dataSnapshot) {
                                 for (DataSnapshot data : dataSnapshot.getChildren()) {
-                                    int haveBeenBookedCount = data.child("haveBeenBookedCount").getValue(int.class);
+                                    int haveBeenBookedCount = 10;
+//                                    int haveBeenBookedCount = data.child("haveBeenBookedCount").getValue(int.class);
                                     Address address = data.child("address").getValue(Address.class);
                                     LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                                     double latitude = address.getLatitude();
