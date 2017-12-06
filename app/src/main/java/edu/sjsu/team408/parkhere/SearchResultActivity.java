@@ -1,6 +1,7 @@
 package edu.sjsu.team408.parkhere;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -60,6 +61,7 @@ public class SearchResultActivity extends ListActivity {
     static final String LONGITUDE = "longitude";
 
     static final int VIEW_DETAIL_PARKING_FROM_RESULT = 101;
+    private static final int PERMISSIONS_REQUEST_ACCESS_LOCATION = 102;
     private ArrayList<String> availableParkingSpaces;
     private DatabaseReference databaseReference;
     private FirebaseAuth firebaseAuth;
@@ -92,8 +94,8 @@ public class SearchResultActivity extends ListActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(dataSnapshot.child("AvailableParkings").hasChild(dateSearchTerm)) {
-                    for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings")
+                if (dataSnapshot.child("AvailableParkings").hasChild(dateSearchTerm)) {
+                    for (DataSnapshot userIDList : dataSnapshot.child("AvailableParkings")
                             .child(dateSearchTerm).getChildren()) {
                         String p = userIDList.getValue(String.class);
                         availableParkingSpaces.add(p);
@@ -139,9 +141,9 @@ public class SearchResultActivity extends ListActivity {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if(firebaseAuth.getCurrentUser() != null) {
+                if (firebaseAuth.getCurrentUser() != null) {
                     String targetID = firebaseAuth.getCurrentUser().getUid();
-                    if(!targetID.isEmpty()) {
+                    if (!targetID.isEmpty()) {
                         if (dataSnapshot.child("Users").hasChild(targetID)) {
                             currentUser = dataSnapshot.child("Users").child(targetID).getValue(User.class);
                         }
@@ -153,7 +155,6 @@ public class SearchResultActivity extends ListActivity {
             public void onCancelled(DatabaseError databaseError) {
             }
         });
-
 
 
         if (userHasDesiredLocation) {
@@ -183,11 +184,24 @@ public class SearchResultActivity extends ListActivity {
         super.onStart();
         if (!checkPermissions()) {
             requestPermissions();
-        } else if (!userHasDesiredLocation){
+        } else if (!userHasDesiredLocation) {
             getLastLocation();
         }
     }
-    @SuppressWarnings("MissingPermission")
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        switch (requestCode) {
+            case PERMISSIONS_REQUEST_ACCESS_LOCATION: {
+                // Permission is granted
+                getLastLocation();
+            }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
     private void getLastLocation() {
         mFusedLocationClient.getLastLocation()
                 .addOnCompleteListener(this, new OnCompleteListener<Location>() {
@@ -195,12 +209,18 @@ public class SearchResultActivity extends ListActivity {
                     public void onComplete(@NonNull Task<Location> task) {
                         if (task.isSuccessful() && task.getResult() != null) {
                             mLocation = task.getResult();
+                            showSnackbar("" +
+                                    Double.toString(mLocation.getLatitude())
+                                    + " "
+                                    + Double.toString(mLocation.getLongitude()));
+
                         } else {
                             Log.w(TAG, "getLastLocation:exception", task.getException());
                             showSnackbar(getString(R.string.no_location_detected));
                         }
                     }
                 });
+//        }
     }
     private void showSnackbar(final String text) {
         View container = findViewById(R.id.activity_search_result_container);
@@ -216,9 +236,12 @@ public class SearchResultActivity extends ListActivity {
                 .setAction(getString(actionStringId), listener).show();
     }
     private boolean checkPermissions() {
-        int permissionState = ActivityCompat.checkSelfPermission(this,
+        int permissionState1 = ActivityCompat.checkSelfPermission(this,
                 android.Manifest.permission.ACCESS_COARSE_LOCATION);
-        return permissionState == PackageManager.PERMISSION_GRANTED;
+        int permissionState2 = ActivityCompat.checkSelfPermission(this,
+                android.Manifest.permission.ACCESS_FINE_LOCATION);
+        return permissionState1 == PackageManager.PERMISSION_GRANTED
+                && permissionState2 == PackageManager.PERMISSION_GRANTED;
     }
     private void requestPermissions() {
         boolean shouldProvideRationale =
@@ -249,7 +272,8 @@ public class SearchResultActivity extends ListActivity {
     }
     private void startLocationPermissionRequest() {
         ActivityCompat.requestPermissions(SearchResultActivity.this,
-                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION
+                , Manifest.permission.ACCESS_FINE_LOCATION},
                 REQUEST_PERMISSIONS_REQUEST_CODE);
     }
 
@@ -372,8 +396,7 @@ public class SearchResultActivity extends ListActivity {
         // if a location is specified
         if (mLocation != null) {
             // Create the adapter to convert the array to views
-            ListingAdapter adapter = new ListingAdapter(this, listings,
-                    mLocation);
+            ListingAdapter adapter = new ListingAdapter(this, listings, mLocation);
 
             Log.i("TEST", mLocation.toString());
 

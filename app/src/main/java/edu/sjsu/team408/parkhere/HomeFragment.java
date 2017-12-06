@@ -28,6 +28,7 @@ public class HomeFragment extends Fragment {
     private final static int SEARCH_TIME = 1;
 
     private Button searchBtn;
+    private Button searchInMapButton;
     private static EditText searchDateET;
     private EditText locationSearchTerm;
     private static EditText searchTimeET;
@@ -95,6 +96,15 @@ public class HomeFragment extends Fragment {
             public void onClick(View view) {
                 String searchQuery = locationSearchTerm.getText().toString();
                 searchListing(searchQuery);
+            }
+        });
+
+        searchInMapButton = view.findViewById(R.id.searchInMapButton);
+        searchInMapButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getContext(), SearchInMapActivity.class);
+                startActivity(intent);
             }
         });
 

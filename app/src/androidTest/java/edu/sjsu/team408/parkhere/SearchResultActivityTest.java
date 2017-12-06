@@ -33,7 +33,7 @@ public class SearchResultActivityTest {
             ActivityTestRule<>(MainActivity.class);
     @Before
     public void initStringInput() {
-        dateStringToBeEntered = "11-10-2017";
+        dateStringToBeEntered = "12-5-2017";
         locationStringToBeTyped = "64 S 4th St, San Jose";
         altLocationStringToBeTyped = "447 Great Mall Dr, Milpitas, CA 95035";
         invalidLocationStringToBeTyped = "66S5th";
