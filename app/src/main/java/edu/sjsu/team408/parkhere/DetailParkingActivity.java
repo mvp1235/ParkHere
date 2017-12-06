@@ -177,7 +177,7 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveFromTime.setText("From Time - " + clickedParking.getStartTime());
         reserveToTime.setText("To Time - " + clickedParking.getEndTime());
 
-        setParkingPhoto(clickedParking.getParkingIDRef());
+        setParkingPhoto(clickedParking.getId());
 
         addressTV.setText(clickedParking.getAddress().toString());      //crashes here
         ownerTV.setText(clickedParking.getOwner().getName());
@@ -270,7 +270,11 @@ public class DetailParkingActivity extends AppCompatActivity {
             deleteBtn.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-
+                    deleteParkingListing(clickedParking.getParkingIDRef());
+                    deleteParkingReference(clickedParking);
+                    notifyOwner();
+                    setResult(RESULT_OK);
+                    finish();
                 }
             });
 
@@ -317,7 +321,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if(firebaseAuth.getCurrentUser() != null) {
-                    String targetID = clickedParking.getParkingIDRef();
+                    String targetID = clickedParking.getId();
                     if (dataSnapshot.child("ParkingSpaces").hasChild(targetID)) {
                         ParkingSpace p = dataSnapshot.child("ParkingSpaces").child(targetID).getValue(ParkingSpace.class);
                         double avgRating = 0;
@@ -404,7 +408,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     private void showRatings() {
         Intent intent = new Intent(DetailParkingActivity.this, ViewRatingsActivity.class);
-        intent.putExtra(SearchResultActivity.PARKING_ID_REF, clickedParking.getParkingIDRef());
+        intent.putExtra(SearchResultActivity.PARKING_ID_REF, clickedParking.getId());
         startActivity(intent);
     }
 
@@ -417,7 +421,7 @@ public class DetailParkingActivity extends AppCompatActivity {
     private void writeOwnerReview() {
         String reviewerID = firebaseAuth.getCurrentUser().getUid();
         String revieweeID = clickedParking.getOwnerParkingID();
-        String parkingID = clickedParking.getParkingIDRef();
+        String parkingID = clickedParking.getId();
 
         Intent intent = new Intent(this, BookingReviewActivity.class);
         intent.putExtra("reviewerID", reviewerID);
@@ -567,7 +571,7 @@ public class DetailParkingActivity extends AppCompatActivity {
 
 
     public void notifyOwner() {
-        final String ownerID = parkingSpaceToBook.getOwnerParkingID();
+        final String ownerID = clickedParking.getOwnerParkingID();
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -590,19 +594,24 @@ public class DetailParkingActivity extends AppCompatActivity {
                     }
                 }
                 ownerListing.remove(target);
-                for(Listing l: splittedListings){
-                    ownerListing.add(l);
+                if(splittedListings != null) {
+                    for (Listing l : splittedListings) {
+                        ownerListing.add(l);
+                    }
                 }
                 owner.setMyListingHistory(ownerListing);
 
-                Listing p = parkingSpaceToBook.clone();
-                User currentUserPublicInfo = currentUser.clone();
-                p.setReservedBy(currentUserPublicInfo);
-                if (dataSnapshot.child("Users").hasChild(ownerID)) {
-                    //User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
-                    owner.addToMyReservetionList(p);
-                    databaseReference.child("Users").child(ownerID).setValue(owner);
+                if(parkingSpaceToBook != null) {
+                    Listing p = parkingSpaceToBook.clone();
+                    User currentUserPublicInfo = currentUser.clone();
+                    p.setReservedBy(currentUserPublicInfo);
+                    if (dataSnapshot.child("Users").hasChild(ownerID)) {
+                        //User owner = dataSnapshot.child("Users").child(ownerID).getValue(User.class);
+                        owner.addToMyReservetionList(p);
+                    }
                 }
+
+                databaseReference.child("Users").child(ownerID).setValue(owner);
             }
 
 

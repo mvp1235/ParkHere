@@ -55,7 +55,7 @@ public class ListingAdapter extends ArrayAdapter<Listing> {
         TextView parkingDistance = (TextView) convertView.findViewById(R.id.parkingDistance);
 
         StorageReference storageReference = FirebaseStorage.getInstance().getReference();
-        storageReference.child("parkingPhotos/" + parking.getParkingIDRef()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+        storageReference.child("parkingPhotos/" + parking.getId()).getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
             @Override
             public void onSuccess(Uri uri) {
                 // Got the download URL
