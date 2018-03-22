@@ -20,12 +20,17 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 /**
- * Created by MVP on 11/3/2017.
+ * A custom ArrayAdapter for storing a list of reserved listings from the current user
  */
 
 public class HistoryParkingSpaceAdapter extends ArrayAdapter<Listing> {
     private Context mContext;
 
+    /**
+     * Constructor for the adapter
+     * @param context the current context
+     * @param listings the list of listings to be stored
+     */
     public HistoryParkingSpaceAdapter(@NonNull Context context, ArrayList<Listing> listings) {
         super(context, 0, listings);
         mContext = context;
