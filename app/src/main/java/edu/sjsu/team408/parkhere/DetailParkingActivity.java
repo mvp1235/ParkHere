@@ -346,6 +346,9 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Obtain user information from Firebase
+     */
     private void getUserInfo() {
         final String ownerID = clickedParking.getOwnerParkingID();
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -405,19 +408,28 @@ public class DetailParkingActivity extends AppCompatActivity {
         return String.valueOf(location.distanceTo(thatLocation) / MILES_TO_METER);
     }
 
-
+    /**
+     * Starts the ViewRatingsActivity for the particular parking space
+     */
     private void showRatings() {
         Intent intent = new Intent(DetailParkingActivity.this, ViewRatingsActivity.class);
         intent.putExtra(SearchResultActivity.PARKING_ID_REF, clickedParking.getId());
         startActivity(intent);
     }
 
+    /**
+     * Checks to see if a user is reserving his/her own parking spot
+     * @return true if seekerID and ownerID are the same, false otherwise
+     */
     public boolean checkReservingYourOwnParking() {
         String ownerParkingID = clickedParking.getOwnerParkingID();
         String ownerID = firebaseAuth.getCurrentUser().getUid();
         return ownerParkingID.equals(ownerID);
     }
 
+    /**
+     * Starts the BookingReviewActivity
+     */
     private void writeOwnerReview() {
         String reviewerID = firebaseAuth.getCurrentUser().getUid();
         String revieweeID = clickedParking.getOwnerParkingID();
@@ -453,7 +465,9 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Starts EditingListingActivity
+     */
     private void editListing() {
         Intent intent = new Intent(DetailParkingActivity.this, EditListingActivity.class);
 
