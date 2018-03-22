@@ -20,6 +20,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+/**
+ * Activity which allows user to leave a review on the listing they previously booked
+ */
 public class BookingReviewActivity extends AppCompatActivity {
 
     private DatabaseReference databaseReference;
@@ -122,6 +125,9 @@ public class BookingReviewActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Saves the review to the Firebase
+     */
     private void saveReviewToDatabase() {
         final String description = descriptionET.getText().toString();
         final double star = ratingBar.getRating();
@@ -174,6 +180,10 @@ public class BookingReviewActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Adds the review ID to the user's review list on Firebase for references
+     * @param r the review to be added
+     */
     private void addReviewIdToUser(final Review r) {
         final String reviewerID = r.getReviewerID();
         final String revieweeID = r.getRevieweeID();
@@ -211,6 +221,11 @@ public class BookingReviewActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Add an ID reference of the review to the particular parking
+     * @param r the review to be added
+     * @param oldRating the old rating if the user had previously rated on the parking already, 0 if it is the first time
+     */
     private void addReviewIdToParkingSpace(final Review r, final double oldRating) {
         final String parkingID = r.getParkingID();
         final String reviewID = r.getId();

@@ -15,6 +15,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+/**
+ * Activity which shows a list of all listings booked by the current user
+ */
 public class BookingHistoryActivity extends ListActivity {
 
     public static final int VIEW_DETAIL_HISTORY_BOOKING_ = 5000;
@@ -127,6 +130,9 @@ public class BookingHistoryActivity extends ListActivity {
 
     }
 
+    /**
+     * Display the list
+     */
     private void showCurrentlyReservedParkings() {
         if(listings == null) {
             //empty
