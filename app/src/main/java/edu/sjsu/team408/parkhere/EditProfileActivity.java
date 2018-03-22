@@ -50,6 +50,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
+/**
+ * Activity for editing user profile
+ */
 public class EditProfileActivity extends AppCompatActivity {
     private static final int REQUEST_IMAGE_CAPTURE = 9000;
     private static final int REQUEST_GALLERY_PHOTO = 9001;
@@ -151,6 +154,9 @@ public class EditProfileActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Shows user the prompt to pick between taking a photo or picking one from gallery
+     */
     private void showPhotoActionDialog() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(EditProfileActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
@@ -177,6 +183,9 @@ public class EditProfileActivity extends AppCompatActivity {
         photoActionDialog.show();
     }
 
+    /**
+     * Start intent for taking picture
+     */
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -228,6 +237,9 @@ public class EditProfileActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Extract and validate data from the input fields for editing on Firebase
+     */
     public void updateProfile() {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -262,6 +274,11 @@ public class EditProfileActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Edit user information on Firebase
+     * @param address new address for the user
+     * @param targetID id of the user to be edited
+     */
     public void editProfileDatabase(final String address, final String targetID) {
         String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
                 + Uri.encode(address) + "&sensor=true&key=AIzaSyBqgv8PrGCSFVa-Nb2ymE3gGnuv-LgfGps";   //using my own API key here, 2,500 free request per day,
@@ -303,6 +320,11 @@ public class EditProfileActivity extends AppCompatActivity {
         queue.add(stateReq);
     }
 
+    /**
+     * Gets an Address object, including the coordinates
+     * @param address full address string
+     * @return an Address object, including the coordinates
+     */
     public Address getAddress(String address) {
         Address newAddress = null;
         Geocoder geocoder = new Geocoder(this);
