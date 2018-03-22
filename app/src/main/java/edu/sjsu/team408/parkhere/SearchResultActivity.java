@@ -43,6 +43,7 @@ public class SearchResultActivity extends ListActivity {
     private static final String TAG = SearchResultActivity.class.getSimpleName();
     private static final int REQUEST_PERMISSIONS_REQUEST_CODE = 34;
     private static final String TIME_TAG = "MyActivity";
+    private static final String ERROR_TAG = "Database Error";
 
     static final String LISTING_ID = "listingID";
     static final String PARKING_BUNDLE = "parkingBundle";
@@ -76,6 +77,8 @@ public class SearchResultActivity extends ListActivity {
     private boolean userHasDesiredLocation;
 
     private boolean isMap;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -110,37 +113,10 @@ public class SearchResultActivity extends ListActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
-                //not supported
+                Log.i(ERROR_TAG, "Database error: " + databaseError);
             }
         });
 
-        /**
-         //old search algorithm, this one iterates through all dates in the "AvailableParkings"
-         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
-        @Override
-        public void onDataChange(DataSnapshot dataSnapshot) {
-        long startTime = System.currentTimeMillis(); //seconds
-        for(DataSnapshot dates: dataSnapshot.child("AvailableParkings").getChildren()){
-        String availableDate = dates.getKey();
-        if(availableDate.equals(dateSearchTerm)) {
-        for(DataSnapshot userIDList: dataSnapshot.child("AvailableParkings").child(dateSearchTerm).getChildren()){
-        String p = userIDList.getValue(String.class);
-        availableParkingSpaces.add(p);
-        }
-        searchResult(searchTimeTerm);
-        }
-        }
-        long endTime = System.currentTimeMillis(); //seconds
-        String totalSearchTime = endTime - startTime + " Millis";
-        Log.i(TAG, "Total search Time: " + totalSearchTime);
-        }
-
-        @Override
-        public void onCancelled(DatabaseError databaseError) {
-
-        }
-        });
-         */
 
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -157,6 +133,7 @@ public class SearchResultActivity extends ListActivity {
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+                Log.i(ERROR_TAG, "Database error: " + databaseError);
             }
         });
 
@@ -226,6 +203,8 @@ public class SearchResultActivity extends ListActivity {
                 });
 //        }
     }
+
+
     private void showSnackbar(final String text) {
         View container = findViewById(R.id.activity_search_result_container);
         if (container != null) {
@@ -327,6 +306,10 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
+    /**
+     * Search the database for an available parking space base on search time.
+     * @param searchTimeTerm User's search time input.
+     */
     private void searchResult (String searchTimeTerm) {
         listings = new ArrayList<>();  // get the parking spaces.
         if(availableParkingSpaces.size() > 0) {
@@ -349,7 +332,8 @@ public class SearchResultActivity extends ListActivity {
 
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
-
+                        //print error to console.
+                        Log.i(ERROR_TAG, "Database error: " + databaseError);
                     }
                 });
 
@@ -357,6 +341,12 @@ public class SearchResultActivity extends ListActivity {
         }
     }
 
+    /**
+     * Take a string of available time and return a time in format of
+     * hour : minute AM/PM
+     * @param availableTime A string of available time including start time and end time
+     * @return A array of string. Index 0 - time format for start time. Index 1 - time format for end time.
+     */
     private String[] getTimeFormat(String availableTime) {
         String[] results = new String[2];
         String availableTimeTokens[] = availableTime.split(":");
@@ -396,6 +386,9 @@ public class SearchResultActivity extends ListActivity {
         return results;
     }
 
+    /**
+     * Shows the listing available for given search time.
+     */
     private void showResult() {
         // if a location is specified
         if (mLocation != null) {
@@ -409,32 +402,26 @@ public class SearchResultActivity extends ListActivity {
         } else {
             Toast.makeText(this, R.string.addressInvalid, Toast.LENGTH_SHORT).show();
         }
-//        if (isMap) {
-//            finish();
-//            Intent toMapData = new Intent(SearchResultActivity.this, SearchInMapActivity.class);
-//            Bundle bundle = new Bundle();
-//            bundle.putSerializable("foundLists", listings);
-//            bundle.putParcelable("location", mLocation);
-//            toMapData.putExtra("bundle", bundle);
-//            startActivity(toMapData);
-//        }
     }
 
-
+    /**
+     * Determine if the search time is within the available time
+     * @param searchTime    The search time to be determined
+     * @param availableTime The available time to compute
+     * @return  True if search time is within the available time
+     */
     private static boolean isWithinAvailableTime(String searchTime, String availableTime) {
         //if no time is specify, we return all results
-        if (searchTime.isEmpty())
+        if (searchTime.isEmpty() && availableTime.isEmpty()){
             return true;
+        }
 
         String availableTimeTokens[] = availableTime.split(":");
         int startHour = Integer.parseInt(availableTimeTokens[0]);
-        int startMinute = Integer.parseInt(availableTimeTokens[1]);
         int endHour = Integer.parseInt(availableTimeTokens[2]);
-        int endMinute = Integer.parseInt(availableTimeTokens[3]);
 
         int searchTimeSystem[] = NewListingActivity.get24HoursTimeSystem(searchTime);
         int searchHour = searchTimeSystem[0];
-        int searchMinute = searchTimeSystem[1];
 
         return (searchHour - startHour >= 0) && (searchHour - endHour <= 0);
     }
