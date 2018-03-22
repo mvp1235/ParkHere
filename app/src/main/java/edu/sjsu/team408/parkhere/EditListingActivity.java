@@ -53,6 +53,9 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+/**
+ * Activity for editing a listing created by the user
+ */
 public class EditListingActivity extends AppCompatActivity {
 
     private final static int REQUEST_GALLERY_PHOTO = 9000;
@@ -230,7 +233,6 @@ public class EditListingActivity extends AppCompatActivity {
             progressDialog.setMessage("Uploading the photo...");
             progressDialog.show();
 
-
             Bundle extras = data.getExtras();
             Bitmap parkingBitmap = (Bitmap) extras.get("data");
 
@@ -239,6 +241,7 @@ public class EditListingActivity extends AppCompatActivity {
             String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), parkingBitmap, "Title", null);
             Uri imageUri = Uri.parse(path);
 
+            //Upload the photo to Firebase storage
             StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -249,6 +252,7 @@ public class EditListingActivity extends AppCompatActivity {
                 }
             });
 
+            //Set the bitmap to the image view
             listingPhoto.setImageBitmap(parkingBitmap);
             photoActionDialog.dismiss();
 
@@ -256,6 +260,7 @@ public class EditListingActivity extends AppCompatActivity {
             progressDialog.setMessage("Uploading the photo...");
             progressDialog.show();
 
+            //Upload photo to Firebase storage
             Uri imageUri = data.getData();
             StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -265,11 +270,15 @@ public class EditListingActivity extends AppCompatActivity {
                     progressDialog.dismiss();
                 }
             });
+            //Set the URI to the image view
             listingPhoto.setImageURI(imageUri);
             photoActionDialog.dismiss();
         }
     }
 
+    /**
+     * Shows user the prompt to pick between taking a photo or picking one from gallery
+     */
     private void showPhotoActionDialog() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(EditListingActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
@@ -296,6 +305,9 @@ public class EditListingActivity extends AppCompatActivity {
         photoActionDialog.show();
     }
 
+    /**
+     * Start intent for taking picture
+     */
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -303,6 +315,9 @@ public class EditListingActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Prepare data for editing the listing information on Firebase
+     */
     public void editListing() {
         Intent i = new Intent();
         String streetNumString = addressStreetNumber.getText().toString();
@@ -468,6 +483,11 @@ public class EditListingActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Receive the input from time picker and set appropriate input for start time textview
+     * @param hour hour returned by time picker
+     * @param minute minute returned by time picker
+     */
     public void setStartTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";
@@ -486,6 +506,11 @@ public class EditListingActivity extends AppCompatActivity {
         startTime.setText(completeTime);
     }
 
+    /**
+     * Receive the input from time picker and set appropriate input for end time textview
+     * @param hour hour returned by time picker
+     * @param minute minute returned by time picker
+     */
     public void setEndTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";
@@ -504,6 +529,12 @@ public class EditListingActivity extends AppCompatActivity {
         endTime.setText(completeTime);
     }
 
+    /**
+     * Receive input from date picker and set appropriate input for start date textview
+     * @param year year returned by date picker
+     * @param month month returned by date picker
+     * @param day day returned by date picker
+     */
     public void setStartDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
@@ -514,6 +545,12 @@ public class EditListingActivity extends AppCompatActivity {
         startDate.setText(completeDate);
     }
 
+    /**
+     * Receive input from date picker and set appropriate input for end date textview
+     * @param year year returned by date picker
+     * @param month month returned by date picker
+     * @param day day returned by date picker
+     */
     public void setEndDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
@@ -630,8 +667,20 @@ public class EditListingActivity extends AppCompatActivity {
         editUserListing(parking);
     }
 
-
-    //This method contains parkingID
+    /**
+     * Gets a Listing object containging all provided information
+     * @param startDate starting date of the listing
+     * @param endDate ending date of the listing
+     * @param startTime starting time of the listing
+     * @param endTime ending time of the listing
+     * @param userID owner ID
+     * @param ownerName owner name
+     * @param price price of listing
+     * @param address address of listing
+     * @param point lat/lng coordinate of listing
+     * @param parkingID id of the associated parking space
+     * @return a Listing object containing all the provided information
+     */
     public static Listing getParkingSpace(String startDate, String endDate, String startTime,
                                           String endTime, String userID, String ownerName,
                                           String price, String address, LatLng point, String parkingID) {
@@ -652,6 +701,10 @@ public class EditListingActivity extends AppCompatActivity {
         return new Listing(currentListingID, addr, owner, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
+    /**
+     * Edit an existing listing
+     * @param ps the listing to be edited
+     */
     private void editUserListing(final Listing ps) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
