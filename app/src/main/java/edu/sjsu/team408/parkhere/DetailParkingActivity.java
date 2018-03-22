@@ -279,6 +279,7 @@ public class DetailParkingActivity extends AppCompatActivity {
             });
 
         }else if(request == ReservationListActivity.VIEW_DETAIL_RESERVATION) {
+
             reserveListBtn.setVisibility(View.GONE);
             editBtn.setVisibility(View.GONE);
             reserveBtn.setVisibility(View.GONE);
@@ -583,7 +584,9 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     }
 
-
+    /**
+     * Update owner's object on database after seeker made reservation.
+     */
     public void notifyOwner() {
         final String ownerID = clickedParking.getOwnerParkingID();
 
@@ -657,6 +660,12 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Split parking space depending on seeker's reservation preference.
+     * May split listing into multiple listings.
+     * @param clickedParking The parking that seeker wants to reserve
+     * @return A list of splitted listing after seeker make reservation
+     */
     public Listing[] splitParkingSpace(Listing clickedParking) {
         String reserveStartDate = reserveFromDate.getText().toString().split(":")[1].trim();
         String reserveEndDate = reserveToDate.getText().toString().split(":")[1].trim();
@@ -834,6 +843,10 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
 
+    /**
+     * Remove parking reference from database after seeker reserve listing
+     * @param clickedParking The parking seeker reserved.
+     */
     public void deleteParkingReference(Listing clickedParking) {
         final String parkingIDRef = clickedParking.getParkingIDRef();
         String startDate = clickedParking.getStartDate();
@@ -872,6 +885,10 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Update owner list of listing after seeker make reservation
+     * @param spaces Listing to update on owner listing
+     */
     public void updateOwnerListing(Listing[] spaces) {
         final String ownerID = clickedParking.getOwnerParkingID();
 
@@ -904,7 +921,10 @@ public class DetailParkingActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Remove parking from database
+     * @param parkingID The parking ID to remove from database
+     */
     public void deleteParkingListing(final String parkingID) {
         databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -921,6 +941,10 @@ public class DetailParkingActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Add splitted listings after seeker make reservation to database
+     * @param spaces Splitted listings to add to parking space
+     */
     public void addSplittedParkingsToDatabase(Listing[] spaces) {
         int i = 1;
         int outOfBounds = spaces.length;
@@ -961,6 +985,11 @@ public class DetailParkingActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Get the date from Gregorian Calendar
+     * @param g Gregorian Calendar object
+     * @return The date in format month - day - year
+     */
     public String getDate(GregorianCalendar g) {
         int month = g.get(Calendar.MONTH) + 1;
         int day = g.get(Calendar.DAY_OF_MONTH);
@@ -969,6 +998,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         return month + "-" + day + "-" + year;
     }
 
+    /**
+     * Get date in Gregorian Calendar
+     * @param date The date
+     * @return Gregorian Calendar object with set date
+     */
     public GregorianCalendar getGregorianCalendarDate(String date) {
         String[] tokens = date.split("-");
         int month = Integer.parseInt(tokens[0]);
@@ -977,6 +1011,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         return new GregorianCalendar(year, month -1 , day);
     }
 
+    /**
+     * Get time in Gregorian Calendar
+     * @param time The time
+     * @return Gregorian Calendar object with set time
+     */
     public GregorianCalendar getGregorianCalendarTime(String time) {
         String[] tokens = time.split("-");
         int hour = Integer.parseInt(tokens[0]);
@@ -1002,6 +1041,9 @@ public class DetailParkingActivity extends AppCompatActivity {
         return null;
     }
 
+    /**
+     * Display date picker to pick reserve start date
+     */
     private DatePickerDialog.OnDateSetListener fromDateListener = new
             DatePickerDialog.OnDateSetListener() {
                 @Override
@@ -1015,6 +1057,9 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
             };
 
+    /**
+     * Display date picker to pick reserve end date
+     */
     private DatePickerDialog.OnDateSetListener toDateListener = new
             DatePickerDialog.OnDateSetListener() {
                 @Override
@@ -1028,18 +1073,29 @@ public class DetailParkingActivity extends AppCompatActivity {
                 }
             };
 
+    /**
+     * Display time picker to pick reserve start time
+     */
     private TimePickerDialog.OnTimeSetListener fromTimeListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view,int hourofday,int min){
             setReserveFromTime(hourofday, min);
         }
     };
 
+    /**
+     * Display time picker to pick reserve to time
+     */
     private TimePickerDialog.OnTimeSetListener toTimeListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view,int hourofday,int min){
             setReserveToTime(hourofday, min);
         }
     };
 
+    /**
+     * Set reserve start time
+     * @param hour Start hour
+     * @param minute Start minute
+     */
     public void setReserveFromTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";
@@ -1058,6 +1114,11 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveFromTime.setText("From Time- " + completeTime);
     }
 
+    /**
+     * Set reserve to time
+     * @param hour End hour
+     * @param minute End minute
+     */
     public void setReserveToTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";
@@ -1076,6 +1137,12 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveToTime.setText("To Time- " + completeTime);
     }
 
+    /**
+     * Set reserve from date
+     * @param year The year
+     * @param month The month
+     * @param day The day
+     */
     public void setReserveFromDate(int year, int month, int day){
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
@@ -1086,6 +1153,12 @@ public class DetailParkingActivity extends AppCompatActivity {
         reserveFromDate.setText("From Date: " + completeDate);
     }
 
+    /**
+     * Set parking space reserve to date
+     * @param year The year
+     * @param month The Month
+     * @param day The day
+     */
     public void setReserveToDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);

@@ -141,6 +141,11 @@ public class HomeFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    /**
+     * Search on map for most frequently reserved parking space
+     * @param location Specified location or current location if empty
+     * @param isMap Search by map option 
+     */
     public void searchListing(String location, boolean isMap) {
         String searchDate = searchDateET.getText().toString();
         String searchTime = searchTimeET.getText().toString();
@@ -156,16 +161,31 @@ public class HomeFragment extends Fragment {
         startActivityForResult(intent, VIEW_PARKINGS_CODE);
     }
 
+    /**
+     * Show date picker for user to pick search date
+     * @param v View to display
+     */
     public void showDatePickerDialog(View v) {
         DialogFragment newFragment = new DatePickerFragment();
         newFragment.show(getFragmentManager(), "datePicker");
     }
 
+    /**
+     * Show time picker for user to pick search time
+     * @param v View to display
+     */
     public void showTimePickerDialog(View v) {
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getFragmentManager(), "timePicker");
     }
 
+    /**
+     * Format date to string to month - day - year
+     * @param year The year
+     * @param month The month
+     * @param day The day
+     * @return formatted date string
+     */
     public static String getDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
@@ -176,10 +196,19 @@ public class HomeFragment extends Fragment {
         return completeDate;
     }
 
+    /**
+     * Set search date after user selects a search date
+     * @param completeDate Date to search
+     */
     public static void setDate(String completeDate) {
         searchDateET.setText(completeDate);
     }
 
+    /**
+     * Set search time after user selects/input a search time
+     * @param hour Aearch hour
+     * @param minute Search Minute
+     */
     public static void setSearchTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";

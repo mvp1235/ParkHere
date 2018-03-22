@@ -91,6 +91,9 @@ public class BookingPaymentActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Process payment after seeker schedule a payment through PayPal
+     */
     private void processPayment() {
         String amount = amountTV.getText().toString();
         String owner = ownerInfoTV.getText().toString();
@@ -103,7 +106,9 @@ public class BookingPaymentActivity extends AppCompatActivity {
     }
 
 
-
+    /**
+     * Get payment information to display
+     */
     public void getPaymentInfo(){
         Intent intent = getIntent();
         ownerName = intent.getStringExtra("ownerName");
