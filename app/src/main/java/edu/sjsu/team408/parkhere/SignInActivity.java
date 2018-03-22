@@ -19,6 +19,9 @@ import com.google.firebase.auth.FirebaseUser;
 import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 import static edu.sjsu.team408.parkhere.ProfileFragment.TAG_SIGN_IN;
 
+/**
+ * Sign in activity, allowing users to sign in to their ParkHere account
+ */
 public class SignInActivity extends AppCompatActivity {
 
     private EditText emailET, passwordET;
@@ -43,6 +46,9 @@ public class SignInActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Signs the user in
+     */
     private void signIn() {
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
