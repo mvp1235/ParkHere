@@ -39,34 +39,66 @@ public class Chat {
         return result;
     }
 
+    /**
+     * Get the last/most recent message.
+     * @return a lastMessage
+     */
     public String getLastMessage() {
         return lastMessage;
     }
 
+    /**
+     * Set the content of the lastMessage
+     * @param lastMessage a string to be used to set as the lastMessage
+     */
     public void setLastMessage(String lastMessage) {
         this.lastMessage = lastMessage;
     }
 
+    /**
+     * Get the timestamp of the chat.
+     * @return timestamp of the chat
+     */
     public Date getTimestamp() {
         return timestamp;
     }
 
+    /**
+     * Set the timestamp of the chat.
+     * @param timestamp timestamp of the chat
+     */
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
     }
 
+    /**
+     * Get the name the user is chatting with.
+     * @return chatWithName
+     */
     public String getChatWithName() {
         return chatWithName;
     }
 
+    /**
+     * Set the name the user is chatting with.
+     * @param chatWithName the name the user is chatting with.
+     */
     public void setChatWithName(String chatWithName) {
         this.chatWithName = chatWithName;
     }
 
+    /**
+     * Get the unique id of another user this chat owner is chatting with.
+     * @return chatWithUid
+     */
     public String getChatWithUid() {
         return chatWithUid;
     }
 
+    /**
+     * Set the unique id of another user this chat owner is chatting with.
+     * @param chatWithUid A unique id of another user this chat owner is chatting with.
+     */
     public void setChatWithUid(String chatWithUid) {
         this.chatWithUid = chatWithUid;
     }
