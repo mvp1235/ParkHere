@@ -15,6 +15,9 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.squareup.picasso.Picasso;
 
+/**
+ * Activity which displays the user information
+ */
 public class ProfileInfo extends AppCompatActivity {
     private static final String TIME_TAG = "MyActivity";
     private TextView profileName, profileEmail, profilePhone, profileAddress;
@@ -32,7 +35,7 @@ public class ProfileInfo extends AppCompatActivity {
         profileEmail = (TextView) findViewById(R.id.profileEmail);
         profilePhone = (TextView) findViewById(R.id.profilePhone);
         profileAddress = (TextView) findViewById(R.id.profileAddress);
-        profilePhoto= (ImageView) findViewById(R.id.profilePicture);
+        profilePhoto = (ImageView) findViewById(R.id.profilePicture);
 
         Intent intent = getIntent();
         String name = intent.getStringExtra("name");

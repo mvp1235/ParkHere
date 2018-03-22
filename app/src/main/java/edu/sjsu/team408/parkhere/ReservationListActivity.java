@@ -16,7 +16,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.util.ArrayList;
 
 /**
- * Created by DuocNguyen on 11/21/17.
+ * Activity which displays a list of the current user's listings booked by others
  */
 
 public class ReservationListActivity extends ListActivity{

@@ -15,6 +15,9 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
+/**
+ * Activity which shows a list of all listings listed by the current user
+ */
 public class ListingHistoryActivity extends ListActivity {
 
     public static final int VIEW_DETAIL_HISTORY_LISTING = 2001;

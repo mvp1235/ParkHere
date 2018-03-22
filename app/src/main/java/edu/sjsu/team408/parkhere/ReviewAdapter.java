@@ -29,9 +29,8 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * Created by MVP on 12/1/2017.
+ * A custom ArrayAdapter which stores a list of reviews
  */
-
 public class ReviewAdapter extends ArrayAdapter<Review> {
 
     private Context mContext;
