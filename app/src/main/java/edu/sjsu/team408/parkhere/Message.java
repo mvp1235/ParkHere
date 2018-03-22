@@ -20,10 +20,19 @@ public class Message {
     private String content;
     private Date timestamp;
 
+    /**
+     * Default constructor required for calls to DataSnapshot.getValue(Post.class)
+     */
     public Message() {
-        // Default constructor required for calls to DataSnapshot.getValue(Post.class)
     }
 
+    /**
+     * Construct a new Message object.
+     * @param authorId the unique id of the author of a message
+     * @param author the name of the author of a message
+     * @param content a string containing the content of a message
+     * @param timestamp a data containing the timestamp of a message
+     */
     public Message(String authorId,
                    String author,
                    String content,
@@ -34,6 +43,10 @@ public class Message {
         this.timestamp = timestamp;
     }
 
+    /**
+     * Create a HashMap object.
+     * @return a result HashMap object
+     */
     @Exclude //Marks a field as excluded from the Database.
     public Map<String, Object> toMap() {
         HashMap<String, Object> result = new HashMap<>();
@@ -45,35 +58,27 @@ public class Message {
         return result;
     }
 
+    /**
+     * Get the unique id of the author of a message.
+     * @return author's unique id
+     */
     public String getAuthorId() {
         return authorId;
     }
 
-    public void setAuthorId(String authorId) {
-        this.authorId = authorId;
-    }
-
-    public String getAuthor() {
-        return author;
-    }
-
-    public void setAuthor(String author) {
-        this.author = author;
-    }
-
+    /**
+     * Get the content of a message.
+     * @return a string containing the content of a message
+     */
     public String getContent() {
         return content;
     }
 
+    /**
+     * Set the content of a message.
+     * @param content a string containing a message
+     */
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
     }
 }
