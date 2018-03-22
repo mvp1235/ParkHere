@@ -24,7 +24,9 @@ public class MainActivity extends AppCompatActivity {
     public static FirebaseAuth mAuth;
     private BottomNavigationView navigation;
 
-
+    /**
+     * Create a listener for the items in BottomNavigationView.
+     */
     private BottomNavigationView.OnNavigationItemSelectedListener mOnNavigationItemSelectedListener
             = new BottomNavigationView.OnNavigationItemSelectedListener() {
 
