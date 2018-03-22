@@ -17,8 +17,10 @@ import android.widget.Button;
 public class HistoryFragment extends Fragment {
     private Button bookingBtn, listingBtn;
 
+    /**
+     * Required empty public constructor.
+     */
     public HistoryFragment() {
-        // Required empty public constructor
     }
 
 
@@ -48,11 +50,17 @@ public class HistoryFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Start BookingHistoryActivity.
+     */
     public void viewBookings() {
         Intent intent = new Intent(getContext(), BookingHistoryActivity.class);
         startActivity(intent);
     }
 
+    /**
+     * Start ListingHistoryActivity.
+     */
     public void viewListings() {
         Intent intent = new Intent(getContext(), ListingHistoryActivity.class);
         startActivity(intent);
