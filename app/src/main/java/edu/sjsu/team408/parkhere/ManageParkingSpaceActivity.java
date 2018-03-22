@@ -25,6 +25,9 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
+/**
+ * Models manage parking space activity
+ */
 public class ManageParkingSpaceActivity extends AppCompatActivity {
 
     private static final int EDIT_PARKING_SPACE = 5001;
@@ -118,6 +121,9 @@ public class ManageParkingSpaceActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Take user to edit parking space view
+     */
     private void editParkingSpace() {
         Intent intent = new Intent(ManageParkingSpaceActivity.this, EditParkingSpaceActivity.class);
         ArrayList<String> parsedAddress = parseAddress(address);
@@ -129,7 +135,10 @@ public class ManageParkingSpaceActivity extends AppCompatActivity {
         intent.putExtra("parkingID", parkingID);
         startActivityForResult(intent, EDIT_PARKING_SPACE);
     }
-    
+
+    /**
+     * Remove parking space from database
+     */
     private void deleteParkingSpace() {
         if (userID != null && parkingID != null) {
             //Delete from ParkingSpaces

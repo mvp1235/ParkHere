@@ -92,7 +92,9 @@ public class ListingHistoryActivity extends ListActivity {
 
     }
 
-
+    /**
+     * Shows user's listing history
+     */
     private void showMyListingHistory() {
         if(listings == null) {
             //empty

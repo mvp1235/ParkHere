@@ -6,6 +6,7 @@ import android.os.Parcelable;
 
 /**
  * Created by MVP on 10/31/17.
+ * Models listing object
  */
 
 public class Listing implements Parcelable{
@@ -24,9 +25,25 @@ public class Listing implements Parcelable{
     private String ownerParkingID;
     private User reservedBy;
 
-
+    /**
+     * Construct an empty listing
+     */
     public Listing(){}
 
+    /**
+     * Construct a new listing
+     * @param id    Listing ID
+     * @param address   Listing address
+     * @param owner Listing Ower
+     * @param parkingImageUrl Listing Parking Image
+     * @param specialInstruction 
+     * @param startDate
+     * @param endDate
+     * @param startTime
+     * @param endTime
+     * @param price
+     * @param parkingIDRef
+     */
     public Listing(String id, Address address, User owner, String parkingImageUrl, String specialInstruction,
                    String startDate, String endDate, String startTime, String endTime, double price, String parkingIDRef) {
         this.id = id;
