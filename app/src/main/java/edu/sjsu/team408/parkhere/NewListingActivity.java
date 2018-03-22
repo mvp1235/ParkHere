@@ -48,8 +48,13 @@ import com.squareup.picasso.Picasso;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * Models a Listing activity
+ */
 public class NewListingActivity extends AppCompatActivity{
     private static final String TAG = NewListingActivity.class.getSimpleName();
+    private static final String ERROR = "Database Error";
+
 
     private final static int FROM_DATE = 0;
     private final static int TO_DATE = 1;
@@ -121,6 +126,7 @@ public class NewListingActivity extends AppCompatActivity{
 
             @Override
             public void onCancelled(DatabaseError databaseError) {
+
             }
         });
 
@@ -315,45 +321,6 @@ public class NewListingActivity extends AppCompatActivity{
             i.putExtra("startDate", startDateString);
             i.putExtra("endDate", endDateString);
 
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Robin's geocoding code
-            // for some reason, it doesn't work properly for all addresses when using on emulator, but is perfect on my Samsung S8
-            // I went ahead and used the Google Geocoding API instead, which works fine for all devices
-            // for better development since you guys don't own an android device, let's disable this and use my part for now.
-            // Getting latitude and longitude of an address
-
-            //From here
-//            Geocoder geocoder = new Geocoder(this,  Locale.getDefault());
-//            List<android.location.Address> addressList;
-//            LatLng point = null;
-//
-//            try {
-//                String addressString = streetNumString + ", " + cityString + ", "
-//                        + stateString;
-//                Log.i("TEST", addressString);
-//                addressList = geocoder.getFromLocationName(addressString, 1);
-//                if (addressList.size() > 0) {
-//                    android.location.Address location = addressList.get(0);
-//                    location.getLatitude();
-//                    location.getLongitude();
-//                    point = new LatLng(location.getLatitude(), location.getLongitude());
-//                    Log.i("TEST", location.toString() + " dsddsdsd");
-//                }
-//            } catch (IOException e) {
-//                Toast.makeText(getApplicationContext(), R.string.addressInvalid,
-//                        Toast.LENGTH_SHORT).show();
-//                Log.i("TEST", "ERROR MAKING LISTING");
-//            }
-//            addListingToDatabaseNew(startDateString, endDateString, startTimeString, endTimeString, point);
-            //Till here
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-            //Huy's replacement
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            //FROM HERE
-            //Let's use this version to prevent the problem we've been facing, i.e. it only works for certain address entered
             String addressString = streetNumString + ", " + cityString + ", "
                     + stateString;
             String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
@@ -391,9 +358,6 @@ public class NewListingActivity extends AppCompatActivity{
             // add it to the queue
             queue.add(stateReq);
 
-            //TILL HERE
-            /////////////////////////////////////////////
-
 
             setResult(RESULT_OK, i);
             finish();
@@ -419,6 +383,9 @@ public class NewListingActivity extends AppCompatActivity{
         return null;
     }
 
+    /**
+     * Start Date Listener. Display date and allows user to pick.
+     */
     private DatePickerDialog.OnDateSetListener startDateListener = new
             DatePickerDialog.OnDateSetListener() {
                 @Override
@@ -432,6 +399,9 @@ public class NewListingActivity extends AppCompatActivity{
                 }
             };
 
+    /**
+     * Display date and allows user to pick end date.
+     */
     private DatePickerDialog.OnDateSetListener endDateListener = new
             DatePickerDialog.OnDateSetListener() {
                 @Override
@@ -445,18 +415,29 @@ public class NewListingActivity extends AppCompatActivity{
                 }
             };
 
+    /**
+     * Display time and allows user to pick start time
+     */
     private TimePickerDialog.OnTimeSetListener startTimeListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view,int hourofday,int min){
             setStartTime(hourofday, min);
         }
     };
 
+    /**
+     * Display time and allows user to pick end time
+     */
     private TimePickerDialog.OnTimeSetListener endTimeListener = new TimePickerDialog.OnTimeSetListener() {
         public void onTimeSet(TimePicker view,int hourofday,int min){
             setEndTime(hourofday, min);
         }
     };
 
+    /**
+     * Set start time of listing
+     * @param hour Listing start hour
+     * @param minute Listing start minute
+     */
     public void setStartTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";
@@ -475,6 +456,11 @@ public class NewListingActivity extends AppCompatActivity{
         startTime.setText(completeTime);
     }
 
+    /**
+     * Set listing end time
+     * @param hour  Listing end hour
+     * @param minute  Listing end minute
+     */
     public void setEndTime(int hour, int minute) {
         String hourString, minuteString;
         String ampm = "AM";
@@ -493,6 +479,12 @@ public class NewListingActivity extends AppCompatActivity{
         endTime.setText(completeTime);
     }
 
+    /**
+     * Set listing start date
+     * @param year The year
+     * @param month The month
+     * @param day The day
+     */
     public void setStartDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
@@ -503,6 +495,12 @@ public class NewListingActivity extends AppCompatActivity{
         startDate.setText(completeDate);
     }
 
+    /**
+     * Set listing end date
+     * @param year  The year
+     * @param month The month
+     * @param day the day
+     */
     public void setEndDate(int year, int month, int day) {
         String yearString, monthString, dayString;
         yearString = Integer.toString(year);
@@ -609,8 +607,8 @@ public class NewListingActivity extends AppCompatActivity{
 
     /**
      * Converts time string into 24 hours time system
-     * @param time
-     * @return
+     * @param time The time in 12 hours time system
+     * @return Time string in 24 hours system
      */
     public static int[] get24HoursTimeSystem(String time) {
         int result[] = new int[2];    // out of bounds. Check if it's 25 that means it's wrong.
@@ -628,6 +626,21 @@ public class NewListingActivity extends AppCompatActivity{
 
 
     //This method contains parkingID
+
+    /**
+     * Creates a listing with given inputs.
+     * @param startDate The start available date
+     * @param endDate The end available date
+     * @param startTime The start available time
+     * @param endTime   The end available time
+     * @param userID Owner ID
+     * @param ownerName Owner name
+     * @param price Price of parking space to reserve
+     * @param address Address of parking space
+     * @param point The coordiate point on map
+     * @param parkingID The parking photo
+     * @return A new listing to store on database
+     */
     public Listing getParkingSpace(String startDate, String endDate, String startTime,
                                           String endTime, String userID, String ownerName,
                                           String price, String address, LatLng point, String parkingID) {
@@ -649,6 +662,10 @@ public class NewListingActivity extends AppCompatActivity{
         return new Listing(currentListingIDRef, addr, owner1, parkingImageUrl, specialInstruction, startDate, endDate, startTime, endTime ,Double.parseDouble(price), parkingID);
     }
 
+    /**
+     * Add listing to owner object on database
+     * @param ps The listing to add to owner object
+     */
     private void addListingToUser(Listing ps) {
         final ArrayList<Listing> newList = new ArrayList<Listing>();
         newList.add(ps);
@@ -674,6 +691,20 @@ public class NewListingActivity extends AppCompatActivity{
         });
     }
 
+    /**
+     * Helper function to get listing based on input parameters
+     * @param startDate The start available date
+     * @param endDate The end available date
+     * @param startTime The start available time
+     * @param endTime The end available time
+     * @param userID Owner ID
+     * @param ownerName Owner Name
+     * @param price The price to reserve parking space
+     * @param address The address of parking space
+     * @param point The coordinate point of parking space on map.
+     * @param parkingID Parking ID
+     * @return A new Listing object with input properties 
+     */
     public static Listing getValue(String startDate, String endDate, String startTime,
                                    String endTime, String userID, String ownerName, String price,
                                    String address, LatLng point, String parkingID) {

@@ -44,7 +44,9 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 
-
+/**
+ * Models a New Parking Space Activity
+ */
 public class NewParkingSpaceActivity extends AppCompatActivity {
 
     private final static int REQUEST_GALLERY_PHOTO = 9000;
@@ -180,6 +182,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
         if (requestCode == REQUEST_IMAGE_CAPTURE) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Now user should be able to use camera
+
             }
             else {
                 // Your app will not have this permission. Turn off all functions
@@ -189,6 +192,9 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Shows photo action dialog
+     */
     private void showPhotoActionDialog() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(NewParkingSpaceActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
@@ -250,44 +256,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             i.putExtra("specialInstruction", specialInstructionString);
 
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////////////////
-            // Robin's geocoding code
-            // for some reason, it doesn't work properly for all addresses when using on emulator, but is perfect on my Samsung S8
-            // I went ahead and used the Google Geocoding API instead, which works fine for all devices
-            // for better development since you guys don't own an android device, let's disable this and use my part for now.
-            // Getting latitude and longitude of an address
 
-            //From here
-//            Geocoder geocoder = new Geocoder(this,  Locale.getDefault());
-//            List<android.location.Address> addressList;
-//            LatLng point = null;
-//
-//            try {
-//                String addressString = streetNumString + ", " + cityString + ", "
-//                        + stateString;
-//                Log.i("TEST", addressString);
-//                addressList = geocoder.getFromLocationName(addressString, 1);
-//                if (addressList.size() > 0) {
-//                    android.location.Address location = addressList.get(0);
-//                    location.getLatitude();
-//                    location.getLongitude();
-//                    point = new LatLng(location.getLatitude(), location.getLongitude());
-//                    Log.i("TEST", location.toString() + " dsddsdsd");
-//                }
-//            } catch (IOException e) {
-//                Toast.makeText(getApplicationContext(), R.string.addressInvalid,
-//                        Toast.LENGTH_SHORT).show();
-//                Log.i("TEST", "ERROR MAKING LISTING");
-//            }
-//            addListingToDatabaseNew(startDateString, endDateString, startTimeString, endTimeString, point);
-            //Till here
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-            //Huy's replacement
-            /////////////////////////////////////////////////////////////////////////////////////////////////////
-            //FROM HERE
-            //Let's use this version to prevent the problem we've been facing, i.e. it only works for certain address entered
             String addressString = streetNumString + ", " + cityString + ", "
                     + stateString;
             String url = "https://maps.googleapis.com/maps/api/geocode/json?address="
@@ -317,7 +286,7 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
                             p.setOwner(owner);
 
                             addParkingToDatabase(p);
-                            //Do what you want
+
                         }
                     } catch (JSONException e1) {
                         e1.printStackTrace();
@@ -334,8 +303,6 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
             // add it to the queue
             queue.add(stateReq);
 
-            //TILL HERE
-            /////////////////////////////////////////////
 
             setResult(RESULT_OK, i);
             finish();
@@ -343,6 +310,10 @@ public class NewParkingSpaceActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Add Parking Space to Database
+     * @param p Parking Space to add
+     */
     private void addParkingToDatabase(final ParkingSpace p) {
         databaseReference.child("ParkingSpaces").child(p.getParkingID()).setValue(p); //add listing to ParkingSpaces database
 
