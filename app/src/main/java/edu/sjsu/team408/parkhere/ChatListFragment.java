@@ -132,6 +132,11 @@ public class ChatListFragment extends Fragment {
         chatRecyclerView.setAdapter(mAdapter);
     }
 
+    /**
+     * Query the database for user's chats.
+     * @param databaseReference A database reference
+     * @return chatsQuery
+     */
     private Query getQuery(DatabaseReference databaseReference) {
         Query chatsQuery = databaseReference
                 .child("Users")
@@ -157,8 +162,15 @@ public class ChatListFragment extends Fragment {
         }
     }
 
+    /**
+     * Get the current user unique id from Firebase Authentication.
+     * @return a string containing the user unique id
+     */
     public String getUid() { return FirebaseAuth.getInstance().getCurrentUser().getUid(); }
 
+    /**
+     * Observe database changes and update.
+     */
     private void observeDatabaseChangesAndUpdate() {
         chatOfThisUserDatabaseRef.addChildEventListener(
                 new ChildEventListener() {
@@ -190,6 +202,10 @@ public class ChatListFragment extends Fragment {
         );
     }
 
+    /**
+     * Get newly added chat and notify RecyclerView.
+     * @param dataSnapshot a DataSnapshot object
+     */
     private void getTheNewlyAddedChatAndNotifyRecyclerView(
             DataSnapshot dataSnapshot
     ) {
