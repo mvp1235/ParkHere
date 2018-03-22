@@ -129,7 +129,7 @@ public class ManageParkingSpaceActivity extends AppCompatActivity {
         intent.putExtra("parkingID", parkingID);
         startActivityForResult(intent, EDIT_PARKING_SPACE);
     }
-
+    
     private void deleteParkingSpace() {
         if (userID != null && parkingID != null) {
             //Delete from ParkingSpaces
