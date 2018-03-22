@@ -65,6 +65,9 @@ public class BookingHistoryActivity extends ListActivity {
 
     }
 
+    /**
+     * Extract and validate data from input fields, and prepare for DetailedParkingActivity
+     */
     private void checkIntent() {
         Intent afterPaymentIntent = getIntent();
         String parkingIdRef = afterPaymentIntent.getStringExtra("parkingIDRef");
