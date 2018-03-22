@@ -33,6 +33,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         }
     }
 
+    /**
+     * Set listOfChats
+     * @param listOfChats a list of chat object
+     */
     public ChatAdapter(List<Chat> listOfChats) {
         this.listOfChats = listOfChats;
     }
@@ -46,7 +50,11 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         return new ViewHolder(v);
     }
 
-    // Replace the contents of a view (invoked by the layout manager)
+    /**
+     * Replace the contents of a view (invoked by the layout manager)
+     * @param holder a ViewHolder object
+     * @param position the position
+     */
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         holder.chatWithLabel.setText(listOfChats.get(position).getChatWithName());
@@ -58,8 +66,10 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ViewHolder> {
         super.onAttachedToRecyclerView(recyclerView);
     }
 
-    // Return the size of the dataset (invoked by the layout manager)
     @Override
+    /**
+     * Return the size of the dataset (invoked by the layout manager)
+     */
     public int getItemCount() {
         return listOfChats.size();
     }
