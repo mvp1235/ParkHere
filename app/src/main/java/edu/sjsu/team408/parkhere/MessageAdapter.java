@@ -16,6 +16,12 @@ public class MessageAdapter extends ArrayAdapter<ChatBubble> {
     private List<ChatBubble> messages;
     private String side;
 
+    /**
+     * Construct a new MessageAdapter.
+     * @param context an Activity context
+     * @param resource a resource number
+     * @param objects a list of ChatBubble object
+     */
     public MessageAdapter(Activity context, int resource, List<ChatBubble> objects) {
         super(context, resource, objects);
         this.activity = context;
