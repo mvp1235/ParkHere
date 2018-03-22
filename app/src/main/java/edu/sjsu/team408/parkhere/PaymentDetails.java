@@ -43,7 +43,11 @@ public class PaymentDetails extends AppCompatActivity {
         });
     }
 
-
+    /**
+     * Show detailed payment information
+     * @param response  Ojbect containing payment response information
+     * @param paymentAmount Transaction amount
+     */
     private void showDetails(JSONObject response, String paymentAmount) {
         try {
             statusTV.setText("Status: " + response.getString("state"));

@@ -88,6 +88,9 @@ public class ReservationListActivity extends ListActivity{
 
     }
 
+    /**
+     * Shows user's reservation list. If there's no reservations, it will display nothing.
+     */
     public void showMyReservationList(){
         if(reservationList == null) {
             //empty
