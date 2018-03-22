@@ -44,6 +44,9 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * Activity for editing a parking space information
+ */
 public class EditParkingSpaceActivity extends AppCompatActivity {
 
     private final static int REQUEST_GALLERY_PHOTO = 9000;
@@ -138,6 +141,7 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
             String path = MediaStore.Images.Media.insertImage(getApplicationContext().getContentResolver(), parkingBitmap, "Title", null);
             Uri imageUri = Uri.parse(path);
 
+            //upload the photo to Firebase storage
             StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
                 @Override
@@ -155,6 +159,7 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
             progressDialog.setMessage("Uploading the photo...");
             progressDialog.show();
 
+            //upload the photo to Firebase storage
             Uri imageUri = data.getData();
             StorageReference filepath = storageReference.child("parkingPhotos").child(currentParkingID);
             filepath.putFile(imageUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
@@ -169,6 +174,9 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Shows user the prompt to pick between taking a photo or picking one from gallery
+     */
     private void showPhotoActionDialog() {
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(EditParkingSpaceActivity.this);
         View mView = getLayoutInflater().inflate(R.layout.dialog_pick_photos, null);
@@ -195,6 +203,9 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
         photoActionDialog.show();
     }
 
+    /**
+     * Start intent for taking picture
+     */
     private void dispatchTakePictureIntent() {
         Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
@@ -202,6 +213,9 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Extract and validate data from input field for editing on Firebase
+     */
     public void editParkingSpace() {
         Intent i = new Intent();
         final String streetNumString = streetNumberET.getText().toString();
@@ -302,6 +316,10 @@ public class EditParkingSpaceActivity extends AppCompatActivity {
 
     }
 
+    /**
+     * Edit the parking space on Firebase
+     * @param p the parking space to be edited
+     */
     private void editParkingDatabase(final ParkingSpace p) {
         databaseReference.child("ParkingSpaces").child(p.getParkingID()).setValue(p);
 
