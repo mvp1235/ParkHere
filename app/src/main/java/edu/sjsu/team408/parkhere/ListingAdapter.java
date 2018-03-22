@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 /**
- * Created by MVP on 11/1/2017.
+ * An custom ArrayAdapter for storing all the listings available on Firebase
  */
 
 public class ListingAdapter extends ArrayAdapter<Listing> {
