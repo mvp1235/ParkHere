@@ -273,6 +273,10 @@ public class ChatDetailActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Hide the autocomplete textView and show the name the user is chatting with.
+     * @param chatWithName a string of another user's name the current user is chatting with.
+     */
     private void hideAutoCompleteTextViewAndShowChatWithNameLabel(String chatWithName) {
         if (autoCompleteTextView.getVisibility() == View.VISIBLE) {
             autoCompleteTextView.setEnabled(false);
@@ -322,6 +326,15 @@ public class ChatDetailActivity extends AppCompatActivity {
         messagesReference = mDatabase.child("messages").child(chatKey);
     }
 
+    /**
+     * Add a new chat entry to the database if a current chat session with the
+     * another receiving user does not exist, else add the new message entry.
+     * @param author the name of the author of the new message
+     * @param authorUid the unique id of the author of the new message
+     * @param chatWithName the name of the receiving user of the new message
+     * @param chatWithUid the unique id of the receiving user of the new message
+     * @param messageContent a string that contains the content of the new message
+     */
     private void makeANewChatIfNecessaryAndWriteNewMessage(final String author,
                                                            final String authorUid,
                                                            final String chatWithName,
@@ -392,6 +405,13 @@ public class ChatDetailActivity extends AppCompatActivity {
         );
     }
 
+    /**
+     * Make a new chat object and add it to the database.
+     * @param author the name of the author of the new chat
+     * @param authorUid the unique id of the author of the new chat
+     * @param chatWithName the name of the receiving user of the new chat
+     * @param chatWithUid the unique id of the receiving user of the new chat
+     */
     private void makeNewChat(String author, String authorUid, String chatWithName, String chatWithUid) {
         String Users_field = "/" + getString(R.string.Users) + "/";
         String Users_uid_chats_field = "/" + getString(R.string.chats) + "/";
@@ -428,7 +448,14 @@ public class ChatDetailActivity extends AppCompatActivity {
             listenToMessagesReferenceChanges();
     }
 
-
+    /**
+     * Write a new message entry to the database.
+     * @param author the name of the author of the new message
+     * @param authorUid the unique id of the author of the new message
+     * @param chatWithName the name of the receiving user of the new message
+     * @param chatWithUid the unique id of the receiving user of the new message
+     * @param messageContent a string that contains the content of the new message
+     */
     private void writeNewMessage(String author, String authorUid, String chatWithName,
                                  String chatWithUid, String messageContent) {
         Date timestamp = new Date();
@@ -451,8 +478,12 @@ public class ChatDetailActivity extends AppCompatActivity {
         editText.setText("");
     }
 
-
-
+    /**
+     * Find the unique id of a user by his/her name.
+     * @param userList a list of user names
+     * @param chatWithName the name of the user the sending user is chatting with
+     * @return an empty string due to unknown usage
+     */
     private String findUidByName(ArrayList<User> userList, String chatWithName) {
         for (User user : userList) {
             if (chatWithName.equals(user.getName()))
@@ -461,6 +492,10 @@ public class ChatDetailActivity extends AppCompatActivity {
         return "";
     }
 
+    /**
+     * Check if the autocomplete text field is valid.
+     * @return a boolean value containing the validity of the autocomplete text field
+     */
     private boolean autoCompleteTextFieldIsValid() {
         boolean validity = false;
         if (!autoCompleteTextView.getText().toString().trim().equals("") ||
@@ -470,11 +505,17 @@ public class ChatDetailActivity extends AppCompatActivity {
         return validity;
     }
 
+    /**
+     * Add a new message to a list to be displayed.
+     * @param message a string containing the message content
+     * @param isMyMessage a boolean value of whether this message belongs to the sender
+     */
     private void addMessageToList(Message message, Boolean isMyMessage) {
         ChatBubble chatBubble = new ChatBubble(message, isMyMessage);
         chatBubbleList.add(chatBubble);
         adapter.notifyDataSetChanged();
     }
+
     public void makeToast(String text) {
         Toast.makeText(this, text, Toast.LENGTH_SHORT).show();
     }
