@@ -310,18 +310,27 @@ public class ProfileFragment extends Fragment {
         startActivityForResult(intent, MAKE_NEW_LISTING_CODE);
     }
 
+    /**
+     * Sign out from Firebase Authentication
+     */
     private void signOut() {
         mAuth.signOut();
         refreshPage();
     }
 
+    /**
+     * Refresh profile page
+     */
     private void refreshPage() {
-        //Refresh profile page
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
         transaction.replace(R.id.content, new ProfileFragment());
         transaction.commit();
     }
 
+    /**
+     * Set the current user profile.
+     * @param user a user object
+     */
     private void setCurrentUserProfile(User user) {
 
         if(user == null) {
@@ -343,5 +352,4 @@ public class ProfileFragment extends Fragment {
 //        Picasso.with(getContext()).load(profileURL).into(profileIV);
 
     }
-
 }
