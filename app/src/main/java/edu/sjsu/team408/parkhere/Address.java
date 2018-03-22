@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * Created by MVP on 10/31/17.
+ * 
  */
 
 public class Address implements Parcelable {

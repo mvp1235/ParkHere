@@ -16,6 +16,9 @@ import com.google.firebase.database.ValueEventListener;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * An activity which displays all ratings for a particular chosen parking spot
+ */
 public class ViewRatingsActivity extends ListActivity {
 
     private ArrayList<Review> reviews;
@@ -29,6 +32,7 @@ public class ViewRatingsActivity extends ListActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_ratings);
 
+        //connect to firebase database
         databaseReference = FirebaseDatabase.getInstance().getReference();
         firebaseAuth = FirebaseAuth.getInstance();
         reviews = new ArrayList<>();

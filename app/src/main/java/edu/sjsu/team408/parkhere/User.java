@@ -7,7 +7,7 @@ import android.util.Log;
 import java.util.ArrayList;
 
 /**
- * Created by MVP on 10/31/17.
+ * User object model
  */
 
 public class User implements Parcelable{
@@ -24,8 +24,21 @@ public class User implements Parcelable{
     private ArrayList<String> myReviews;          // reviews left on other listing owners
     private ArrayList<String> myParkingSpaces;
 
+    /**
+     * Default constructor for User
+     * Instantiate an empty User object
+     */
     public User(){};
 
+    /**
+     * Constructor for User
+     * @param id id of user
+     * @param name name of user
+     * @param address physical address of user
+     * @param phoneNumber phone number of user
+     * @param emailAddress email address of user
+     * @param profileURL profile URL of user
+     */
     public User(String id, String name, Address address, String phoneNumber, String emailAddress, String profileURL) {
         this.id = id;
         this.name = name;
@@ -41,7 +54,10 @@ public class User implements Parcelable{
         this.myParkingSpaces = new ArrayList<>();
     }
 
-
+    /**
+     * Constructor for User
+     * @param in the Parcel object which contains all information necessary for the User
+     */
     protected User(Parcel in) {
         id = in.readString();
         name = in.readString();
@@ -78,54 +94,106 @@ public class User implements Parcelable{
         }
     };
 
+    /**
+     * Gets the user's ID
+     * @return id
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Sets the user's id
+     * @param id the new id to be set
+     */
     public void setId(String id) {
         this.id = id;
     }
 
+    /**
+     * Gets the user's name
+     * @return name
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Set the user's name
+     * @param name the new name to be set
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     * Gets the user's address
+     * @return address
+     */
     public Address getAddress() {
         return address;
     }
 
+    /**
+     * Sets the user's address
+     * @param address the new address to be set
+     */
     public void setAddress(Address address) {
         this.address = address;
     }
 
+    /**
+     * Gets the user's phone number
+     * @return phoneNumber
+     */
     public String getPhoneNumber() {
         return phoneNumber;
     }
 
+    /**
+     * Sets the user's phone number
+     * @param phoneNumber the new phone number to be set
+     */
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
     }
 
+    /**
+     * Gets the email address
+     * @return emailAddress
+     */
     public String getEmailAddress() {
         return emailAddress;
     }
 
+    /**
+     * Set the user email address
+     * @param emailAddress the new email address to be set
+     */
     public void setEmailAddress(String emailAddress) {
         this.emailAddress = emailAddress;
     }
 
+    /**
+     * Gets the user profile URL
+     * @return profileURL
+     */
     public String getProfileURL() {
         return profileURL;
     }
 
+    /**
+     * Set profile URL to a new URL
+     * @param profileURL the URL to be set
+     */
     public void setProfileURL(String profileURL) {
         this.profileURL = profileURL;
     }
 
+    /**
+     * Add a new reserved parking to the myCurrentReservedParkings list
+     * @param p the new parking to be added
+     */
     public void addReservedParking(Listing p) {
         if(myCurrentReservedParkings == null) {
             myCurrentReservedParkings = new ArrayList<Listing>();
@@ -133,10 +201,18 @@ public class User implements Parcelable{
         myCurrentReservedParkings.add(p);
     }
 
+    /**
+     * Gets all the current reserved parkings
+     * @return myCurrentReservedParkings
+     */
     public ArrayList<Listing> getMyCurrentReservedParkings() {
         return myCurrentReservedParkings;
     }
 
+    /**
+     * Add a new listing to the listing history
+     * @param newList the new list to be added
+     */
     public void addToListingHistory(ArrayList<Listing> newList) {
         if(myListingHistory == null) {
             this.myListingHistory = newList;
@@ -149,30 +225,58 @@ public class User implements Parcelable{
         }
     }
 
+    /**
+     * Remove a listing from myListingHistory
+     * @param l the listing to be removed, if existed
+     */
     public void deleteFromListingHistory(Listing l) {
         if (myListingHistory.contains(l)) {
             myListingHistory.remove(l);
         }
     }
 
-
+    /**
+     * Gets the listing history of the user
+     * @return myListingHistory
+     */
     public ArrayList<Listing> getMyListingHistory() {return this.myListingHistory;}
 
+    /**
+     * Set the listing history to a new list
+     * @param myListingHistory the new list to be set
+     */
     public void setMyListingHistory(ArrayList<Listing> myListingHistory) {
         this.myListingHistory = myListingHistory;
     }
 
+    /**
+     * Set the current reserved parkings list to a new list
+     * @param myCurrentReservedParkings the new list to be added
+     */
     public void setMyCurrentReservedParkings(ArrayList<Listing> myCurrentReservedParkings){
         this.myCurrentReservedParkings = myCurrentReservedParkings;
     }
 
+    /**
+     * Gets the user's reservation list
+     * @return myReservationList
+     */
     public ArrayList<Listing> getMyReservationList(){
         return this.myReservationList;
     }
 
+    /**
+     * Set the user reservation list to a new list
+     * @param myReservationList the new list to be added
+     */
     public void setMyReservationList(ArrayList<Listing> myReservationList){
         this.myReservationList = myReservationList;
     }
+
+    /**
+     * Add a new listing to the user's reservation list
+     * @param p the listing to be added
+     */
     public void addToMyReservetionList(Listing p) {
         if(myReservationList == null) {
             myReservationList = new ArrayList<Listing>();
@@ -180,15 +284,26 @@ public class User implements Parcelable{
         myReservationList.add(p);
     }
 
+    /**
+     * Gets a clone of the user object
+     * @return a clone of the user object
+     */
     public User clone(){
         return new User(id, name, address, phoneNumber, emailAddress,profileURL);
     }
 
+    /**
+     * Gets a string representation of the user's information
+     * @return the name of the user
+     */
     public String toString () {
         return getName();
     }
 
-
+    /**
+     * Add a new review ID to the current review list
+     * @param reviewID the new review ID to be added
+     */
     public void addToReviewList(String reviewID) {
         if (myReviews == null)
             myReviews = new ArrayList<>();
@@ -199,6 +314,10 @@ public class User implements Parcelable{
     }
 
 
+    /**
+     * Add a new review ID to the current feedback list
+     * @param reviewID the new review ID to be added
+     */
     public void addToFeedbackList(String reviewID) {
         if (myFeedbacks == null)
             myFeedbacks = new ArrayList<>();
@@ -208,6 +327,10 @@ public class User implements Parcelable{
             myFeedbacks.add(reviewID);
     }
 
+    /**
+     * Add a new parking space ID to the current list
+     * @param pID the new parking space ID to be added
+     */
     public void addToParkingSpacesList(String pID) {
         if (myParkingSpaces == null)
             myParkingSpaces = new ArrayList<>();
@@ -217,6 +340,10 @@ public class User implements Parcelable{
             myParkingSpaces.add(pID);
     }
 
+    /**
+     * Delete a certain parking space ID from the list
+     * @param pID the parking ID of the parking space to be deleted
+     */
     public void deleteFromParkingSpaces(String pID) {
         if (myParkingSpaces == null)
             myParkingSpaces = new ArrayList<>();
@@ -226,6 +353,10 @@ public class User implements Parcelable{
         }
     }
 
+    /**
+     * Gets all of the user's feedback from others
+     * @return myFeedbacks
+     */
     public ArrayList<String> getMyFeedbacks() {
         return myFeedbacks;
     }
@@ -241,12 +372,20 @@ public class User implements Parcelable{
         this.myReviews = myReviews;
     }
 
+    /**
+     * Get all parking space IDs created by the user
+     * @return myParkingSpaces
+     */
     public ArrayList<String> getMyParkingSpaces() {
         if (myParkingSpaces == null)
             myParkingSpaces = new ArrayList<>();
         return myParkingSpaces;
     }
 
+    /**
+     * Set a new list of parking space IDs to the user's parking space list
+     * @param myParkingSpaces the new list of parking spaces to be set
+     */
     public void setMyParkingSpaces(ArrayList<String> myParkingSpaces) {
         this.myParkingSpaces = myParkingSpaces;
     }

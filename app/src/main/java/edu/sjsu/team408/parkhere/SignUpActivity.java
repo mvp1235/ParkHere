@@ -21,8 +21,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import static edu.sjsu.team408.parkhere.MainActivity.mAuth;
 import static edu.sjsu.team408.parkhere.ProfileFragment.TAG_SIGN_IN;
 
+/**
+ * Sign up activity, allowing users to sign up for a ParkHere account using their email addresses
+ */
 public class SignUpActivity extends AppCompatActivity {
-
 
     static String EMAIL_EXIST_PROMPT = "The email address is already in use. Please choose another email.";
     static String SERVER_PROBLEM_PROMPT = "There are some server problems. Please try again later.";
@@ -31,6 +33,7 @@ public class SignUpActivity extends AppCompatActivity {
     private TextView signUpPromptsTV;
     private Button signUpBtn;
     private DatabaseReference databaseReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,6 +54,9 @@ public class SignUpActivity extends AppCompatActivity {
         databaseReference = FirebaseDatabase.getInstance().getReference();
     }
 
+    /**
+     * Extract user email and password inputs from the fields, and do all necessary syntax checks prior to saving the information to Firebase
+     */
     private void signUp() {
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
@@ -96,7 +102,9 @@ public class SignUpActivity extends AppCompatActivity {
         }
     }
 
-
+    /**
+     * Save the user instance to Firebase
+     */
     private void storeUserInDatabase() {
         User newUser = new User();
         String email = mAuth.getCurrentUser().getEmail();
@@ -110,6 +118,11 @@ public class SignUpActivity extends AppCompatActivity {
         databaseReference.child("Users").child(ID).setValue(newUser);
     }
 
+    /**
+     * Extract the string in front of the '@' sign from email address input
+     * @param email the email to be parsed
+     * @return the string in front of the '@' sign
+     */
     public static String usernameFromEmail(String email) {
         if (email.contains("@")) {
             return email.split("@")[0];
@@ -117,10 +130,4 @@ public class SignUpActivity extends AppCompatActivity {
             return email;
         }
     }
-
-
-
-
-
-
 }

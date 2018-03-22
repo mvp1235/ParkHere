@@ -36,7 +36,7 @@ import java.util.List;
 import static edu.sjsu.team408.parkhere.HomeFragment.VIEW_PARKINGS_CODE;
 
 /**
- * Created by DuocNguyen on 11/1/17.
+ * Activity which shows the results of current available listings in the database
  */
 
 public class SearchResultActivity extends ListActivity {
