@@ -115,7 +115,7 @@ public class SearchInMapActivity extends AppCompatActivity
     /**
      * Styles the polygon, based on type.
      * @param polygon The polygon object that needs styling.
-     * @param haveBeenBookedCount
+     * @param haveBeenBookedCount the count of the parking space having been booked
      */
     private void stylePolygon(Polygon polygon, int haveBeenBookedCount) {
         String type = "";
